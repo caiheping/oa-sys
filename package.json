@@ -1,0 +1,47 @@
+{
+  "name": "crm-vue3",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "serve": "vite preview",
+    "lint": "eslint --ext .js,ts,.vue src --fix"
+  },
+  "dependencies": {
+    "@vueuse/core": "^5.0.2",
+    "all": "^0.0.0",
+    "ant-design-vue": "^2.1.6",
+    "axios": "^0.21.1",
+    "js-cookie": "^2.2.1",
+    "lodash-es": "^4.17.21",
+    "normalize.css": "^8.0.1",
+    "pinia": "2.0.0-alpha.18",
+    "vue": "^3.1.1",
+    "vue-i18n": "^9.1.6",
+    "vue-router": "^4.0.5"
+  },
+  "devDependencies": {
+    "@types/js-cookie": "^2.2.6",
+    "@types/lodash-es": "^4.17.4",
+    "@types/node": "^14.17.1",
+    "@typescript-eslint/eslint-plugin": "^4.22.0",
+    "@typescript-eslint/parser": "^4.22.0",
+    "@vitejs/plugin-vue": "^1.1.5",
+    "@vue/compiler-sfc": "^3.0.5",
+    "eslint": "^7.25.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-define-config": "^1.0.8",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-vue": "^7.9.0",
+    "less": "^4.1.1",
+    "less-loader": "^8.1.1",
+    "prettier": "^2.2.1",
+    "prettier-eslint": "^12.0.0",
+    "typescript": "^4.1.3",
+    "vite": "^2.3.4",
+    "vite-plugin-svg-icons": "^0.6.2",
+    "vite-plugin-windicss": "^0.16.0",
+    "vue-tsc": "^0.0.8",
+    "windicss": "^3.0.12"
+  }
+}
