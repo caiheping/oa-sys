@@ -104,4 +104,24 @@ export default defineComponent({
     color: #fff;
   }
 }
+
+.ant-btn-link {
+  padding: 0;
+  &.ant-btn-success {
+    background: transparent;
+    color: @success-color;
+  }
+  &.ant-btn-warning {
+    background: transparent;
+    color: @warning-color;
+  }
+  &.ant-btn-error {
+    background: transparent;
+    color: @error-color;
+  }
+  &.ant-btn-normal {
+    background: transparent;
+    color: @normal-color;
+  }
+}
 </style>

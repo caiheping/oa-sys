@@ -1,6 +1,6 @@
 import Cookies from "js-cookie";
 
-const TokenKey = "CRM-Token";
+const TokenKey = "OA-Token";
 
 export function getToken() {
   return Cookies.get(TokenKey);

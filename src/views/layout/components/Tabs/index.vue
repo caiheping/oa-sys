@@ -183,7 +183,7 @@ export default defineComponent({
 .spot {
   position: absolute;
   right: 5px;
-  top: 6px;
+  top: 7px;
   border-radius: 50%;
   padding: 1px;
   background: #fff;
