@@ -1,0 +1,193 @@
+<template>
+  <!-- 简单的表单封装 -->
+  <!-- 操作推窗 -->
+  <a-drawer
+    width="50%"
+    :title="title"
+    placement="right"
+    v-model:visible="isOpen"
+    @close="handleCancel"
+    :maskClosable="false"
+  >
+    <a-form
+      ref="formRef"
+      :labelCol="labelCol"
+      :wrapperCol="wrapperCol"
+      :model="formState"
+      :rules="rules"
+    >
+      <a-row>
+        <a-col :span="12" v-for="(item, index) in formDataList" :key="index">
+          <a-form-item :label="item.label" :name="item.label">
+            <a-input
+              v-if="item.type === 'input'"
+              v-model:value="item.value"
+              :placeholder="item.placeholder"
+            />
+            <a-input-number
+              v-else-if="item.type === 'input-number'"
+              class="!w-[100%]"
+              v-model:value="item.value"
+              :placeholder="item.placeholder"
+            />
+            <a-cascader
+              v-else-if="item.type === 'cascader'"
+              :options="item.options ? item.options : []"
+              v-model:value="item.value"
+              :placeholder="item.placeholder"
+            />
+            <a-checkbox-group
+              v-else-if="item.type === 'checkbox-group'"
+              v-model:value="item.value"
+              :name="item.name"
+              :options="item.options ? item.options : []"
+            />
+            <a-radio-group
+              v-else-if="item.type === 'radio-group'"
+              v-model:value="item.value"
+              :name="item.name"
+              :options="item.options ? item.options : []"
+            />
+            <a-date-picker
+              v-else-if="item.type === 'date-picker'"
+              v-model:value="item.value"
+              :placeholder="item.placeholder"
+            />
+            <a-month-picker
+              v-else-if="item.type === 'month-picker'"
+              v-model:value="item.value"
+              :placeholder="item.placeholder"
+            />
+            <a-range-picker
+              v-else-if="item.type === 'range-picker'"
+              v-model:value="item.value"
+            />
+            <a-week-picker
+              v-else-if="item.type === 'week-picker'"
+              v-model:value="item.value"
+              :placeholder="item.placeholder"
+            />
+            <a-time-picker
+              v-else-if="item.type === 'time-picker'"
+              v-model:value="item.value"
+              :format="item.format ? item.format : 'HH:mm'"
+            />
+            <a-rate
+              v-else-if="item.type === 'rate'"
+              v-model:value="item.value"
+            />
+            <a-select
+              v-else-if="item.type === 'select'"
+              :mode="item.mode ? item.mode : 'tags'"
+              :placeholder="item.placeholder"
+              v-model:value="item.value"
+            >
+              <a-select-option
+                :value="list.value"
+                v-for="(list, i) in item.options"
+                :key="i"
+              >
+                {{ list.value }}
+              </a-select-option>
+            </a-select>
+            <a-slider
+              v-else-if="item.type === 'slider'"
+              v-model:value="item.value"
+              :min="item.min ? item.min : 0"
+              :max="item.max ? item.max : 100"
+            />
+            <a-switch
+              v-else-if="item.type === 'switch'"
+              v-model:checked="item.value"
+            />
+          </a-form-item>
+        </a-col>
+      </a-row>
+    </a-form>
+    <div>
+      <a-button type="primary" class="mr-3">确认</a-button>
+      <a-button @click="handleCancel">取消</a-button>
+    </div>
+  </a-drawer>
+</template>
+
+<script lang="ts">
+import { defineComponent, reactive, ref, UnwrapRef, toRaw, computed } from 'vue'
+import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
+
+interface FormState {
+  name: string
+}
+
+export default defineComponent({
+  props: {
+    open: {
+      type: Boolean,
+      required: true,
+    },
+    formData: {
+      type: Array,
+      required: true,
+    },
+    title: {
+      type: String,
+      required: true,
+    },
+  },
+  emits: ['close'],
+  setup(props, { emit, attrs }) {
+    console.log(props, emit, attrs)
+    // 新增修改表单操作
+    const formRef = ref()
+    const checkedKeys = ref<string[]>([])
+    const selectedKeys = ref<string[]>([])
+    const formState: UnwrapRef<FormState> = reactive({
+      name: '',
+    })
+    const rules = {
+      name: [
+        {
+          required: true,
+          message: '请输入角色名称',
+          trigger: 'blur',
+        },
+      ],
+    }
+    const onSubmit = () => {
+      formRef.value
+        .validate()
+        .then(() => {
+          console.log('values', formState, toRaw(formState))
+        })
+        .catch((error: ValidateErrorEntity<FormState>) => {
+          console.log('error', error)
+        })
+    }
+    const resetForm = () => {
+      formRef.value.resetFields()
+    }
+
+    const handleCancel = () => {
+      emit('close')
+    }
+
+    const isOpen = computed(() => props.open)
+
+    const formDataList = computed(() => props.formData)
+
+    return {
+      isOpen,
+      formDataList,
+      labelCol: { span: 6 },
+      wrapperCol: { span: 18 },
+      rules,
+      formState,
+      checkedKeys,
+      selectedKeys,
+      onSubmit,
+      resetForm,
+      handleCancel,
+    }
+  },
+})
+</script>

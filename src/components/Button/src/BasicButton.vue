@@ -64,9 +64,13 @@ export default defineComponent({
   border-color: @success-color;
   color: #fff;
   &:hover {
+    opacity: 0.6;
+  }
+  &:hover,
+  &:focus,
+  &:active {
     background-color: @success-color;
     border-color: @success-color;
-    opacity: 0.6;
     color: #fff;
   }
 }
@@ -75,9 +79,13 @@ export default defineComponent({
   border-color: @warning-color;
   color: #fff;
   &:hover {
+    opacity: 0.6;
+  }
+  &:hover,
+  &:focus,
+  &:active {
     background-color: @warning-color;
     border-color: @warning-color;
-    opacity: 0.6;
     color: #fff;
   }
 }
@@ -86,9 +94,13 @@ export default defineComponent({
   border-color: @error-color;
   color: #fff;
   &:hover {
+    opacity: 0.6;
+  }
+  &:hover,
+  &:focus,
+  &:active {
     background-color: @error-color;
     border-color: @error-color;
-    opacity: 0.6;
     color: #fff;
   }
 }
@@ -98,9 +110,13 @@ export default defineComponent({
   border-color: @normal-color;
   color: #fff;
   &:hover {
+    opacity: 0.6;
+  }
+  &:hover,
+  &:focus,
+  &:active {
     background-color: @normal-color;
     border-color: @normal-color;
-    opacity: 0.6;
     color: #fff;
   }
 }

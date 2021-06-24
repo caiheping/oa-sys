@@ -101,7 +101,7 @@
 
     <!-- 新增修改用户 -->
     <a-drawer
-      :width="720"
+      width="50%"
       title="Basic Drawer"
       placement="right"
       v-model:visible="open"

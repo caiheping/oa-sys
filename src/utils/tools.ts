@@ -32,6 +32,11 @@ export function handleTree(data: [], id = 'id', parentId = 'parentId', children 
       tree.push(list)
     }
   })
+  Object.keys(obj).forEach(key => {
+    if (!obj[key].children.length) {
+      delete obj[key].children
+    }
+  });
   return {
     tree,
     obj

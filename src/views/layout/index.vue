@@ -17,8 +17,8 @@
       marginLeft: isMobile
         ? '0px'
         : collapsed
-        ? '80px'
-        : sideBarConfig.width + 'px',
+          ? '80px'
+          : sideBarConfig.width + 'px',
     }"
   >
     <div class="header" :style="headerStyle">
@@ -130,6 +130,7 @@ export default defineComponent({
   box-sizing: border-box;
   transition: all 0.3s cubic-bezier(0.2, 0, 0, 1) 0s;
   position: relative;
+  height: 100vh;
   &::-webkit-scrollbar {
     width: 8px;
     height: 8px;
