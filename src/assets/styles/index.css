@@ -6,6 +6,21 @@
   vertical-align: text-top;
   line-height: 0 !important;
 }
+.ant-time-picker-panel-select::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.ant-time-picker-panel-select::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+.ant-time-picker-panel-select::-webkit-scrollbar-thumb {
+  background-color: rgba(144, 147, 153, 0.3);
+  border-radius: 8px;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.2);
+}
+.ant-time-picker-panel-select::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.3);
+}
 body,
 h1,
 h2,
@@ -87,4 +102,12 @@ div:focus {
 .fade-transform-leave-to {
   opacity: 0;
   transform: translateX(30px);
+}
+.vue-treeselect__control {
+  border-radius: 2px !important;
+  line-height: 32px !important;
+  height: 32px !important;
+}
+.vue-treeselect--searchable .vue-treeselect__input-container {
+  height: 32px !important;
 }

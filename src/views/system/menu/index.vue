@@ -5,7 +5,6 @@
         <a-button color="success" @click="isOpen = !isOpen">新增</a-button>
       </a-col>
     </a-row>
-
     <a-table
       rowKey="id"
       :columns="columns"
@@ -23,11 +22,12 @@
       </template>
     </a-table>
 
-    <addOrUpdate
+    <BaseForm
       :open="isOpen"
       :title="drawerTitle"
-      @close="handleClose"
       :formData="formData"
+      @close="handleClose"
+      @submit="handleSubmit"
     />
   </div>
 </template>
@@ -42,7 +42,8 @@ import {
   updateMenu,
 } from '@/api/admin/system/menu'
 import { handleTree } from '@/utils/tools'
-import addOrUpdate from './BaseForm.vue'
+import BaseForm from './BaseForm.vue'
+
 const columns = [
   {
     title: '菜单名称',
@@ -89,7 +90,7 @@ const columns = [
 
 export default defineComponent({
   components: {
-    addOrUpdate,
+    BaseForm,
   },
   setup() {
     const menuList = ref([])
@@ -100,14 +101,57 @@ export default defineComponent({
     }
 
     const isOpen = ref(false)
-    const drawerTitle = ref('新增')
+    const drawerTitle = ref('新增菜单')
     const formData = reactive([
       {
-        type: 'input',
-        label: 'input',
-        name: 'name',
-        value: '',
-        placeholder: 'input',
+        type: 'treeselect',
+        label: '上级菜单',
+        name: 'menuId',
+        value: null,
+        placeholder: '请选择上级菜单',
+        options: [
+          {
+            id: 'a',
+            label: 'a',
+            children: [
+              {
+                id: 'aa',
+                label: 'aa',
+              },
+              {
+                id: 'ab',
+                label: 'ab',
+              },
+            ],
+          },
+          {
+            id: 'b',
+            label: 'b',
+          },
+        ],
+      },
+      {
+        type: 'radio-group',
+        label: '菜单类型',
+        name: 'menuType',
+        value: 'M',
+        options: [
+          { label: '目录', value: 'M' },
+          { label: '菜单', value: 'C' },
+          { label: '按钮', value: 'F' },
+        ],
+        fn: {
+          change: () => {
+            console.log(formData)
+          },
+        },
+      },
+      {
+        type: 'IconSelect',
+        label: 'IconSelect',
+        name: 'IconSelect',
+        value: 'search',
+        placeholder: 'IconSelect',
       },
       {
         type: 'input-number',
@@ -146,6 +190,11 @@ export default defineComponent({
           ,
           { label: 'fjkdls', value: '2' },
         ],
+        fn: {
+          change: () => {
+            console.log(formData)
+          },
+        },
       },
       {
         type: 'date-picker',
@@ -225,6 +274,10 @@ export default defineComponent({
       isOpen.value = false
     }
 
+    const handleSubmit = () => {
+      console.log(formData)
+    }
+
     return {
       menuList,
       columns,
@@ -233,6 +286,7 @@ export default defineComponent({
       drawerTitle,
       formData,
       handleClose,
+      handleSubmit,
     }
   },
 })

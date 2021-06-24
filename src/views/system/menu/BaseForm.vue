@@ -17,11 +17,28 @@
       :rules="rules"
     >
       <a-row>
-        <a-col :span="12" v-for="(item, index) in formDataList" :key="index">
+        <a-col
+          :span="12"
+          v-for="(item, index) in formDataList"
+          :key="index"
+          v-show="!item.hidden"
+        >
           <a-form-item :label="item.label" :name="item.label">
             <a-input
               v-if="item.type === 'input'"
               v-model:value="item.value"
+              :placeholder="item.placeholder"
+            />
+            <treeselect
+              v-if="item.type === 'treeselect'"
+              class="!mt-[3px]"
+              v-model="item.value"
+              :placeholder="item.placeholder"
+              :options="item.options ? item.options : []"
+            />
+            <IconSelect
+              v-if="item.type === 'IconSelect'"
+              :value="item.value"
               :placeholder="item.placeholder"
             />
             <a-input-number
@@ -47,6 +64,7 @@
               v-model:value="item.value"
               :name="item.name"
               :options="item.options ? item.options : []"
+              @change="item.fn.change"
             />
             <a-date-picker
               v-else-if="item.type === 'date-picker'"
@@ -105,7 +123,9 @@
       </a-row>
     </a-form>
     <div>
-      <a-button type="primary" class="mr-3">确认</a-button>
+      <a-button type="primary" class="mr-3" @click="handleSubmit">
+        确认
+      </a-button>
       <a-button @click="handleCancel">取消</a-button>
     </div>
   </a-drawer>
@@ -113,13 +133,20 @@
 
 <script lang="ts">
 import { defineComponent, reactive, ref, UnwrapRef, toRaw, computed } from 'vue'
+import IconSelect from '@/components/IconSelect/index.vue'
 import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
+import Treeselect from 'vue3-treeselect'
+import 'vue3-treeselect/dist/vue3-treeselect.css'
 
 interface FormState {
   name: string
 }
 
 export default defineComponent({
+  components: {
+    Treeselect,
+    IconSelect,
+  },
   props: {
     open: {
       type: Boolean,
@@ -134,7 +161,7 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ['close'],
+  emits: ['close', 'submit'],
   setup(props, { emit, attrs }) {
     console.log(props, emit, attrs)
     // 新增修改表单操作
@@ -171,6 +198,10 @@ export default defineComponent({
       emit('close')
     }
 
+    const handleSubmit = () => {
+      emit('submit')
+    }
+
     const isOpen = computed(() => props.open)
 
     const formDataList = computed(() => props.formData)
@@ -187,6 +218,7 @@ export default defineComponent({
       onSubmit,
       resetForm,
       handleCancel,
+      handleSubmit,
     }
   },
 })
