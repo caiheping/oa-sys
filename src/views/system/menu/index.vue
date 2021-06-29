@@ -2,7 +2,7 @@
   <div class="p-4">
     <a-row :gutter="10" class="mb-2">
       <a-col>
-        <a-button color="success" @click="isOpen = !isOpen">新增</a-button>
+        <a-button color="success" @click="handleAdd">新增</a-button>
       </a-col>
     </a-row>
     <a-table
@@ -13,22 +13,186 @@
     >
       <template #action="{ record }">
         <span>
-          <a-button type="link" color="success" class="mr-3">新增</a-button>
-          <a-button type="link" color="success" class="mr-3">
-            修改1{{ record.name }}
+          <a-button
+            type="link"
+            color="success"
+            class="mr-3"
+            @click="handleAdd(record)"
+          >
+            新增
           </a-button>
-          <a-button type="link" color="error">删除</a-button>
+          <a-button
+            type="link"
+            color="success"
+            class="mr-3"
+            @click="handleUpdate(record)"
+          >
+            修改
+          </a-button>
+          <a-popconfirm
+            title="确定要删除改数据吗？"
+            ok-text="确定"
+            cancel-text="取消"
+            @confirm="confirm(record)"
+            @cancel="cancel"
+          >
+            <a-button type="link" color="error"> 删除 </a-button>
+          </a-popconfirm>
         </span>
       </template>
     </a-table>
 
-    <BaseForm
-      :open="isOpen"
+    <!-- 操作推窗 -->
+    <a-drawer
+      width="50%"
       :title="drawerTitle"
-      :formData="formData"
+      placement="right"
+      v-model:visible="open"
+      :maskClosable="false"
       @close="handleClose"
-      @submit="handleSubmit"
-    />
+    >
+      <a-form
+        v-if="open"
+        ref="formRef"
+        :model="formState"
+        :rules="rules"
+        :label-col="labelCol"
+        :wrapper-col="wrapperCol"
+      >
+        <a-row>
+          <a-col :span="12">
+            <a-form-item label="上级菜单" name="parentId">
+              <treeselect
+                class="!mt-[3px]"
+                v-model="formState.parentId"
+                :normalizer="normalizer"
+                placeholder="请选择上级菜单"
+                :options="treeOption"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="菜单类型" name="menuType">
+              <a-radio-group
+                v-model:value="formState.menuType"
+                name="menuType"
+                :options="[
+                  { label: '目录', value: 'M' },
+                  { label: '菜单', value: 'C' },
+                  { label: '按钮', value: 'F' },
+                ]"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="图标" name="icon">
+              <IconSelect
+                v-model:value="formState.icon"
+                placeholder="选择图标"
+                @change="handleIconChange"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="菜单名称" name="title">
+              <a-input
+                v-model:value="formState.title"
+                placeholder="请输入菜单名称"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="显示排序" name="orderNum">
+              <a-input-number
+                class="!w-[100%]"
+                v-model:value="formState.orderNum"
+                placeholder="请输入显示排序"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="路由地址" name="path">
+              <a-input
+                v-model:value="formState.path"
+                placeholder="请输入路由地址"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="组件名" name="component">
+              <a-input
+                v-model:value="formState.component"
+                placeholder="请输入组件名"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="权限标识" name="perms">
+              <a-input
+                v-model:value="formState.perms"
+                placeholder="请输入权限标识"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="显示隐藏" name="visible">
+              <a-radio-group
+                v-model:value="formState.visible"
+                name="menuType"
+                :options="[
+                  { label: '显示', value: '1' },
+                  { label: '隐藏', value: '0' },
+                ]"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="菜单状态" name="status">
+              <a-radio-group
+                v-model:value="formState.status"
+                name="menuType"
+                :options="[
+                  { label: '正常', value: '1' },
+                  { label: '停用', value: '0' },
+                ]"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="是否缓存" name="keepAlive">
+              <a-radio-group
+                v-model:value="formState.keepAlive"
+                name="menuType"
+                :options="[
+                  { label: '缓存', value: 1 },
+                  { label: '不缓存', value: 0 },
+                ]"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="是否外链" name="isFrame">
+              <a-radio-group
+                v-model:value="formState.isFrame"
+                name="menuType"
+                :options="[
+                  { label: '是', value: '1' },
+                  { label: '否', value: '0' },
+                ]"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="24">
+            <a-form-item>
+              <a-button type="primary" class="mr-3" @click="handleSubmit">
+                确认
+              </a-button>
+              <a-button @click="handleClose">取消</a-button>
+            </a-form-item>
+          </a-col>
+        </a-row>
+      </a-form>
+    </a-drawer>
   </div>
 </template>
 
@@ -42,7 +206,10 @@ import {
   updateMenu,
 } from '@/api/admin/system/menu'
 import { handleTree } from '@/utils/tools'
-import BaseForm from './BaseForm.vue'
+import { message as Message } from 'ant-design-vue'
+import IconSelect from '@/components/IconSelect/index.vue'
+import Treeselect from 'vue3-treeselect'
+import 'vue3-treeselect/dist/vue3-treeselect.css'
 
 const columns = [
   {
@@ -90,178 +257,58 @@ const columns = [
 
 export default defineComponent({
   components: {
-    BaseForm,
+    IconSelect,
+    Treeselect,
   },
   setup() {
+    const rules = {
+      name: [
+        {
+          required: true,
+          message: '请输入角色名称',
+          trigger: 'blur',
+        },
+      ],
+    }
+    const formRef = ref()
     const menuList = ref([])
+    const treeOption = ref([
+      {
+        id: 0,
+        title: '主目录',
+        children: [],
+      },
+    ])
     const getMenuList = () => {
       getMenu().then((res) => {
         menuList.value = handleTree(res.data.rows, 'id', 'parentId').tree
+        treeOption.value[0].children = handleTree(res.data.rows, 'id').tree
       })
     }
-
-    const isOpen = ref(false)
-    const drawerTitle = ref('新增菜单')
-    const formData = reactive([
-      {
-        type: 'treeselect',
-        label: '上级菜单',
-        name: 'menuId',
-        value: null,
-        placeholder: '请选择上级菜单',
-        options: [
-          {
-            id: 'a',
-            label: 'a',
-            children: [
-              {
-                id: 'aa',
-                label: 'aa',
-              },
-              {
-                id: 'ab',
-                label: 'ab',
-              },
-            ],
-          },
-          {
-            id: 'b',
-            label: 'b',
-          },
-        ],
-      },
-      {
-        type: 'radio-group',
-        label: '菜单类型',
-        name: 'menuType',
-        value: 'M',
-        options: [
-          { label: '目录', value: 'M' },
-          { label: '菜单', value: 'C' },
-          { label: '按钮', value: 'F' },
-        ],
-        fn: {
-          change: () => {
-            console.log(formData)
-          },
-        },
-      },
-      {
-        type: 'IconSelect',
-        label: 'IconSelect',
-        name: 'IconSelect',
-        value: 'search',
-        placeholder: 'IconSelect',
-      },
-      {
-        type: 'input-number',
-        label: 'input-number',
-        name: 'name',
-        value: '',
-        placeholder: 'input-number',
-      },
-      {
-        type: 'cascader',
-        label: 'cascader',
-        name: 'cascader',
-        value: [],
-        placeholder: 'cascader',
-        options: [],
-      },
-      {
-        type: 'checkbox-group',
-        label: 'chegroup',
-        name: 'checkbox-group',
-        value: [1, 2],
-        placeholder: 'checkbox-group',
-        options: [
-          { label: 'Apple', value: 1 },
-          { label: 'fjkdls', value: 2 },
-        ],
-      },
-      {
-        type: 'radio-group',
-        label: 'radio-group',
-        name: 'radio-group',
-        value: '1',
-        placeholder: 'radio-group',
-        options: [
-          { label: 'Apple', value: '1' },
-          ,
-          { label: 'fjkdls', value: '2' },
-        ],
-        fn: {
-          change: () => {
-            console.log(formData)
-          },
-        },
-      },
-      {
-        type: 'date-picker',
-        label: 'date-picker',
-        name: 'date-picker',
-        value: '',
-        placeholder: 'date-picker',
-      },
-      {
-        type: 'month-picker',
-        label: 'month-picker',
-        name: 'month-picker',
-        value: '',
-        placeholder: 'month-picker',
-      },
-      {
-        type: 'range-picker',
-        label: 'range-picker',
-        name: 'range-picker',
-        value: [],
-        placeholder: 'range-picker',
-      },
-      {
-        type: 'week-picker',
-        label: 'week-picker',
-        name: 'week-picker',
-        value: '',
-        placeholder: 'week-picker',
-      },
-      {
-        type: 'time-picker',
-        label: 'time-picker',
-        name: 'time-picker',
-        value: '',
-        placeholder: 'time-picker',
-      },
-      {
-        type: 'rate',
-        label: 'rate',
-        name: 'rate',
-        value: 2,
-        placeholder: 'rate',
-      },
-      {
-        type: 'select',
-        label: 'select',
-        name: 'select',
-        value: [],
-        placeholder: 'select',
-        options: [],
-      },
-      {
-        type: 'slider',
-        label: 'slider',
-        name: 'slider',
-        value: 20,
-        placeholder: 'slider',
-      },
-      {
-        type: 'switch',
-        label: 'switch',
-        name: 'switch',
-        value: false,
-        placeholder: 'switch',
-      },
-    ])
-
+    const normalizer = (node) => {
+      return {
+        id: node.id,
+        label: node.title,
+        children: node.children,
+      }
+    }
+    const open = ref(false)
+    const drawerTitle = ref('')
+    const formState = reactive({
+      id: null,
+      parentId: 0,
+      menuType: 'M',
+      icon: '',
+      title: '',
+      orderNum: '',
+      path: '',
+      component: '',
+      perms: '',
+      visible: '1',
+      status: '1',
+      keepAlive: '1',
+      isFrame: '0',
+    })
     const init = () => {
       getMenuList()
     }
@@ -269,24 +316,88 @@ export default defineComponent({
     onMounted(() => {
       init()
     })
-
     const handleClose = () => {
-      isOpen.value = false
+      formState.id = null
+      formRef.value.resetFields()
+      open.value = false
     }
 
     const handleSubmit = () => {
-      console.log(formData)
+      console.log(formState.id)
+      if (formState.id) {
+        updateMenu(formState).then((res) => {
+          Message.success(res.message)
+          getMenuList()
+          open.value = false
+        })
+      } else {
+        addMenu(formState).then((res) => {
+          console.log(res)
+          Message.success(res.message)
+          getMenuList()
+          open.value = false
+        })
+      }
+    }
+
+    const confirm = (row) => {
+      delMenu(row.id).then(() => {
+        getMenuList()
+        Message.success('删除成功')
+      })
+    }
+
+    const cancel = (e: MouseEvent) => {
+      console.log(e)
+      Message.success('取消删除')
+    }
+
+    /** 新增按钮操作 */
+    const handleAdd = (row) => {
+      console.log(formState)
+      if (row != null && row.id) {
+        formState.parentId = row.id
+      }
+      console.log(row.id)
+      open.value = true
+      drawerTitle.value = '添加菜单'
+    }
+    /** 新增按钮操作 */
+    const handleUpdate = (row) => {
+      getMenuById(row.id).then((res) => {
+        Object.keys(formState).forEach((key) => {
+          formState[key] = res.data[key]
+        })
+        open.value = true
+        drawerTitle.value = '修改菜单'
+      })
+    }
+
+    const handleIconChange = (val) => {
+      formState.icon = val
+      console.log(val)
     }
 
     return {
       menuList,
+      confirm,
+      cancel,
       columns,
-      getMenuList,
-      isOpen,
+      handleAdd,
+      handleUpdate,
+
+      open,
       drawerTitle,
-      formData,
       handleClose,
       handleSubmit,
+      formState,
+      labelCol: { span: 6 },
+      wrapperCol: { span: 18 },
+      normalizer,
+      treeOption,
+      rules,
+      formRef,
+      handleIconChange,
     }
   },
 })

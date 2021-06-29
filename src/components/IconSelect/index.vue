@@ -3,7 +3,7 @@
     <a-select
       v-model:value="selected"
       style="width: 100%"
-      placeholder="select one country"
+      placeholder="请选择图标"
       option-label-prop="label"
       @change="handleChange"
     >
@@ -30,17 +30,20 @@ import { ref, defineComponent } from 'vue'
 import icons from './requireIcon'
 export default defineComponent({
   props: ['value'],
-  setup(props) {
-    console.log(icons)
+  emits: ['change'],
+  setup(props, { emit }) {
     const selected = ref(props.value)
-
     const handleChange = (val) => {
-      console.log(val)
+      emit('change', val)
+    }
+    const reset = () => {
+      selected.value = ''
     }
     return {
       icons,
       selected,
       handleChange,
+      reset,
     }
   },
 })
