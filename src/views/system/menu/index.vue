@@ -11,6 +11,16 @@
       :data-source="menuList"
       :defaultExpandAllRows="true"
     >
+      <template #icon="{ record }">
+        <div class="flex justify-center">
+          <svg-icon :name="record.icon" />
+        </div>
+      </template>
+      <template #status="{ record }">
+        <div class="flex justify-center">
+          <span>{{ record.status === '1' ? '正常' : '停用' }}</span>
+        </div>
+      </template>
       <template #action="{ record }">
         <span>
           <a-button
@@ -221,31 +231,39 @@ const columns = [
     title: '图标',
     dataIndex: 'icon',
     key: 'icon',
+    align: 'center',
+    slots: { customRender: 'icon' },
   },
   {
     title: '排序',
     dataIndex: 'orderNum',
     key: 'orderNum',
+    align: 'center',
   },
   {
     title: '权限标识',
     dataIndex: 'perms',
     key: 'perms',
+    align: 'center',
   },
   {
     title: '组件名',
     dataIndex: 'component',
     key: 'component',
+    align: 'center',
   },
   {
     title: '状态',
     dataIndex: 'status',
     key: 'status',
+    align: 'center',
+    slots: { customRender: 'status' },
   },
   {
     title: '创建时间',
     dataIndex: 'createdAt',
     key: 'createdAt',
+    align: 'center',
   },
   {
     title: '操作',
