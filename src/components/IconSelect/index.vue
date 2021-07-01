@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts">
-import { ref, defineComponent } from 'vue'
+import { ref, defineComponent, watchEffect } from 'vue'
 import icons from './requireIcon'
 export default defineComponent({
   props: ['value'],
@@ -36,6 +36,9 @@ export default defineComponent({
     const handleChange = (val) => {
       emit('change', val)
     }
+    watchEffect(() => {
+      selected.value = props.value
+    })
     const reset = () => {
       selected.value = ''
     }

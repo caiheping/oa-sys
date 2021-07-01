@@ -92,7 +92,7 @@ export default defineComponent({
       return style
     })
     const handleClick = ({ key }: { key: string }) => {
-      console.log(key)
+      // console.log(key)
       router.push({
         name: key,
       })

@@ -73,11 +73,12 @@
           <a-col :span="12">
             <a-form-item label="上级菜单" name="parentId">
               <treeselect
+                ref="treeRef"
                 class="!mt-[3px]"
                 v-model="formState.parentId"
                 :normalizer="normalizer"
                 placeholder="请选择上级菜单"
-                :options="treeOption"
+                :options="treeOptions"
               />
             </a-form-item>
           </a-col>
@@ -95,19 +96,19 @@
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="图标" name="icon">
-              <IconSelect
-                v-model:value="formState.icon"
-                placeholder="选择图标"
-                @change="handleIconChange"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="12">
             <a-form-item label="菜单名称" name="title">
               <a-input
                 v-model:value="formState.title"
                 placeholder="请输入菜单名称"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12" v-if="formState.menuType !== 'F'">
+            <a-form-item label="菜单图标" name="icon">
+              <IconSelect
+                v-model:value="formState.icon"
+                placeholder="选择菜单图标"
+                @change="handleIconChange"
               />
             </a-form-item>
           </a-col>
@@ -120,7 +121,7 @@
               />
             </a-form-item>
           </a-col>
-          <a-col :span="12">
+          <a-col :span="12" v-if="formState.menuType !== 'F'">
             <a-form-item label="路由地址" name="path">
               <a-input
                 v-model:value="formState.path"
@@ -128,7 +129,10 @@
               />
             </a-form-item>
           </a-col>
-          <a-col :span="12">
+          <a-col
+            :span="12"
+            v-if="formState.menuType === 'C' || formState.menuType === 'M'"
+          >
             <a-form-item label="组件名" name="component">
               <a-input
                 v-model:value="formState.component"
@@ -136,7 +140,7 @@
               />
             </a-form-item>
           </a-col>
-          <a-col :span="12">
+          <a-col :span="12" v-if="formState.menuType === 'F'">
             <a-form-item label="权限标识" name="perms">
               <a-input
                 v-model:value="formState.perms"
@@ -144,8 +148,8 @@
               />
             </a-form-item>
           </a-col>
-          <a-col :span="12">
-            <a-form-item label="显示隐藏" name="visible">
+          <a-col :span="12" v-if="formState.menuType !== 'F'">
+            <a-form-item label="显示状态" name="visible">
               <a-radio-group
                 v-model:value="formState.visible"
                 name="menuType"
@@ -168,7 +172,7 @@
               />
             </a-form-item>
           </a-col>
-          <a-col :span="12">
+          <a-col :span="12" v-if="formState.menuType !== 'F'">
             <a-form-item label="是否缓存" name="keepAlive">
               <a-radio-group
                 v-model:value="formState.keepAlive"
@@ -180,7 +184,7 @@
               />
             </a-form-item>
           </a-col>
-          <a-col :span="12">
+          <a-col :span="12" v-if="formState.menuType !== 'F'">
             <a-form-item label="是否外链" name="isFrame">
               <a-radio-group
                 v-model:value="formState.isFrame"
@@ -207,7 +211,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, reactive, ref } from 'vue'
+import { defineComponent, onMounted, reactive, ref, nextTick } from 'vue'
+import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
 import {
   getMenu,
   getMenuById,
@@ -219,8 +224,11 @@ import { handleTree } from '@/utils/tools'
 import { message as Message } from 'ant-design-vue'
 import IconSelect from '@/components/IconSelect/index.vue'
 import Treeselect from 'vue3-treeselect'
+import { formRules } from '@/utils/validate'
+import useDrawer from '@/hooks/useDrawer'
 import 'vue3-treeselect/dist/vue3-treeselect.css'
 
+// 表头配置
 const columns = [
   {
     title: '菜单名称',
@@ -279,30 +287,30 @@ export default defineComponent({
     Treeselect,
   },
   setup() {
+    const treeRef = ref()
     const rules = {
-      name: [
+      parentId: [
         {
           required: true,
-          message: '请输入角色名称',
+          validator: formRules.number,
+          message: '上级菜单不能为空',
+          trigger: 'change',
+        },
+      ],
+      title: [{ required: true, message: '菜单名称不能为空', trigger: 'blur' }],
+      orderNum: [
+        {
+          required: true,
+          validator: formRules.number,
+          message: '显示排序不能为空',
           trigger: 'blur',
         },
       ],
+      path: [{ required: true, message: '路由地址不能为空', trigger: 'blur' }],
+      component: [{ required: true, message: '组件不能为空', trigger: 'blur' }],
+      perms: [{ required: true, message: '权限标识不能为空', trigger: 'blur' }],
     }
     const formRef = ref()
-    const menuList = ref([])
-    const treeOption = ref([
-      {
-        id: 0,
-        title: '主目录',
-        children: [],
-      },
-    ])
-    const getMenuList = () => {
-      getMenu().then((res) => {
-        menuList.value = handleTree(res.data.rows, 'id', 'parentId').tree
-        treeOption.value[0].children = handleTree(res.data.rows, 'id').tree
-      })
-    }
     const normalizer = (node) => {
       return {
         id: node.id,
@@ -310,91 +318,117 @@ export default defineComponent({
         children: node.children,
       }
     }
-    const open = ref(false)
-    const drawerTitle = ref('')
+
+    // 获取菜单树
+    const treeOptions = ref([
+      {
+        id: 0,
+        title: '主目录',
+        children: [],
+      },
+    ])
+    const menuList = ref([])
+    // 获取菜单列表/转成树格式
+    const getMenuList = () => {
+      getMenu().then((res) => {
+        menuList.value = handleTree(res.data.rows, 'id', 'parentId').tree
+        treeOptions.value[0].children = handleTree(res.data.rows, 'id').tree
+      })
+    }
     const formState = reactive({
       id: null,
-      parentId: 0,
+      parentId: null,
       menuType: 'M',
       icon: '',
       title: '',
-      orderNum: '',
+      orderNum: '1',
       path: '',
       component: '',
       perms: '',
       visible: '1',
       status: '1',
-      keepAlive: '1',
+      keepAlive: 1,
       isFrame: '0',
     })
-    const init = () => {
-      getMenuList()
-    }
-
-    onMounted(() => {
-      init()
-    })
+    // 取消推窗
+    const { open, drawerTitle } = useDrawer()
     const handleClose = () => {
       formState.id = null
       formRef.value.resetFields()
       open.value = false
     }
-
+    // 表单提交
     const handleSubmit = () => {
-      console.log(formState.id)
-      if (formState.id) {
-        updateMenu(formState).then((res) => {
-          Message.success(res.message)
-          getMenuList()
-          open.value = false
+      formRef.value
+        .validate()
+        .then(() => {
+          if (formState.id) {
+            updateMenu(formState).then((res) => {
+              Message.success(res.message)
+              getMenuList()
+              open.value = false
+            })
+          } else {
+            addMenu(formState).then((res) => {
+              Message.success(res.message)
+              getMenuList()
+              open.value = false
+            })
+          }
         })
-      } else {
-        addMenu(formState).then((res) => {
-          console.log(res)
-          Message.success(res.message)
-          getMenuList()
-          open.value = false
+        .catch((error: ValidateErrorEntity) => {
+          console.log('error', error)
         })
-      }
     }
-
+    // 确认删除
     const confirm = (row) => {
       delMenu(row.id).then(() => {
         getMenuList()
         Message.success('删除成功')
       })
     }
-
+    // 取消删除
     const cancel = (e: MouseEvent) => {
       console.log(e)
       Message.success('取消删除')
     }
 
-    /** 新增按钮操作 */
+    // 新增按钮操作
     const handleAdd = (row) => {
-      console.log(formState)
-      if (row != null && row.id) {
-        formState.parentId = row.id
-      }
-      console.log(row.id)
       open.value = true
       drawerTitle.value = '添加菜单'
+      if (row != null && row.id) {
+        nextTick(() => {
+          formState.parentId = row.id
+          treeRef.value.forest.selectedNodeIds.push(row.id)
+        })
+      }
     }
-    /** 新增按钮操作 */
+    // 更新按钮操作
     const handleUpdate = (row) => {
       getMenuById(row.id).then((res) => {
-        Object.keys(formState).forEach((key) => {
-          formState[key] = res.data[key]
-        })
         open.value = true
         drawerTitle.value = '修改菜单'
+        nextTick(() => {
+          Object.keys(formState).forEach((key) => {
+            formState[key] = res.data[key]
+          })
+          treeRef.value.forest.selectedNodeIds.push(res.data.parentId)
+        })
       })
     }
-
+    // 表单图标改变事件
     const handleIconChange = (val) => {
       formState.icon = val
-      console.log(val)
     }
+
+    // 初始化
+    const init = () => {
+      getMenuList()
+    }
+    onMounted(() => {
+      init()
+    })
 
     return {
       menuList,
@@ -412,10 +446,11 @@ export default defineComponent({
       labelCol: { span: 6 },
       wrapperCol: { span: 18 },
       normalizer,
-      treeOption,
+      treeOptions,
       rules,
       formRef,
       handleIconChange,
+      treeRef,
     }
   },
 })
