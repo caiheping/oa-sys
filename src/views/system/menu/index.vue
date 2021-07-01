@@ -79,6 +79,7 @@
                 :normalizer="normalizer"
                 placeholder="请选择上级菜单"
                 :options="treeOptions"
+                @select="handleTreeSelect"
               />
             </a-form-item>
           </a-col>
@@ -395,31 +396,53 @@ export default defineComponent({
 
     // 新增按钮操作
     const handleAdd = (row) => {
-      open.value = true
-      drawerTitle.value = '添加菜单'
-      if (row != null && row.id) {
-        nextTick(() => {
-          formState.parentId = row.id
-          treeRef.value.forest.selectedNodeIds.push(row.id)
+      getMenu().then((res) => {
+        res.data.rows.forEach((item) => {
+          item.isDisabled = false
         })
-      }
+        treeOptions.value[0].children = handleTree(res.data.rows, 'id').tree
+
+        open.value = true
+        drawerTitle.value = '添加菜单'
+        if (row != null && row.id) {
+          nextTick(() => {
+            formState.parentId = row.id
+            treeRef.value.forest.selectedNodeIds.push(row.id)
+          })
+        }
+      })
     }
     // 更新按钮操作
     const handleUpdate = (row) => {
-      getMenuById(row.id).then((res) => {
-        open.value = true
-        drawerTitle.value = '修改菜单'
-        nextTick(() => {
-          Object.keys(formState).forEach((key) => {
-            formState[key] = res.data[key]
+      getMenu().then((res) => {
+        res.data.rows.forEach((item) => {
+          if (item.id === row.id) {
+            item.isDisabled = true
+          } else {
+            item.isDisabled = false
+          }
+        })
+        treeOptions.value[0].children = handleTree(res.data.rows, 'id').tree
+
+        getMenuById(row.id).then((res) => {
+          open.value = true
+          drawerTitle.value = '修改菜单'
+          nextTick(() => {
+            Object.keys(formState).forEach((key) => {
+              formState[key] = res.data[key]
+            })
+            treeRef.value.forest.selectedNodeIds.push(res.data.parentId)
           })
-          treeRef.value.forest.selectedNodeIds.push(res.data.parentId)
         })
       })
     }
     // 表单图标改变事件
     const handleIconChange = (val) => {
       formState.icon = val
+    }
+    // 上级部门选中事件
+    const handleTreeSelect = (node) => {
+      formState.parentId = node.id
     }
 
     // 初始化
@@ -451,6 +474,7 @@ export default defineComponent({
       formRef,
       handleIconChange,
       treeRef,
+      handleTreeSelect,
     }
   },
 })

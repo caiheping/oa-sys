@@ -10,6 +10,7 @@
       <template #suffixIcon>
         <svg-icon :name="selected" size="12" />
       </template>
+      <a-select-option value="无" label="无" />
       <a-select-option
         :value="icon"
         :label="icon"

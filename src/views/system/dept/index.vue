@@ -70,7 +70,7 @@
         :wrapper-col="wrapperCol"
       >
         <a-row>
-          <a-col :span="12" v-if="formState.parentId !== 0">
+          <a-col :span="12" v-show="formState.parentId !== 0">
             <a-form-item label="上级部门" name="parentId">
               <treeselect
                 ref="treeRef"
@@ -79,6 +79,7 @@
                 :normalizer="normalizer"
                 placeholder="请选择上级部门"
                 :options="deptOptions"
+                @select="handleTreeSelect"
               />
             </a-form-item>
           </a-col>
@@ -299,29 +300,76 @@ export default defineComponent({
 
     // 新增按钮操作
     const handleAdd = (row) => {
-      open.value = true
-      drawerTitle.value = '添加部门'
-      if (row != null && row.deptId) {
-        nextTick(() => {
-          formState.parentId = row.deptId
-          if (treeRef.value) {
-            treeRef.value.forest.selectedNodeIds.push(row.deptId)
-          }
+      getDept().then((res) => {
+        res.data.rows.forEach((item) => {
+          item.isDisabled = false
         })
-      }
+        const children = handleTree(
+          res.data.rows,
+          'deptId',
+          'parentId',
+          'children',
+          userStore.userInfo.user.deptId
+        ).tree
+        const parent = res.data.rows.filter(
+          (item) => item.deptId === userStore.userInfo.user.deptId
+        )
+        parent[0].children = children
+        deptList.value = parent
+        deptOptions.value = parent
+
+        open.value = true
+        drawerTitle.value = '添加部门'
+        if (row != null && row.deptId) {
+          nextTick(() => {
+            formState.parentId = row.deptId
+            if (treeRef.value) {
+              treeRef.value.forest.selectedNodeIds.push(row.deptId)
+            }
+          })
+        }
+      })
     }
     // 更新按钮操作
     const handleUpdate = (row) => {
-      getDeptById(row.deptId).then((res) => {
-        open.value = true
-        drawerTitle.value = '修改部门'
-        nextTick(() => {
-          Object.keys(formState).forEach((key) => {
-            formState[key] = res.data[key]
+      getDept().then((res) => {
+        res.data.rows.forEach((item) => {
+          if (item.deptId === row.deptId) {
+            item.isDisabled = true
+          } else {
+            item.isDisabled = false
+          }
+        })
+        const children = handleTree(
+          res.data.rows,
+          'deptId',
+          'parentId',
+          'children',
+          userStore.userInfo.user.deptId
+        ).tree
+        const parent = res.data.rows.filter(
+          (item) => item.deptId === userStore.userInfo.user.deptId
+        )
+        parent[0].children = children
+        deptList.value = parent
+        deptOptions.value = parent
+
+        getDeptById(row.deptId).then((res) => {
+          open.value = true
+          drawerTitle.value = '修改部门'
+          nextTick(() => {
+            Object.keys(formState).forEach((key) => {
+              formState[key] = res.data[key]
+            })
+            treeRef.value.forest.selectedNodeIds.push(res.data.parentId)
           })
-          treeRef.value.forest.selectedNodeIds.push(res.data.parentId)
         })
       })
+    }
+
+    // 上级部门选中事件
+    const handleTreeSelect = (node) => {
+      formState.parentId = node.deptId
     }
 
     // 初始化
@@ -352,6 +400,7 @@ export default defineComponent({
       rules,
       formRef,
       treeRef,
+      handleTreeSelect,
     }
   },
 })

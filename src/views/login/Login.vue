@@ -55,7 +55,7 @@
           html-type="submit"
           size="large"
           style="width: 100%"
-        >{{ t('sys.login.loginButton') }}</a-button
+          >{{ t('sys.login.loginButton') }}</a-button
         >
       </a-form-item>
     </a-form>

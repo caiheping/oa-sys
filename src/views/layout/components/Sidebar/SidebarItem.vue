@@ -1,7 +1,7 @@
 <template>
   <a-sub-menu v-if="item.children && item.children.length" class="subMenu">
     <template #title>
-      <span v-if="item?.meta?.icon !== '#'" class="anticon anticon-pie-chart">
+      <span v-if="item?.meta?.icon" class="anticon anticon-pie-chart">
         <svg-icon :name="item?.meta?.icon" />
       </span>
       <span>{{ item?.meta?.title }}</span>
@@ -9,7 +9,7 @@
     <SidebarItem v-for="list in item.children" :key="list.name" :item="list" />
   </a-sub-menu>
   <a-menu-item v-else class="subMenu">
-    <span v-if="item?.meta?.icon !== '#'" class="anticon anticon-pie-chart">
+    <span v-if="item?.meta?.icon" class="anticon anticon-pie-chart">
       <svg-icon :name="item?.meta?.icon" />
     </span>
     <span>{{ item?.meta?.title }}</span>
@@ -17,9 +17,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent } from 'vue'
 export default defineComponent({
-  name: "SidebarItem",
+  name: 'SidebarItem',
   props: {
     item: {
       type: Object,
@@ -27,7 +27,7 @@ export default defineComponent({
     },
   },
   setup() {
-    return {};
+    return {}
   },
-});
+})
 </script>
