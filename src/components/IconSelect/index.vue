@@ -10,7 +10,7 @@
       <template #suffixIcon>
         <svg-icon :name="selected" size="12" />
       </template>
-      <a-select-option value="无" label="无" />
+      <a-select-option value="" label="无" />
       <a-select-option
         :value="icon"
         :label="icon"
@@ -30,7 +30,12 @@
 import { ref, defineComponent, watchEffect } from 'vue'
 import icons from './requireIcon'
 export default defineComponent({
-  props: ['value'],
+  props: {
+    value: {
+      type: String,
+      required: true,
+    },
+  },
   emits: ['change'],
   setup(props, { emit }) {
     const selected = ref(props.value)

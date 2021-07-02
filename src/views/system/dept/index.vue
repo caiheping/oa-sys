@@ -40,7 +40,7 @@
             修改
           </a-button>
           <a-popconfirm
-            title="确定要删除改数据吗？"
+            title="确定要删除该数据吗？"
             ok-text="确定"
             cancel-text="取消"
             @confirm="confirm(record)"
@@ -231,15 +231,16 @@ export default defineComponent({
     // 获取部门列表
     const getList = () => {
       getDept().then((res) => {
+        // 获取菜单树
         const children = handleTree(
           res.data.rows,
           'deptId',
           'parentId',
           'children',
-          userStore.userInfo.user.deptId
+          userStore.userInfo.deptId
         ).tree
         const parent = res.data.rows.filter(
-          (item) => item.deptId === userStore.userInfo.user.deptId
+          (item) => item.deptId === userStore.userInfo.deptId
         )
         parent[0].children = children
         deptList.value = parent
@@ -271,12 +272,16 @@ export default defineComponent({
             updateDept(formState).then((res) => {
               Message.success(res.message)
               getList()
+              formState.deptId = null
+              formRef.value.resetFields()
               open.value = false
             })
           } else {
             addDept(formState).then((res) => {
               Message.success(res.message)
               getList()
+              formState.deptId = null
+              formRef.value.resetFields()
               open.value = false
             })
           }
@@ -309,10 +314,10 @@ export default defineComponent({
           'deptId',
           'parentId',
           'children',
-          userStore.userInfo.user.deptId
+          userStore.userInfo.deptId
         ).tree
         const parent = res.data.rows.filter(
-          (item) => item.deptId === userStore.userInfo.user.deptId
+          (item) => item.deptId === userStore.userInfo.deptId
         )
         parent[0].children = children
         deptList.value = parent
@@ -345,10 +350,10 @@ export default defineComponent({
           'deptId',
           'parentId',
           'children',
-          userStore.userInfo.user.deptId
+          userStore.userInfo.deptId
         ).tree
         const parent = res.data.rows.filter(
-          (item) => item.deptId === userStore.userInfo.user.deptId
+          (item) => item.deptId === userStore.userInfo.deptId
         )
         parent[0].children = children
         deptList.value = parent

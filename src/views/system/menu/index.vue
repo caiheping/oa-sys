@@ -40,7 +40,7 @@
             修改
           </a-button>
           <a-popconfirm
-            title="确定要删除改数据吗？"
+            title="确定要删除该数据吗？"
             ok-text="确定"
             cancel-text="取消"
             @confirm="confirm(record)"
@@ -135,10 +135,22 @@
             v-if="formState.menuType === 'C' || formState.menuType === 'M'"
           >
             <a-form-item label="组件名" name="component">
-              <a-input
+              <!-- <a-input
                 v-model:value="formState.component"
                 placeholder="请输入组件名"
-              />
+              /> -->
+              <a-select
+                placeholder="请输入组件名"
+                v-model:value="formState.component"
+              >
+                <a-select-option
+                  v-for="item in dynamicComponents"
+                  :key="item"
+                  :value="item"
+                >
+                  {{ item }}
+                </a-select-option>
+              </a-select>
             </a-form-item>
           </a-col>
           <a-col :span="12" v-if="formState.menuType === 'F'">
@@ -222,6 +234,7 @@ import {
   updateMenu,
 } from '@/api/admin/system/menu'
 import { handleTree } from '@/utils/tools'
+import dynamicRouter from '@/router/dynamicRouter'
 import { message as Message } from 'ant-design-vue'
 import IconSelect from '@/components/IconSelect/index.vue'
 import Treeselect from 'vue3-treeselect'
@@ -289,6 +302,8 @@ export default defineComponent({
   },
   setup() {
     const treeRef = ref()
+    console.log(Object.keys(dynamicRouter))
+    const dynamicComponents = ref(Object.keys(dynamicRouter))
     const rules = {
       parentId: [
         {
@@ -330,7 +345,7 @@ export default defineComponent({
     ])
     const menuList = ref([])
     // 获取菜单列表/转成树格式
-    const getMenuList = () => {
+    const getList = () => {
       getMenu().then((res) => {
         menuList.value = handleTree(res.data.rows, 'id', 'parentId').tree
         treeOptions.value[0].children = handleTree(res.data.rows, 'id').tree
@@ -366,13 +381,17 @@ export default defineComponent({
           if (formState.id) {
             updateMenu(formState).then((res) => {
               Message.success(res.message)
-              getMenuList()
+              getList()
+              formState.id = null
+              formRef.value.resetFields()
               open.value = false
             })
           } else {
             addMenu(formState).then((res) => {
               Message.success(res.message)
-              getMenuList()
+              getList()
+              formState.id = null
+              formRef.value.resetFields()
               open.value = false
             })
           }
@@ -384,7 +403,7 @@ export default defineComponent({
     // 确认删除
     const confirm = (row) => {
       delMenu(row.id).then(() => {
-        getMenuList()
+        getList()
         Message.success('删除成功')
       })
     }
@@ -447,7 +466,7 @@ export default defineComponent({
 
     // 初始化
     const init = () => {
-      getMenuList()
+      getList()
     }
     onMounted(() => {
       init()
@@ -466,6 +485,7 @@ export default defineComponent({
       handleClose,
       handleSubmit,
       formState,
+      dynamicComponents,
       labelCol: { span: 6 },
       wrapperCol: { span: 18 },
       normalizer,

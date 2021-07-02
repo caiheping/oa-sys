@@ -11,6 +11,7 @@ const dynamicRouter: IDynamicRouter = {
   Notice: () => import("@/views/system/notice/index.vue"),
   Menu: () => import("@/views/system/menu/index.vue"),
   Dict: () => import("@/views/system/dict/index.vue"),
+  DictData: () => import("@/views/system/dict/data.vue"),
   Dept: () => import("@/views/system/dept/index.vue"),
 };
 

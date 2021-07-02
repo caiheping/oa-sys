@@ -3,24 +3,33 @@
     <div class="mb-3">
       <a-form layout="inline" :model="queryParams">
         <a-form-item label="字典名称">
-          <a-input
-            allowClear="true"
-            v-model:value="queryParams.dictName"
-            placeholder="请输入字典名称"
-          />
-        </a-form-item>
-        <a-form-item label="字典类型">
-          <a-input
-            allowClear="true"
+          <a-select
             v-model:value="queryParams.dictType"
-            placeholder="请输入字典类型"
+            placeholder="字典名称"
+            style="width: 200px"
+            @select="handleQuery"
+          >
+            <a-select-option
+              v-for="item in typeOptions"
+              :key="item.id"
+              :value="item.dictType"
+            >
+              {{ item.dictName }}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item label="字典标签">
+          <a-input
+            allowClear="true"
+            v-model:value="queryParams.dictLabel"
+            placeholder="请输入字典标签"
           />
         </a-form-item>
         <a-form-item label="状态">
           <a-select
             allowClear="true"
             v-model:value="queryParams.status"
-            placeholder="请选择状态"
+            placeholder="数据状态"
             style="width: 200px"
             @select="handleQuery"
           >
@@ -68,11 +77,6 @@
       :data-source="userList"
       :pagination="pagination"
     >
-      <template #dictType="{ record }">
-        <router-link :to="'dictData/' + record.id">
-          <span class="text-[#1890ff]">{{ record.dictType }}</span>
-        </router-link>
-      </template>
       <template #status="{ record }">
         <span>{{ selectDictLabel(statusOptions, record.status) }}</span>
       </template>
@@ -118,18 +122,36 @@
       >
         <a-row>
           <a-col :span="12">
-            <a-form-item label="字典名称" name="dictName">
+            <a-form-item label="字典类型" name="dictType">
               <a-input
-                v-model:value="formState.dictName"
-                placeholder="请输入字典名称"
+                disabled
+                v-model:value="formState.dictType"
+                placeholder="请输入字典类型"
               />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="字典类型" name="dictType">
+            <a-form-item label="字典标签" name="dictLabel">
               <a-input
-                v-model:value="formState.dictType"
-                placeholder="请输入字典类型"
+                v-model:value="formState.dictLabel"
+                placeholder="请输入字典标签"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="字典键值" name="dictValue">
+              <a-input
+                v-model:value="formState.dictValue"
+                placeholder="请输入字典键值"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="显示排序" name="dictSort">
+              <a-input-number
+                class="!w-[100%]"
+                v-model:value="formState.dictSort"
+                placeholder="请输入显示排序"
               />
             </a-form-item>
           </a-col>
@@ -177,13 +199,15 @@ import {
   toRefs,
   computed,
 } from 'vue'
+import { listType, getType } from '@/api/admin/system/dict/type'
 import {
-  listType,
-  getType,
-  delType,
-  addType,
-  updateType,
-} from '@/api/admin/system/dict/type'
+  listData,
+  getDataById,
+  delData,
+  addData,
+  updateData,
+} from '@/api/admin/system/dict/data'
+import { useRoute } from 'vue-router'
 import { getDict, selectDictLabel } from '@/utils/dictFormat'
 import useDrawer from '@/hooks/useDrawer'
 import { message as Message } from 'ant-design-vue'
@@ -191,25 +215,32 @@ import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
 
 interface FormState {
   id: null | number
-  dictName: string
-  dictType: string | number
+  dictType: string | undefined
+  dictValue: string
+  dictLabel: string
+  dictSort: number
   status: string
   remark: string
 }
 
 const columns = [
   {
-    title: '字典名称',
-    dataIndex: 'dictName',
-    key: 'dictName',
+    title: '字典标签',
+    dataIndex: 'dictLabel',
+    key: 'dictLabel',
     align: 'center',
   },
   {
-    title: '字典类型',
-    dataIndex: 'dictType',
-    key: 'dictType',
+    title: '字典键值',
+    dataIndex: 'dictValue',
+    key: 'dictValue',
     align: 'center',
-    slots: { customRender: 'dictType' },
+  },
+  {
+    title: '字典排序',
+    dataIndex: 'dictSort',
+    key: 'dictSort',
+    align: 'center',
   },
   {
     title: '状态',
@@ -240,15 +271,17 @@ const columns = [
 
 export default defineComponent({
   setup() {
+    const route = useRoute()
     const rules = {
       dictName: [
         { required: true, message: '字典名称不能为空', trigger: 'blur' },
       ],
-      dictType: [
+      dictLabel: [
         { required: true, message: '字典类型不能为空', trigger: 'blur' },
       ],
       status: [{ required: true, message: '状态不能为空', trigger: 'change' }],
     }
+    console.log(route.params.id)
     // 查询表单操作
     const queryParams = reactive({
       pageNum: 1,
@@ -278,7 +311,7 @@ export default defineComponent({
     }
 
     const getList = (queryParams?: {}) => {
-      listType(queryParams).then((res) => {
+      listData(queryParams).then((res) => {
         console.log(res)
         userList.value = res.data.rows
         pagination.total = res.data.count
@@ -286,15 +319,26 @@ export default defineComponent({
       })
     }
 
+    const typeOptions = ref()
+
     const init = () => {
-      getList()
+      getType(route.params.id).then((res) => {
+        queryParams.dictType = res.data.dictType
+        console.log(queryParams)
+        getList(queryParams)
+      })
+      listType().then((res) => {
+        typeOptions.value = res.data.rows
+      })
     }
 
     const formRef = ref()
     const formState: FormState = reactive({
       id: null,
-      dictName: '',
       dictType: '',
+      dictLabel: '',
+      dictValue: '',
+      dictSort: 1,
       status: '1',
       remark: '',
     })
@@ -313,20 +357,20 @@ export default defineComponent({
         .validate()
         .then(() => {
           if (formState.id) {
-            updateType(formState).then((res) => {
+            updateData(formState).then((res) => {
               Message.success(res.message)
-              getList()
               formState.id = null
               formRef.value.resetFields()
               open.value = false
+              getList(queryParams)
             })
           } else {
-            addType(formState).then((res) => {
+            addData(formState).then((res) => {
               Message.success(res.message)
-              getList()
               formState.id = null
               formRef.value.resetFields()
               open.value = false
+              getList(queryParams)
             })
           }
         })
@@ -337,8 +381,8 @@ export default defineComponent({
     // 确认删除
     const confirm = (row) => {
       const dictId = row.id || state.selectedRowKeys
-      delType(dictId).then(() => {
-        getList()
+      delData(dictId).then(() => {
+        getList(queryParams)
         Message.success('删除成功')
       })
     }
@@ -352,12 +396,15 @@ export default defineComponent({
     const handleAdd = () => {
       open.value = true
       drawerTitle.value = '添加字典'
+      formState.dictType = queryParams.dictType
       console.log(99)
     }
     // 更新按钮操作
     const handleUpdate = (row) => {
-      getType(row.id).then((res) => {
+      getDataById(row.id).then((res) => {
         open.value = true
+
+        formState.dictType = queryParams.dictType
         drawerTitle.value = '修改字典'
         nextTick(() => {
           Object.keys(formState).forEach((key) => {
@@ -369,6 +416,7 @@ export default defineComponent({
 
     const statusOptions = ref([])
     onMounted(async () => {
+      console.log(queryParams)
       statusOptions.value = await getDict('sys_normal_disable')
       console.log(statusOptions)
       init()
@@ -385,6 +433,7 @@ export default defineComponent({
       ...toRefs(state),
       hasSelected,
       onSelectChange,
+      typeOptions,
 
       open,
       drawerTitle,

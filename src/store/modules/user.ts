@@ -71,7 +71,7 @@ export const useUserStore = defineStore({
         } else {
           this.roles = [];
         }
-        this.userInfo = res.data;
+        this.userInfo = res.data.user;
         return res;
       } catch (error) {
         if (error.response.status === 401) {
