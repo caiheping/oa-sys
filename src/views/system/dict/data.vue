@@ -68,6 +68,7 @@
     </a-row>
 
     <a-table
+      :loading="loading"
       rowKey="id"
       :row-selection="{
         selectedRowKeys: selectedRowKeys,
@@ -212,6 +213,8 @@ import { getDict, selectDictLabel } from '@/utils/dictFormat'
 import useDrawer from '@/hooks/useDrawer'
 import { message as Message } from 'ant-design-vue'
 import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
+import { useAppStore } from '@/store/modules/app'
+import { mapState } from 'pinia'
 
 interface FormState {
   id: null | number
@@ -449,6 +452,9 @@ export default defineComponent({
       handleAdd,
       handleUpdate,
     }
+  },
+  computed: {
+    ...mapState(useAppStore, ['loading']),
   },
 })
 </script>

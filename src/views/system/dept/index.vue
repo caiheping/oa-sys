@@ -6,6 +6,7 @@
       </a-col>
     </a-row>
     <a-table
+      :loading="loading"
       rowKey="deptId"
       :columns="columns"
       :data-source="deptList"
@@ -142,6 +143,8 @@ import { message as Message } from 'ant-design-vue'
 import Treeselect from 'vue3-treeselect'
 import { formRules } from '@/utils/validate'
 import useDrawer from '@/hooks/useDrawer'
+import { useAppStore } from '@/store/modules/app'
+import { mapState } from 'pinia'
 import 'vue3-treeselect/dist/vue3-treeselect.css'
 
 interface FormState {
@@ -407,6 +410,9 @@ export default defineComponent({
       treeRef,
       handleTreeSelect,
     }
+  },
+  computed: {
+    ...mapState(useAppStore, ['loading']),
   },
 })
 </script>

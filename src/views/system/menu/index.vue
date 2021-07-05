@@ -6,6 +6,7 @@
       </a-col>
     </a-row>
     <a-table
+      :loading="loading"
       rowKey="id"
       :columns="columns"
       :data-source="menuList"
@@ -240,6 +241,8 @@ import IconSelect from '@/components/IconSelect/index.vue'
 import Treeselect from 'vue3-treeselect'
 import { formRules } from '@/utils/validate'
 import useDrawer from '@/hooks/useDrawer'
+import { useAppStore } from '@/store/modules/app'
+import { mapState } from 'pinia'
 import 'vue3-treeselect/dist/vue3-treeselect.css'
 
 // 表头配置
@@ -496,6 +499,9 @@ export default defineComponent({
       treeRef,
       handleTreeSelect,
     }
+  },
+  computed: {
+    ...mapState(useAppStore, ['loading']),
   },
 })
 </script>

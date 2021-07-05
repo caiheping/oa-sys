@@ -2,20 +2,28 @@
   <div class="p-4">
     <div class="mb-3">
       <a-form layout="inline" :model="queryParams">
-        <a-form-item label="用户名">
+        <a-form-item label="角色名称">
           <a-input
-            v-model:value="queryParams.userName"
-            placeholder="请输入用户名"
+            allowClear="true"
+            v-model:value="queryParams.roleName"
+            placeholder="请输入角色名称"
           />
         </a-form-item>
-        <a-form-item label="角色">
+        <a-form-item label="状态">
           <a-select
-            v-model:value="queryParams.role"
-            placeholder="请选择角色"
+            allowClear="true"
+            v-model:value="queryParams.status"
+            placeholder="请选择角色状态"
             style="width: 200px"
+            @select="handleQuery"
           >
-            <a-select-option value="0">超级管理员</a-select-option>
-            <a-select-option value="1">员工</a-select-option>
+            <a-select-option
+              v-for="dict in statusOptions"
+              :key="dict.dictValue"
+              :value="dict.dictValue"
+            >
+              {{ dict.dictLabel }}
+            </a-select-option>
           </a-select>
         </a-form-item>
         <a-form-item>
@@ -28,90 +36,147 @@
     </div>
     <a-row :gutter="10" class="mb-2">
       <a-col>
-        <a-button color="success" @click="open = !open">新增</a-button>
+        <a-button color="success" @click="handleAdd">新增</a-button>
       </a-col>
       <a-col>
-        <a-button color="error">删除</a-button>
-      </a-col>
-      <a-col>
-        <a-button color="warning">导入</a-button>
-      </a-col>
-      <a-col>
-        <a-button color="normal">导出</a-button>
+        <a-popconfirm
+          title="确定要删除选中数据吗？"
+          ok-text="确定"
+          cancel-text="取消"
+          @confirm="confirm"
+          @cancel="cancel"
+        >
+          <a-button :disabled="!hasSelected" color="error"> 删除 </a-button>
+        </a-popconfirm>
       </a-col>
     </a-row>
 
     <a-table
+      :loading="loading"
       rowKey="id"
+      :row-selection="{
+        selectedRowKeys: selectedRowKeys,
+        onChange: onSelectChange,
+      }"
       :columns="columns"
-      :data-source="userList"
+      :data-source="roleList"
       :pagination="pagination"
     >
+      <template #roleKey="{ record }">
+        <router-link :to="'dictData/' + record.id">
+          <span class="text-[#1890ff]">{{ record.roleKey }}</span>
+        </router-link>
+      </template>
+      <template #status="{ record }">
+        <span>{{ selectDictLabel(statusOptions, record.status) }}</span>
+      </template>
       <template #action="{ record }">
         <span>
-          <a-button type="link" color="success" class="mr-3">
-            修改{{ record.name }}
+          <a-button
+            type="link"
+            color="success"
+            class="mr-3"
+            @click="handleUpdate(record)"
+          >
+            修改
           </a-button>
-          <a-button type="link" color="success" class="mr-3">
-            数据权限{{ record.name }}
-          </a-button>
-          <a-button type="link" color="error">删除</a-button>
+          <a-popconfirm
+            title="确定要删除该数据吗？"
+            ok-text="确定"
+            cancel-text="取消"
+            @confirm="confirm(record)"
+            @cancel="cancel"
+          >
+            <a-button type="link" color="error">删除</a-button>
+          </a-popconfirm>
         </span>
       </template>
     </a-table>
 
-    <!-- 操作推窗 -->
+    <!-- 新增修改推窗 -->
     <a-drawer
-      width="50%"
-      title="新增角色"
+      width="540px"
+      :title="drawerTitle"
       placement="right"
       v-model:visible="open"
       :maskClosable="false"
+      @close="handleClose"
     >
       <a-form
+        v-if="open"
         ref="formRef"
         :model="formState"
         :rules="rules"
         :label-col="labelCol"
         :wrapper-col="wrapperCol"
       >
-        <a-form-item label="角色名称" name="name">
-          <a-input
-            v-model:value="formState.name"
-            placeholder="请输入角色名称"
-          />
-        </a-form-item>
-        <a-form-item label="权限字符" name="name">
-          <a-input
-            v-model:value="formState.name"
-            placeholder="请输入权限字符"
-          />
-        </a-form-item>
-        <a-form-item label="显示顺序" name="name">
-          <a-input-number v-model:value="formState.name" :min="1" :max="999" />
-        </a-form-item>
-        <a-form-item label="状态" name="name">
-          <a-input v-model:value="formState.name" />
-        </a-form-item>
-        <a-form-item label="菜单权限" name="name">
-          <a-tree
-            checkable
-            :tree-data="treeData"
-            v-model:selectedKeys="selectedKeys"
-            v-model:checkedKeys="checkedKeys"
-          />
-        </a-form-item>
-        <a-form-item label="备注" name="name">
-          <a-textarea
-            v-model:value="formState.name"
-            placeholder="请输入备注"
-            :rows="4"
-          />
-        </a-form-item>
-        <a-form-item>
-          <a-button type="primary" class="mr-3">确认</a-button>
-          <a-button>取消</a-button>
-        </a-form-item>
+        <a-row>
+          <a-col :span="24">
+            <a-form-item label="角色名称" name="roleName">
+              <a-input
+                v-model:value="formState.roleName"
+                placeholder="请输入角色名称"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="24">
+            <a-form-item label="权限字符" name="roleKey">
+              <a-input
+                v-model:value="formState.roleKey"
+                placeholder="请输入权限字符"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="24">
+            <a-form-item label="显示排序" name="roleSort">
+              <a-input-number
+                class="!w-[100%]"
+                v-model:value="formState.roleSort"
+                placeholder="请输入显示排序"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="24">
+            <a-form-item label="状态" name="status">
+              <a-radio-group
+                v-model:value="formState.status"
+                name="menuType"
+                :options="[
+                  { label: '正常', value: '1' },
+                  { label: '停用', value: '0' },
+                ]"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="24">
+            <a-form-item label="菜单权限" name="menuIds">
+              <a-tree
+                :blockNode="true"
+                checkable
+                :replace-fields="replaceFields"
+                :tree-data="menuOptions"
+                v-model:checkedKeys="checkedKeys"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="24">
+            <a-form-item label="备注" name="remark">
+              <a-textarea
+                :rows="3"
+                v-model:value="formState.remark"
+                placeholder="请输入备注"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="24">
+            <a-form-item>
+              <a-button type="primary" class="mr-3" @click="handleSubmit">
+                确认
+              </a-button>
+              <a-button @click="handleClose">取消</a-button>
+            </a-form-item>
+          </a-col>
+        </a-row>
       </a-form>
     </a-drawer>
   </div>
@@ -122,35 +187,39 @@ import {
   reactive,
   ref,
   onMounted,
-  UnwrapRef,
-  toRaw,
+  nextTick,
+  toRefs,
+  computed,
 } from 'vue'
-import { TreeDataItem } from 'ant-design-vue/es/tree/Tree'
+import {
+  getRole,
+  getRoleById,
+  addRole,
+  updateRole,
+  delRole,
+} from '@/api/admin/system/role'
+import { getMenu } from '@/api/admin/system/menu'
+import { getDict, selectDictLabel } from '@/utils/dictFormat'
+import useDrawer from '@/hooks/useDrawer'
+import { useAppStore } from '@/store/modules/app'
+import { mapState } from 'pinia'
+import { message as Message } from 'ant-design-vue'
 import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
-import { getRole } from '@/api/admin/system/role'
+import { handleTree } from '@/utils/tools'
 
 interface FormState {
-  name: string
+  id: null | number
+  roleName: string
+  roleKey: string
+  roleSort: number | string
+  status: string
+  menuIds: number[]
+  remark: string
 }
 
-const treeData: TreeDataItem[] = [
-  {
-    title: 'parent 1',
-    key: '0-0',
-    children: [],
-  },
-  {
-    title: 'parent 1',
-    key: '0-1',
-    children: [
-      {
-        title: 'parent 1-1',
-        key: '0-1-1',
-        children: [{ key: '0-1-1-0', title: 'title0010' }],
-      },
-    ],
-  },
-]
+interface RoleList extends FormState {
+  checked: boolean
+}
 
 const columns = [
   {
@@ -176,6 +245,7 @@ const columns = [
     dataIndex: 'status',
     key: 'status',
     align: 'center',
+    slots: { customRender: 'status' },
   },
   {
     title: '创建人',
@@ -199,132 +269,216 @@ const columns = [
 
 export default defineComponent({
   setup() {
+    const checkMenus = () => {
+      if (checkedKeys.value.length) {
+        return Promise.resolve()
+      } else {
+        return Promise.reject('菜单权限为空')
+      }
+    }
+    const rules = {
+      roleName: [
+        { required: true, message: '角色名称不能为空', trigger: 'blur' },
+      ],
+      roleKey: [
+        { required: true, message: '权限字符不能为空', trigger: 'blur' },
+      ],
+      status: [{ required: true, message: '状态不能为空', trigger: 'change' }],
+      menuIds: [
+        {
+          required: true,
+          validator: checkMenus,
+          trigger: 'change',
+        },
+      ],
+    }
+
     // 查询表单操作
     const queryParams = reactive({
-      userName: undefined,
-      deptId: 0,
-      role: undefined,
+      pageNum: 1,
+      pageSize: 10,
+      roleName: undefined,
+      roleKey: undefined,
+      status: undefined,
     })
     // 表格操作
-    const userList = ref([])
+    const roleList = ref<RoleList[]>([])
     const pagination = reactive({
       total: 0,
       current: 1,
       pageSize: 10,
     })
+    const state = reactive({
+      selectedRowKeys: [],
+    })
+    const hasSelected = computed(() => state.selectedRowKeys.length > 0)
 
     const handleQuery = () => {
-      getRoleList(queryParams)
+      getList(queryParams)
+    }
+    const onSelectChange = (selectedRowKeys) => {
+      console.log('selectedRowKeys changed: ', selectedRowKeys)
+      state.selectedRowKeys = selectedRowKeys
     }
 
-    const getRoleList = (queryParams?: {}) => {
+    const getList = (queryParams?: {}) => {
       getRole(queryParams).then((res) => {
         console.log(res)
-        userList.value = res.data.rows
+        roleList.value = res.data.rows
         pagination.total = res.data.count
+        state.selectedRowKeys = []
+        roleList.value.forEach((list) => {
+          if (list.status === '1') {
+            list.checked = true
+          } else {
+            list.checked = false
+          }
+        })
       })
     }
 
-    // 新增修改表单操作
-    const open = ref(false)
-    const formRef = ref()
-    const checkedKeys = ref<string[]>([])
-    const selectedKeys = ref<string[]>([])
-    const formState: UnwrapRef<FormState> = reactive({
-      name: '',
-      region: undefined,
-      date1: undefined,
-      delivery: false,
-      type: [],
-      resource: '',
-      desc: '',
-    })
-    const rules = {
-      name: [
-        {
-          required: true,
-          message: '请输入角色名称',
-          trigger: 'blur',
-        },
-      ],
-      region: [
-        {
-          required: true,
-          message: 'Please select Activity zone',
-          trigger: 'change',
-        },
-      ],
-      date1: [
-        {
-          required: true,
-          message: 'Please pick a date',
-          trigger: 'change',
-          type: 'object',
-        },
-      ],
-      type: [
-        {
-          type: 'array',
-          required: true,
-          message: 'Please select at least one activity type',
-          trigger: 'change',
-        },
-      ],
-      resource: [
-        {
-          required: true,
-          message: 'Please select activity resource',
-          trigger: 'change',
-        },
-      ],
-      desc: [
-        {
-          required: true,
-          message: 'Please input activity form',
-          trigger: 'blur',
-        },
-      ],
+    const init = () => {
+      getList()
+      getMenuTreeselect()
     }
-    const onSubmit = () => {
+
+    const formRef = ref()
+    const formState: FormState = reactive({
+      id: null,
+      roleName: '',
+      roleKey: '',
+      roleSort: 1,
+      status: '1',
+      menuIds: [],
+      remark: '',
+    })
+    const { open, drawerTitle } = useDrawer()
+    console.log(open)
+    const handleClose = () => {
+      formState.id = null
+      checkedKeys.value = []
+      formRef.value.resetFields()
+      console.log(formRef)
+      open.value = false
+    }
+    // 表单提交
+    const handleSubmit = () => {
+      console.log(formState, checkedKeys)
       formRef.value
         .validate()
         .then(() => {
-          console.log('values', formState, toRaw(formState))
+          formState.menuIds = checkedKeys.value
+          if (formState.id) {
+            updateRole(formState).then((res) => {
+              Message.success(res.message)
+              getList()
+              formState.id = null
+              formRef.value.resetFields()
+              open.value = false
+            })
+          } else {
+            addRole(formState).then((res) => {
+              Message.success(res.message)
+              getList()
+              formState.id = null
+              formRef.value.resetFields()
+              open.value = false
+            })
+          }
         })
-        .catch((error: ValidateErrorEntity<FormState>) => {
+        .catch((error: ValidateErrorEntity) => {
           console.log('error', error)
         })
     }
-    const resetForm = () => {
-      formRef.value.resetFields()
+    // 确认删除
+    const confirm = (row) => {
+      const dictId = row.id || state.selectedRowKeys
+      delRole(dictId).then(() => {
+        getList()
+        Message.success('删除成功')
+      })
+    }
+    // 取消删除
+    const cancel = (e: MouseEvent) => {
+      console.log(e)
+      Message.success('取消删除')
     }
 
-    const init = () => {
-      getRoleList()
+    // 新增按钮操作
+    const handleAdd = () => {
+      open.value = true
+      drawerTitle.value = '添加角色'
+      console.log(99)
+    }
+    // 更新按钮操作
+    const handleUpdate = (row) => {
+      getRoleById(row.id).then((res) => {
+        open.value = true
+        drawerTitle.value = '修改角色'
+        nextTick(() => {
+          Object.keys(formState).forEach((key) => {
+            formState[key] = res.data[key]
+          })
+          checkedKeys.value = res.data.menus.map((list) => list.id)
+        })
+      })
     }
 
-    onMounted(() => {
+    const statusOptions = ref([])
+
+    /** 查询菜单树结构 */
+    const menuOptions = ref([])
+    const checkedKeys = ref([])
+    // 树形控件操作
+    const replaceFields = {
+      children: 'children',
+      title: 'title',
+      key: 'id',
+    }
+    const getMenuTreeselect = () => {
+      getMenu().then((res) => {
+        menuOptions.value = handleTree(res.data.rows, 'id', 'parentId').tree
+      })
+      console.log(999999999, menuOptions)
+    }
+    onMounted(async () => {
+      statusOptions.value = await getDict('sys_normal_disable')
+      console.log(statusOptions)
       init()
     })
 
     return {
       queryParams,
       handleQuery,
-      userList,
+      roleList,
       columns,
       pagination,
-      labelCol: { span: 4 },
-      wrapperCol: { span: 14 },
+      selectDictLabel,
+      statusOptions,
+      ...toRefs(state),
+      hasSelected,
+      onSelectChange,
 
       open,
-      rules,
+      drawerTitle,
       formState,
-      treeData,
+      labelCol: { span: 4 },
+      wrapperCol: { span: 20 },
+      rules,
+      formRef,
+      handleClose,
+      handleSubmit,
+      confirm,
+      cancel,
+      handleAdd,
+      handleUpdate,
+      menuOptions,
       checkedKeys,
-      selectedKeys,
-      onSubmit,
-      resetForm,
+      replaceFields,
     }
+  },
+  computed: {
+    ...mapState(useAppStore, ['loading']),
   },
 })
 </script>

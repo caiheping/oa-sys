@@ -29,8 +29,3 @@ export function updateRoleStatus(params = {}) {
 export function delRole(ids: string) {
   return HttpRequest('/admin/system/role/' + ids, Methods.del)
 }
-
-// 更新角色状态
-export function changeRoleStatus(id: number, params: any = {}) {
-  return HttpRequest(`/admin/system/role/${id}/updateStatus`, Methods.put, params)
-}
