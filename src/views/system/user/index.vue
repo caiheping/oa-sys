@@ -155,7 +155,6 @@
             <a-form-item label="角色" name="roleIds">
               <a-select
                 mode="multiple"
-                :size="size"
                 v-model:value="formState.roleIds"
                 placeholder="请选择角色"
               >

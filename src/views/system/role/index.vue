@@ -53,6 +53,14 @@
           >
             修改
           </a-button>
+          <a-button
+            type="link"
+            color="warning"
+            class="mr-3"
+            @click="handleScopeOpen(record)"
+          >
+            数据权限
+          </a-button>
           <a-popconfirm
             title="确定要删除该数据吗？"
             ok-text="确定"
@@ -147,6 +155,69 @@
                 确认
               </a-button>
               <a-button @click="handleClose">取消</a-button>
+            </a-form-item>
+          </a-col>
+        </a-row>
+      </a-form>
+    </a-drawer>
+
+    <!-- 数据权限推窗 -->
+    <a-drawer
+      width="540px"
+      title="分配数据权限"
+      placement="right"
+      v-model:visible="dataScopeOpen"
+      :maskClosable="false"
+      @close="handleScopeClose"
+    >
+      <a-form
+        v-if="dataScopeOpen"
+        ref="formScopeRef"
+        :model="formScopeState"
+        :rules="scopeRules"
+        :label-col="labelCol"
+        :wrapper-col="wrapperCol"
+      >
+        <a-row>
+          <a-col :span="24">
+            <a-form-item label="角色名称" name="roleName">
+              <a-input
+                :disabled="true"
+                v-model:value="formScopeState.roleName"
+                placeholder="请输入角色名称"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="24">
+            <a-form-item label="权限字符" name="roleKey">
+              <a-input
+                :disabled="true"
+                v-model:value="formScopeState.roleKey"
+                placeholder="请输入权限字符"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="24">
+            <a-form-item label="权限范围" name="dataScope">
+              <a-select
+                v-model:value="formScopeState.dataScope"
+                placeholder="请选择权限范围"
+              >
+                <a-select-option
+                  v-for="item in dataScopeOptions"
+                  :key="item.value"
+                >
+                  {{ item.label }}
+                </a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+          <a-col :span="24">
+            <a-form-item>
+              <a-button type="primary" class="mr-3" @click="handleScopeSubmit">
+                确认
+              </a-button>
+              <a-button @click="handleScopeClose">取消</a-button>
             </a-form-item>
           </a-col>
         </a-row>
@@ -440,6 +511,71 @@ export default defineComponent({
         menuOptions.value = handleTree(res.data.rows, 'id', 'parentId').tree
       })
     }
+
+    // 数据范围选项
+    const dataScopeOptions = reactive([
+      {
+        value: '1',
+        label: '本部门及以下数据权限',
+      },
+      {
+        value: '2',
+        label: '本部门数据权限',
+      },
+      {
+        value: '3',
+        label: '仅本人数据权限',
+      },
+    ])
+    const formScopeRef = ref()
+    const dataScopeOpen = ref(false)
+    const scopeRules = {
+      dataScope: [
+        { required: true, message: '权限范围不能为空', trigger: 'blur' },
+      ],
+    }
+    const formScopeState = reactive({
+      id: undefined,
+      roleName: undefined || '',
+      roleKey: undefined || '',
+      roleSort: undefined,
+      status: undefined,
+      menuIds: undefined,
+      remark: undefined,
+      dataScope: undefined,
+    })
+
+    const handleScopeOpen = (row) => {
+      getRoleById(row.id).then((res) => {
+        dataScopeOpen.value = true
+        nextTick(() => {
+          Object.keys(formScopeState).forEach((key) => {
+            formScopeState[key] = res.data[key]
+          })
+          formScopeState.menuIds = res.data.menus.map((list) => list.id)
+        })
+      })
+    }
+    const handleScopeClose = () => {
+      dataScopeOpen.value = false
+    }
+
+    const handleScopeSubmit = () => {
+      formScopeRef.value
+        .validate()
+        .then(() => {
+          console.log('ok')
+          updateRole(formScopeState).then((res) => {
+            Message.success(res.message)
+            dataScopeOpen.value = false
+            getList()
+          })
+        })
+        .catch((error: ValidateErrorEntity) => {
+          console.log('error', error)
+        })
+    }
+
     onMounted(async () => {
       statusOptions.value = await getDict('sys_normal_disable')
       console.log(statusOptions)
@@ -475,6 +611,15 @@ export default defineComponent({
       menuOptions,
       checkedKeys,
       replaceFields,
+
+      dataScopeOptions,
+      formScopeRef,
+      dataScopeOpen,
+      formScopeState,
+      scopeRules,
+      handleScopeOpen,
+      handleScopeClose,
+      handleScopeSubmit,
     }
   },
   computed: {
