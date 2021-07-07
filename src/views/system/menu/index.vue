@@ -355,15 +355,15 @@ export default defineComponent({
       })
     }
     const formState = reactive({
-      id: null,
-      parentId: null,
+      id: undefined,
+      parentId: undefined,
       menuType: 'M',
-      icon: '',
-      title: '',
+      icon: undefined,
+      title: undefined,
       orderNum: '1',
-      path: '',
-      component: '',
-      perms: '',
+      path: undefined,
+      component: undefined,
+      perms: undefined,
       visible: '1',
       status: '1',
       keepAlive: 1,
@@ -372,7 +372,7 @@ export default defineComponent({
     // 取消推窗
     const { open, drawerTitle } = useDrawer()
     const handleClose = () => {
-      formState.id = null
+      formState.id = undefined
       formRef.value.resetFields()
       open.value = false
     }
@@ -385,7 +385,7 @@ export default defineComponent({
             updateMenu(formState).then((res) => {
               Message.success(res.message)
               getList()
-              formState.id = null
+              formState.id = undefined
               formRef.value.resetFields()
               open.value = false
             })
@@ -393,7 +393,7 @@ export default defineComponent({
             addMenu(formState).then((res) => {
               Message.success(res.message)
               getList()
-              formState.id = null
+              formState.id = undefined
               formRef.value.resetFields()
               open.value = false
             })

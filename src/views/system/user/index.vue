@@ -274,17 +274,17 @@ import DeptSearch from '@/components/DeptSearch/index.vue'
 import FormSearch from '@/components/FormSearch/index.vue'
 
 interface FormState {
-  id: null | number
-  deptId: null | number
-  nickName: string
-  userName: string
-  password: string
-  sex: string
-  roleIds: number[]
-  mobile: number | string
-  status: string
-  email: string
-  remark: string
+  id: undefined | number
+  deptId: undefined | number
+  nickName: undefined | string
+  userName: undefined | string
+  password: undefined | string
+  sex: undefined | string
+  roleIds: undefined | number[]
+  mobile: undefined | number | string
+  status: undefined | string
+  email: undefined | string
+  remark: undefined | string
 }
 
 const columns = [
@@ -501,17 +501,17 @@ export default defineComponent({
     // 获取部门树
     const treeRef = ref()
     const formState: FormState = reactive({
-      id: null,
-      deptId: null,
-      nickName: '',
-      userName: '',
-      password: '',
+      id: undefined,
+      deptId: undefined,
+      nickName: undefined,
+      userName: undefined,
+      password: undefined,
       sex: '1',
-      roleIds: [],
-      mobile: '',
+      roleIds: undefined,
+      mobile: undefined,
       status: '1',
-      email: '',
-      remark: '',
+      email: undefined,
+      remark: undefined,
     })
     const rules = {
       deptId: [
@@ -555,7 +555,7 @@ export default defineComponent({
           if (formState.id) {
             updateUser(formState).then((res) => {
               Message.success(res.message)
-              formState.id = null
+              formState.id = undefined
               formRef.value.resetFields()
               open.value = false
               getList()
@@ -563,7 +563,7 @@ export default defineComponent({
           } else {
             addUser(formState).then((res) => {
               Message.success(res.message)
-              formState.id = null
+              formState.id = undefined
               formRef.value.resetFields()
               open.value = false
               getList()
@@ -589,8 +589,8 @@ export default defineComponent({
 
     // 关闭推窗
     const handleClose = () => {
-      formState.id = null
-      formState.deptId = null
+      formState.id = undefined
+      formState.deptId = undefined
       formRef.value.resetFields()
       console.log(formState)
       open.value = false

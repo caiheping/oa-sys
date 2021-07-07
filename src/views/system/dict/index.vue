@@ -161,11 +161,11 @@ import { mapState } from 'pinia'
 import FormSearch from '@/components/FormSearch/index.vue'
 
 interface FormState {
-  id: null | number
-  dictName: string
-  dictType: string | number
-  status: string
-  remark: string
+  id: undefined | number
+  dictName: undefined | string
+  dictType: undefined | number
+  status: undefined | string
+  remark: undefined | string
 }
 
 const columns = [
@@ -303,16 +303,16 @@ export default defineComponent({
 
     const formRef = ref()
     const formState: FormState = reactive({
-      id: null,
-      dictName: '',
-      dictType: '',
+      id: undefined,
+      dictName: undefined,
+      dictType: undefined,
       status: '1',
-      remark: '',
+      remark: undefined,
     })
     const { open, drawerTitle } = useDrawer()
     console.log(open)
     const handleClose = () => {
-      formState.id = null
+      formState.id = undefined
       formRef.value.resetFields()
       console.log(formRef)
       open.value = false
@@ -327,7 +327,7 @@ export default defineComponent({
             updateType(formState).then((res) => {
               Message.success(res.message)
               getList()
-              formState.id = null
+              formState.id = undefined
               formRef.value.resetFields()
               open.value = false
             })
@@ -335,7 +335,7 @@ export default defineComponent({
             addType(formState).then((res) => {
               Message.success(res.message)
               getList()
-              formState.id = null
+              formState.id = undefined
               formRef.value.resetFields()
               open.value = false
             })

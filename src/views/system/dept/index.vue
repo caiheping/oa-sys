@@ -148,9 +148,9 @@ import { mapState } from 'pinia'
 import 'vue3-treeselect/dist/vue3-treeselect.css'
 
 interface FormState {
-  deptId: null | number
-  parentId: null | number
-  deptName: string
+  deptId: undefined | number
+  parentId: undefined | number
+  deptName: undefined | string
   orderNum: string | number
   status: string
 }
@@ -251,16 +251,16 @@ export default defineComponent({
       })
     }
     const formState: FormState = reactive({
-      deptId: null,
-      parentId: null,
-      deptName: '',
+      deptId: undefined,
+      parentId: undefined,
+      deptName: undefined,
       orderNum: '1',
       status: '1',
     })
     // 取消推窗
     const { open, drawerTitle } = useDrawer()
     const handleClose = () => {
-      formState.deptId = null
+      formState.deptId = undefined
       formRef.value.resetFields()
       console.log(formState)
       open.value = false
@@ -275,7 +275,7 @@ export default defineComponent({
             updateDept(formState).then((res) => {
               Message.success(res.message)
               getList()
-              formState.deptId = null
+              formState.deptId = undefined
               formRef.value.resetFields()
               open.value = false
             })
@@ -283,7 +283,7 @@ export default defineComponent({
             addDept(formState).then((res) => {
               Message.success(res.message)
               getList()
-              formState.deptId = null
+              formState.deptId = undefined
               formRef.value.resetFields()
               open.value = false
             })

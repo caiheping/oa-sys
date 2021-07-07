@@ -176,7 +176,7 @@ import { mapState } from 'pinia'
 import FormSearch from '@/components/FormSearch/index.vue'
 
 interface FormState {
-  id: null | number
+  id: undefined | number
   dictType: string | undefined
   dictValue: string
   dictLabel: string
@@ -353,7 +353,7 @@ export default defineComponent({
 
     const formRef = ref()
     const formState: FormState = reactive({
-      id: null,
+      id: undefined,
       dictType: '',
       dictLabel: '',
       dictValue: '',
@@ -364,7 +364,7 @@ export default defineComponent({
     const { open, drawerTitle } = useDrawer()
     console.log(open)
     const handleClose = () => {
-      formState.id = null
+      formState.id = undefined
       formRef.value.resetFields()
       console.log(formRef)
       open.value = false
@@ -378,7 +378,7 @@ export default defineComponent({
           if (formState.id) {
             updateData(formState).then((res) => {
               Message.success(res.message)
-              formState.id = null
+              formState.id = undefined
               formRef.value.resetFields()
               open.value = false
               getList(queryParams)
@@ -386,7 +386,7 @@ export default defineComponent({
           } else {
             addData(formState).then((res) => {
               Message.success(res.message)
-              formState.id = null
+              formState.id = undefined
               formRef.value.resetFields()
               open.value = false
               getList(queryParams)

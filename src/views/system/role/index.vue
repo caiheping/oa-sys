@@ -254,13 +254,24 @@ import { handleTree } from '@/utils/tools'
 import FormSearch from '@/components/FormSearch/index.vue'
 
 interface FormState {
-  id: null | number
-  roleName: string
-  roleKey: string
-  roleSort: number | string
-  status: string
-  menuIds: number[]
-  remark: string
+  id: undefined | number
+  roleName: undefined | string
+  roleKey: undefined | string
+  roleSort: undefined | number | string
+  status: undefined | string
+  menuIds: undefined | number[]
+  remark: undefined | string
+}
+
+interface FormScopeState {
+  id: undefined | number
+  roleName: undefined | string
+  roleKey: undefined | string
+  roleSort: undefined | number | string
+  status: undefined | string
+  menuIds: undefined | number[]
+  remark: undefined | string
+  dataScope: undefined
 }
 
 interface RoleList extends FormState {
@@ -417,18 +428,18 @@ export default defineComponent({
 
     const formRef = ref()
     const formState: FormState = reactive({
-      id: null,
-      roleName: '',
-      roleKey: '',
+      id: undefined,
+      roleName: undefined,
+      roleKey: undefined,
       roleSort: 1,
       status: '1',
-      menuIds: [],
-      remark: '',
+      menuIds: undefined,
+      remark: undefined,
     })
     const { open, drawerTitle } = useDrawer()
     console.log(open)
     const handleClose = () => {
-      formState.id = null
+      formState.id = undefined
       checkedKeys.value = []
       formRef.value.resetFields()
       console.log(formRef)
@@ -445,7 +456,7 @@ export default defineComponent({
             updateRole(formState).then((res) => {
               Message.success(res.message)
               getList()
-              formState.id = null
+              formState.id = undefined
               formRef.value.resetFields()
               open.value = false
             })
@@ -453,7 +464,7 @@ export default defineComponent({
             addRole(formState).then((res) => {
               Message.success(res.message)
               getList()
-              formState.id = null
+              formState.id = undefined
               formRef.value.resetFields()
               open.value = false
             })
@@ -534,7 +545,7 @@ export default defineComponent({
         { required: true, message: '权限范围不能为空', trigger: 'blur' },
       ],
     }
-    const formScopeState = reactive({
+    const formScopeState: FormScopeState = reactive({
       id: undefined,
       roleName: undefined || '',
       roleKey: undefined || '',
