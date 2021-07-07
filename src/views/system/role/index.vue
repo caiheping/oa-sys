@@ -1,7 +1,11 @@
 <template>
   <div class="p-4">
     <div class="mb-3">
-      <form-search :formFields="formFields" @search="handleQuery" />
+      <form-search
+        :formFields="formFields"
+        @search="handleQuery"
+        @reset="handleQuery"
+      />
     </div>
     <a-row :gutter="10" class="mb-2">
       <a-col>
@@ -272,8 +276,8 @@ export default defineComponent({
     const queryParams = reactive({
       pageNum: 1,
       pageSize: 10,
-      roleName: '',
-      status: '',
+      roleName: undefined || '',
+      status: undefined || '',
     })
     const formFields = reactive([
       {
@@ -287,7 +291,7 @@ export default defineComponent({
         type: 'select',
         label: '状态',
         name: 'status',
-        value: '',
+        value: undefined,
         placeholder: '请选择角色状态',
         normalizer: {
           value: 'dictValue',
@@ -296,6 +300,12 @@ export default defineComponent({
         options: statusOptions,
       },
     ])
+    const handleQuery = (query: { roleName: string; status: string }) => {
+      console.log(query)
+      queryParams.roleName = query.roleName
+      queryParams.status = query.status
+      getList(queryParams)
+    }
     // 表格操作
     const roleList = ref<RoleList[]>([])
     const pagination = reactive({
@@ -308,12 +318,6 @@ export default defineComponent({
     })
     const hasSelected = computed(() => state.selectedRowKeys.length > 0)
 
-    const handleQuery = (query: { roleName: string; status: string }) => {
-      console.log(query)
-      queryParams.roleName = query.roleName
-      queryParams.status = query.status
-      getList(queryParams)
-    }
     const onSelectChange = (selectedRowKeys) => {
       console.log('selectedRowKeys changed: ', selectedRowKeys)
       state.selectedRowKeys = selectedRowKeys

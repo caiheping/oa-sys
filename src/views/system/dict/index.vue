@@ -1,7 +1,11 @@
 <template>
   <div class="p-4">
     <div class="mb-3">
-      <form-search :formFields="formFields" @search="handleQuery" />
+      <form-search
+        :formFields="formFields"
+        @search="handleQuery"
+        @reset="handleQuery"
+      />
     </div>
     <a-row :gutter="10" class="mb-2">
       <a-col>
@@ -239,7 +243,7 @@ export default defineComponent({
         type: 'select',
         label: '状态',
         name: 'status',
-        value: [],
+        value: undefined,
         placeholder: '请选择角色状态',
         normalizer: {
           value: 'dictValue',
@@ -252,10 +256,21 @@ export default defineComponent({
     const queryParams = reactive({
       pageNum: 1,
       pageSize: 10,
-      dictName: '',
-      dictType: '',
-      status: '',
+      dictName: undefined || '',
+      dictType: undefined || '',
+      status: undefined || '',
     })
+
+    const handleQuery = (query: {
+      dictName: string
+      dictType: string
+      status: string
+    }) => {
+      queryParams.dictName = query.dictName
+      queryParams.dictType = query.dictType
+      queryParams.status = query.status
+      getList(queryParams)
+    }
     // 表格操作
     const userList = ref([])
     const pagination = reactive({
@@ -268,16 +283,6 @@ export default defineComponent({
     })
     const hasSelected = computed(() => state.selectedRowKeys.length > 0)
 
-    const handleQuery = (query: {
-      dictName: string
-      dictType: string
-      status: string
-    }) => {
-      queryParams.dictName = query.dictName
-      queryParams.dictType = query.dictType
-      queryParams.status = query.status
-      getList(queryParams)
-    }
     const onSelectChange = (selectedRowKeys) => {
       console.log('selectedRowKeys changed: ', selectedRowKeys)
       state.selectedRowKeys = selectedRowKeys

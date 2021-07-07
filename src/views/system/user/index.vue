@@ -12,7 +12,11 @@
       </a-col>
       <a-col :span="20">
         <div class="mb-3">
-          <form-search :formFields="formFields" @search="handleQuery" />
+          <form-search
+            :formFields="formFields"
+            @search="handleQuery"
+            @reset="handleQuery"
+          />
         </div>
         <a-row :gutter="10" class="mb-2">
           <a-col>
@@ -348,6 +352,7 @@ export default defineComponent({
   },
   setup() {
     const userStore = useUserStore()
+    const roleOptions = ref([])
     /**
      * 左侧树形控件操作
      */
@@ -367,30 +372,29 @@ export default defineComponent({
     // 查询表单操作
     const queryRef = ref()
     const queryParams = reactive({
-      userName: '',
+      userName: undefined || '',
       deptId: 0,
-      role: '',
+      role: undefined || '',
     })
     const formFields = reactive([
       {
         type: 'input',
         label: '用户名',
         name: 'userName',
-        value: '',
+        value: undefined,
         placeholder: '请输入用户名',
       },
       {
         type: 'select',
         label: '角色',
         name: 'role',
-        value: [],
+        value: undefined,
         placeholder: '请选择角色',
-        options: [
-          {
-            value: '',
-            label: 'fdlks',
-          },
-        ],
+        normalizer: {
+          value: 'id',
+          label: 'roleName',
+        },
+        options: roleOptions,
       },
     ])
 
@@ -539,8 +543,6 @@ export default defineComponent({
     const handleTreeSelect = (node) => {
       formState.deptId = node.deptId
     }
-    // 角色列表
-    const roleOptions = ref([])
 
     // 新增修改表单操作
     const formRef = ref()

@@ -105,7 +105,7 @@ export default defineComponent({
     }
     const handleReset = () => {
       formRef.value.resetFields()
-      emit('reset')
+      emit('reset', formState.value)
     }
 
     return {

@@ -248,7 +248,7 @@ export default defineComponent({
       ],
       status: [{ required: true, message: '状态不能为空', trigger: 'change' }],
     }
-    console.log(route.params.id)
+
     // 查询表单操作
     const formFields = reactive([
       {
@@ -300,9 +300,15 @@ export default defineComponent({
       queryParams.status = query.status
       getList(queryParams)
     }
-    const handleReset = () => {
+    const handleReset = (query: {
+      dictType: string
+      dictLabel: string
+      status: string
+    }) => {
       formFields[0].value = undefined
       nextTick(() => {
+        queryParams.dictLabel = query.dictLabel
+        queryParams.status = query.status
         formFields[0].value = queryParams.dictType
         getList(queryParams)
       })
