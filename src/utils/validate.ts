@@ -14,6 +14,13 @@ export const formRules = {
       return Promise.resolve();
     }
   },
+  checkRoleLength: (rule: RuleObject, value: any[]) => {
+    if (value.length) {
+      return Promise.resolve();
+    } else {
+      return Promise.reject('角色不能为空')
+    }
+  },
   email: (rule: RuleObject, value: string) => {
     const reg = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/
     if (value && !reg.test(value)) {

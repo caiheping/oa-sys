@@ -1,54 +1,11 @@
 <template>
   <div class="p-4">
     <div class="mb-3">
-      <a-form layout="inline" :model="queryParams">
-        <a-form-item label="字典名称">
-          <a-select
-            v-model:value="queryParams.dictType"
-            placeholder="字典名称"
-            style="width: 200px"
-            @select="handleQuery"
-          >
-            <a-select-option
-              v-for="item in typeOptions"
-              :key="item.id"
-              :value="item.dictType"
-            >
-              {{ item.dictName }}
-            </a-select-option>
-          </a-select>
-        </a-form-item>
-        <a-form-item label="字典标签">
-          <a-input
-            allowClear="true"
-            v-model:value="queryParams.dictLabel"
-            placeholder="请输入字典标签"
-          />
-        </a-form-item>
-        <a-form-item label="状态">
-          <a-select
-            allowClear="true"
-            v-model:value="queryParams.status"
-            placeholder="数据状态"
-            style="width: 200px"
-            @select="handleQuery"
-          >
-            <a-select-option
-              v-for="dict in statusOptions"
-              :key="dict.dictValue"
-              :value="dict.dictValue"
-            >
-              {{ dict.dictLabel }}
-            </a-select-option>
-          </a-select>
-        </a-form-item>
-        <a-form-item>
-          <a-space>
-            <a-button type="primary" @click="handleQuery">搜索</a-button>
-            <a-button>重置</a-button>
-          </a-space>
-        </a-form-item>
-      </a-form>
+      <form-search
+        :formFields="formFields"
+        @search="handleQuery"
+        @reset="handleReset"
+      />
     </div>
     <a-row :gutter="10" class="mb-2">
       <a-col>
@@ -216,6 +173,8 @@ import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
 import { useAppStore } from '@/store/modules/app'
 import { mapState } from 'pinia'
 
+import FormSearch from '@/components/FormSearch/index.vue'
+
 interface FormState {
   id: null | number
   dictType: string | undefined
@@ -273,8 +232,13 @@ const columns = [
 ]
 
 export default defineComponent({
+  components: {
+    FormSearch,
+  },
   setup() {
     const route = useRoute()
+    const typeOptions = ref()
+    const statusOptions = ref([])
     const rules = {
       dictName: [
         { required: true, message: '字典名称不能为空', trigger: 'blur' },
@@ -286,13 +250,63 @@ export default defineComponent({
     }
     console.log(route.params.id)
     // 查询表单操作
+    const formFields = reactive([
+      {
+        type: 'select',
+        label: '字典类型',
+        name: 'dictType',
+        value: undefined,
+        placeholder: '请选择字典类型',
+        normalizer: {
+          value: 'dictType',
+          label: 'dictName',
+        },
+        options: typeOptions,
+      },
+      {
+        type: 'input',
+        label: '字典标签',
+        name: 'dictLabel',
+        value: '',
+        placeholder: '请输入字典标签',
+      },
+      {
+        type: 'select',
+        label: '状态',
+        name: 'status',
+        value: undefined,
+        placeholder: '请选择数据状态',
+        normalizer: {
+          value: 'dictValue',
+          label: 'dictLabel',
+        },
+        options: statusOptions,
+      },
+    ])
     const queryParams = reactive({
       pageNum: 1,
       pageSize: 10,
-      dictName: undefined,
-      dictType: undefined,
-      status: undefined,
+      dictLabel: undefined || '',
+      dictType: undefined || '',
+      status: undefined || '',
     })
+    const handleQuery = (query: {
+      dictType: string
+      dictLabel: string
+      status: string
+    }) => {
+      queryParams.dictType = query.dictType
+      queryParams.dictLabel = query.dictLabel
+      queryParams.status = query.status
+      getList(queryParams)
+    }
+    const handleReset = () => {
+      formFields[0].value = undefined
+      nextTick(() => {
+        formFields[0].value = queryParams.dictType
+        getList(queryParams)
+      })
+    }
     // 表格操作
     const userList = ref([])
     const pagination = reactive({
@@ -305,9 +319,6 @@ export default defineComponent({
     })
     const hasSelected = computed(() => state.selectedRowKeys.length > 0)
 
-    const handleQuery = () => {
-      getList(queryParams)
-    }
     const onSelectChange = (selectedRowKeys) => {
       console.log('selectedRowKeys changed: ', selectedRowKeys)
       state.selectedRowKeys = selectedRowKeys
@@ -322,11 +333,10 @@ export default defineComponent({
       })
     }
 
-    const typeOptions = ref()
-
     const init = () => {
       getType(route.params.id).then((res) => {
         queryParams.dictType = res.data.dictType
+        formFields[0].value = res.data.dictType
         console.log(queryParams)
         getList(queryParams)
       })
@@ -400,7 +410,6 @@ export default defineComponent({
       open.value = true
       drawerTitle.value = '添加字典'
       formState.dictType = queryParams.dictType
-      console.log(99)
     }
     // 更新按钮操作
     const handleUpdate = (row) => {
@@ -417,7 +426,6 @@ export default defineComponent({
       })
     }
 
-    const statusOptions = ref([])
     onMounted(async () => {
       console.log(queryParams)
       statusOptions.value = await getDict('sys_normal_disable')
@@ -427,7 +435,9 @@ export default defineComponent({
 
     return {
       queryParams,
+      formFields,
       handleQuery,
+      handleReset,
       userList,
       columns,
       pagination,

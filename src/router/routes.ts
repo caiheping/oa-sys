@@ -55,11 +55,14 @@ const constantRoutes: AppRouteRecordRaw[] = [
       title: "401",
     },
   },
-  // {
-  //   path: '/:catchAll(.*)',
-  //   redirect: '/404',
-  //   hidden: true
-  // }
+  {
+    path: '/test',
+    hidden: true,
+    component: import("@/views/system/test/index.vue"),
+    meta: {
+      title: "test",
+    },
+  }
 ];
 
 export default constantRoutes;

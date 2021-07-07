@@ -2,67 +2,17 @@
   <div class="p-4">
     <a-row :gutter="15">
       <a-col :span="4">
-        <a-input
-          allowClear="true"
-          v-model:value="searchValue"
-          placeholder="请输入部门名称"
-        >
-          <template #prefix>
-            <svg-icon name="search" class="text-[#d9d9d9]" />
-          </template>
-        </a-input>
-        <a-tree
-          :blockNode="true"
-          :expandedKeys="expandedKeys"
-          :auto-expand-parent="autoExpandParent"
-          :replace-fields="replaceFields"
-          :tree-data="deptTreeOption"
-          v-model:selectedKeys="selectedKeys"
-          @expand="onExpand"
+        <dept-search
+          ref="deptSearchRef"
+          :original="originalTree"
+          :data="deptTreeOption"
+          :baseFields="replaceFields"
           @select="handleSelect"
-        >
-          <template #title="{ deptName }">
-            <span v-if="deptName.indexOf(searchValue) > -1">
-              {{ deptName.substr(0, deptName.indexOf(searchValue)) }}
-              <span class="text-red-400">{{ searchValue }}</span>
-              {{
-                deptName.substr(
-                  deptName.indexOf(searchValue) + searchValue.length
-                )
-              }}
-            </span>
-            <span v-else>{{ deptName }}</span>
-          </template>
-        </a-tree>
+        />
       </a-col>
       <a-col :span="20">
         <div class="mb-3">
-          <a-form layout="inline" :model="queryParams">
-            <a-form-item label="用户名">
-              <a-input
-                allowClear="true"
-                v-model:value="queryParams.userName"
-                placeholder="请输入用户名"
-              />
-            </a-form-item>
-            <a-form-item label="角色">
-              <a-select
-                v-model:value="queryParams.role"
-                placeholder="请选择角色"
-                style="width: 200px"
-                @select="handleQuery"
-              >
-                <a-select-option value="0">超级管理员</a-select-option>
-                <a-select-option value="1">员工</a-select-option>
-              </a-select>
-            </a-form-item>
-            <a-form-item>
-              <a-space>
-                <a-button type="primary" @click="handleQuery">搜索</a-button>
-                <a-button>重置</a-button>
-              </a-space>
-            </a-form-item>
-          </a-form>
+          <form-search :formFields="formFields" @search="handleQuery" />
         </div>
         <a-row :gutter="10" class="mb-2">
           <a-col>
@@ -73,7 +23,7 @@
               title="确定要删除选中数据吗？"
               ok-text="确定"
               cancel-text="取消"
-              @confirm="confirm(record)"
+              @confirm="confirm"
               @cancel="cancel"
             >
               <a-button :disabled="!hasSelected" color="error"> 删除 </a-button>
@@ -88,6 +38,7 @@
         </a-row>
 
         <a-table
+          :loading="loading"
           rowKey="id"
           :row-selection="{
             selectedRowKeys: selectedRowKeys,
@@ -105,6 +56,9 @@
           <template #status="{ record }">
             <span>{{ selectDictLabel(statusOptions, record.status) }}</span>
           </template>
+          <template #roles="{ record }">
+            <span>{{ getRoles(record) }}</span>
+          </template>
           <template #action="{ record }">
             <span>
               <a-button
@@ -115,7 +69,12 @@
               >
                 修改
               </a-button>
-              <a-button type="link" color="success" class="mr-3">
+              <a-button
+                type="link"
+                color="success"
+                class="mr-3"
+                @click="showModal(record)"
+              >
                 重置密码
               </a-button>
               <a-popconfirm
@@ -182,7 +141,7 @@
           </a-col>
           <a-col :span="12" v-if="!isUpdate">
             <a-form-item label="密码" name="password">
-              <a-input
+              <a-input-password
                 v-model:value="formState.password"
                 placeholder="请输入密码"
               />
@@ -262,6 +221,14 @@
         </a-row>
       </a-form>
     </a-drawer>
+
+    <!-- 重置密码 -->
+    <a-modal v-model:visible="visible" title="重置密码" @ok="handleResetPwd">
+      <div class="flex items-center">
+        <span class="whitespace-nowrap">新密码：</span>
+        <a-input v-model:value="newPassword" placeholder="请输入密码" />
+      </div>
+    </a-modal>
   </div>
 </template>
 <script lang="ts">
@@ -269,8 +236,6 @@ import {
   defineComponent,
   reactive,
   ref,
-  watch,
-  toRaw,
   onMounted,
   toRefs,
   computed,
@@ -288,7 +253,7 @@ import {
   addUser,
   updateUser,
   // exportUser,
-  // resetUserPwd,
+  resetUserPwd,
   // importTemplate,
 } from '@/api/admin/system/user'
 import { getRole } from '@/api/admin/system/role'
@@ -298,6 +263,12 @@ import Treeselect from 'vue3-treeselect'
 import 'vue3-treeselect/dist/vue3-treeselect.css'
 import { useUserStore } from '@/store/modules/user'
 import { formRules } from '@/utils/validate'
+import { useAppStore } from '@/store/modules/app'
+import { mapState } from 'pinia'
+
+// 组件
+import DeptSearch from '@/components/DeptSearch/index.vue'
+import FormSearch from '@/components/FormSearch/index.vue'
 
 interface FormState {
   id: null | number
@@ -325,6 +296,14 @@ const columns = [
     dataIndex: 'nickName',
     key: 'nickName',
     align: 'center',
+  },
+  {
+    title: '角色',
+    key: 'roles',
+    align: 'center',
+    slots: {
+      customRender: 'roles',
+    },
   },
   {
     title: '部门',
@@ -364,74 +343,160 @@ const columns = [
 export default defineComponent({
   components: {
     Treeselect,
+    DeptSearch,
+    FormSearch,
   },
   setup() {
-    // 树形控件操作
+    const userStore = useUserStore()
+    /**
+     * 左侧树形控件操作
+     */
+    const deptSearchRef = ref()
+    const originalTree = ref([])
     const replaceFields = {
       children: 'children',
       title: 'deptName',
       key: 'deptId',
     }
-    const userStore = useUserStore()
-    const treeRef = ref()
-    const selectedKeys = ref<string[]>([])
-    const expandedKeys = ref<number[]>([])
-    const searchValue = ref<string>('')
-    const autoExpandParent = ref<boolean>(true)
     const deptTreeOption = ref<TreeDataItem[]>([])
-    const originalTreeLists = ref([])
-    const onExpand = (keys: number[]) => {
-      expandedKeys.value = keys
-      autoExpandParent.value = false
-    }
-
     const handleSelect = (keys: number[]) => {
-      console.log(keys[0])
       queryParams.deptId = keys[0]
-      handleQuery()
+      handleQuery(queryParams)
     }
-    // 获取部门树
-    const deptOptions = ref([])
-    // 上级部门选中事件
-    const handleTreeSelect = (node) => {
-      formState.deptId = node.deptId
-    }
-
-    watch(searchValue, (value) => {
-      const expanded = originalTreeLists.value
-        .map((item: TreeDataItem) => {
-          if ((item.deptName as string).indexOf(value) > -1) {
-            return item.deptId
-          }
-          return null
-        })
-        .filter((item, i, self) => item && self.indexOf(item) === i)
-      expandedKeys.value = expanded as number[]
-      searchValue.value = value
-      autoExpandParent.value = true
-    })
-    watch(selectedKeys, () => {
-      console.log('selectedKeys', selectedKeys)
-    })
 
     // 查询表单操作
+    const queryRef = ref()
     const queryParams = reactive({
-      userName: undefined,
+      userName: '',
       deptId: 0,
-      role: undefined,
+      role: '',
     })
-    // 表格操作
+    const formFields = reactive([
+      {
+        type: 'input',
+        label: '用户名',
+        name: 'userName',
+        value: '',
+        placeholder: '请输入用户名',
+      },
+      {
+        type: 'select',
+        label: '角色',
+        name: 'role',
+        value: [],
+        placeholder: '请选择角色',
+        options: [
+          {
+            value: '',
+            label: 'fdlks',
+          },
+        ],
+      },
+    ])
+
+    const handleQuery = (query: { userName: string; role: string }) => {
+      queryParams.userName = query.userName
+      queryParams.role = query.role
+      getList(queryParams)
+    }
+
+    /**
+     * 表格操作
+     */
+    const statusOptions = ref([])
+    const state = reactive({
+      selectedRowKeys: [],
+    })
     const userList = ref([])
     const pagination = reactive({
       total: 0,
       current: 1,
       pageSize: 10,
     })
+    // 判断删除按钮是否可点击
+    const hasSelected = computed(() => state.selectedRowKeys.length > 0)
+    // 多选框选择操作
+    const onSelectChange = (selectedRowKeys) => {
+      state.selectedRowKeys = selectedRowKeys
+    }
 
-    const roleOptions = ref([])
+    // 格式角色
+    const getRoles = (record) => {
+      return record.roles.map((list) => list.roleName).join(',')
+    }
 
-    // 新增修改表单操作
-    const formRef = ref()
+    // 新增按钮操作
+    const handleAdd = () => {
+      open.value = true
+      isUpdate.value = false
+      drawerTitle.value = '添加字典'
+    }
+
+    // 更新按钮操作
+    const handleUpdate = (row) => {
+      getUser(row.id).then((res) => {
+        open.value = true
+        isUpdate.value = true
+        drawerTitle.value = '修改字典'
+        nextTick(() => {
+          Object.keys(formState).forEach((key) => {
+            formState[key] = res.data[key]
+          })
+          formState.roleIds = res.data.roles.map((list) => list.id)
+          treeRef.value.forest.selectedNodeIds.push(res.data.deptId)
+          console.log(formState)
+        })
+      })
+    }
+
+    // 确认删除
+    const confirm = (row) => {
+      const id = row.id || state.selectedRowKeys
+      console.log(id)
+      delUser(id).then(() => {
+        getList()
+        Message.success('删除成功')
+      })
+    }
+    // 取消删除
+    const cancel = (e: MouseEvent) => {
+      console.log(e)
+      Message.success('取消删除')
+    }
+    // 部门树选项
+    const deptOptions = ref([])
+
+    // 获取表格数据
+    const getList = (queryParams?: {}) => {
+      listUser(queryParams).then((res) => {
+        console.log(res)
+        userList.value = res.data.rows
+        pagination.total = res.data.count
+      })
+
+      getDept().then((res) => {
+        // 获取菜单树
+        const children = handleTree(
+          res.data.rows,
+          'deptId',
+          'parentId',
+          'children',
+          userStore.userInfo.deptId
+        ).tree
+        const parent = res.data.rows.filter(
+          (item) => item.deptId === userStore.userInfo.deptId
+        )
+        parent[0].children = children
+        deptOptions.value = parent
+        console.log(deptOptions)
+      })
+    }
+
+    /**
+     * 推窗表单操作
+     */
+    // 获取部门树
+    const treeRef = ref()
     const formState: FormState = reactive({
       id: null,
       deptId: null,
@@ -459,26 +524,26 @@ export default defineComponent({
         { required: true, message: '用户名不能为空', trigger: 'blur' },
       ],
       password: [{ required: true, message: '密码不能为空', trigger: 'blur' }],
-      roleIds: [{ required: true, message: '角色不能为空', trigger: 'change' }],
+      roleIds: [
+        {
+          required: true,
+          validator: formRules.checkRoleLength,
+          trigger: 'change',
+        },
+      ],
     }
+    const { open, drawerTitle } = useDrawer()
+    // 是否更新操作
     const isUpdate = ref(false)
-    const onSubmit = () => {
-      formRef.value
-        .validate()
-        .then(() => {
-          console.log('values', formState, toRaw(formState))
-        })
-        .catch((error: ValidateErrorEntity<FormState>) => {
-          console.log('error', error)
-        })
+    // 上级部门选中事件
+    const handleTreeSelect = (node) => {
+      formState.deptId = node.deptId
     }
-    const resetForm = () => {
-      formRef.value.resetFields()
-    }
+    // 角色列表
+    const roleOptions = ref([])
 
-    const handleQuery = () => {
-      getList(queryParams)
-    }
+    // 新增修改表单操作
+    const formRef = ref()
 
     // 表单提交
     const handleSubmit = () => {
@@ -489,18 +554,18 @@ export default defineComponent({
           if (formState.id) {
             updateUser(formState).then((res) => {
               Message.success(res.message)
-              getList()
               formState.id = null
               formRef.value.resetFields()
               open.value = false
+              getList()
             })
           } else {
             addUser(formState).then((res) => {
               Message.success(res.message)
-              getList()
               formState.id = null
               formRef.value.resetFields()
               open.value = false
+              getList()
             })
           }
         })
@@ -509,23 +574,7 @@ export default defineComponent({
         })
     }
 
-    const getDeptList = () => {
-      getDept().then((res) => {
-        console.log(res)
-        originalTreeLists.value = res.data.rows
-        deptTreeOption.value = handleTree(
-          res.data.rows,
-          'deptId',
-          'parentId',
-          'children',
-          0
-        ).tree
-        expandedKeys.value = originalTreeLists.value.map(
-          (item: TreeDataItem) => item.id
-        )
-      })
-    }
-
+    // 序列化部门
     const normalizer = (node) => {
       if (node.children && !node.children.length) {
         delete node.children
@@ -537,48 +586,52 @@ export default defineComponent({
       }
     }
 
-    const state = reactive({
-      selectedRowKeys: [],
-    })
-    const hasSelected = computed(() => state.selectedRowKeys.length > 0)
-    const onSelectChange = (selectedRowKeys) => {
-      console.log('selectedRowKeys changed: ', selectedRowKeys)
-      state.selectedRowKeys = selectedRowKeys
-    }
-
-    const getList = (queryParams?: {}) => {
-      listUser(queryParams).then((res) => {
-        console.log(res)
-        userList.value = res.data.rows
-        pagination.total = res.data.count
-      })
-
-      getDept().then((res) => {
-        // 获取菜单树
-        const children = handleTree(
-          res.data.rows,
-          'deptId',
-          'parentId',
-          'children',
-          userStore.userInfo.deptId
-        ).tree
-        const parent = res.data.rows.filter(
-          (item) => item.deptId === userStore.userInfo.deptId
-        )
-        parent[0].children = children
-        deptOptions.value = parent
-        console.log(deptOptions)
-      })
-    }
-
-    // 取消推窗
-    const { open, drawerTitle } = useDrawer()
+    // 关闭推窗
     const handleClose = () => {
       formState.id = null
       formState.deptId = null
       formRef.value.resetFields()
       console.log(formState)
       open.value = false
+    }
+
+    /**
+     * 重置密码操作
+     */
+    const visible = ref<boolean>(false)
+    const resetformState = reactive({
+      id: 0,
+      newPassword: '',
+    })
+    const showModal = (row) => {
+      resetformState.id = row.id
+      visible.value = true
+    }
+    // 重置密码
+    const handleResetPwd = () => {
+      resetUserPwd(resetformState.id, {
+        newPassword: resetformState.newPassword,
+      }).then((res) => {
+        Message.success(res.message)
+        visible.value = false
+      })
+    }
+
+    // 获取部门数据
+    const getDeptList = () => {
+      getDept().then((res) => {
+        originalTree.value = res.data.rows
+        deptTreeOption.value = handleTree(
+          res.data.rows,
+          'deptId',
+          'parentId',
+          'children',
+          0
+        ).tree
+        deptSearchRef.value.expandedKeys.value = originalTree.value.map(
+          (item: TreeDataItem) => item.id
+        )
+      })
     }
 
     const init = () => {
@@ -589,44 +642,6 @@ export default defineComponent({
       })
     }
 
-    // 确认删除
-    const confirm = (row) => {
-      const id = row.id || state.selectedRowKeys
-      delUser(id).then(() => {
-        getList()
-        Message.success('删除成功')
-      })
-    }
-    // 取消删除
-    const cancel = (e: MouseEvent) => {
-      console.log(e)
-      Message.success('取消删除')
-    }
-    // 新增按钮操作
-    const handleAdd = () => {
-      open.value = true
-      isUpdate.value = false
-      drawerTitle.value = '添加字典'
-    }
-    // 更新按钮操作
-    const handleUpdate = (row) => {
-      getUser(row.id).then((res) => {
-        open.value = true
-        isUpdate.value = true
-        drawerTitle.value = '修改字典'
-        nextTick(() => {
-          Object.keys(formState).forEach((key) => {
-            formState[key] = res.data[key]
-          })
-          formState.roleIds = res.data.roles.map((list) => list.id)
-          treeRef.value.forest.selectedNodeIds.push(res.data.deptId)
-          console.log(formState)
-        })
-      })
-    }
-
-    const statusOptions = ref([])
-
     onMounted(async () => {
       statusOptions.value = await getDict('sys_normal_disable')
       init()
@@ -634,47 +649,54 @@ export default defineComponent({
 
     return {
       replaceFields,
-      selectedKeys,
-      expandedKeys,
-      searchValue,
-      autoExpandParent,
+      deptSearchRef,
+      originalTree,
       deptTreeOption,
-      onExpand,
       handleSelect,
-      selectDictLabel,
+
+      queryRef,
+      queryParams,
+      formFields,
+      handleQuery,
+
       statusOptions,
+      columns,
+      ...toRefs(state),
+      userList,
+      pagination,
+      selectDictLabel,
+      hasSelected,
+      onSelectChange,
+      getRoles,
       confirm,
       cancel,
       handleAdd,
       handleUpdate,
-      hasSelected,
-      ...toRefs(state),
-      onSelectChange,
 
-      queryParams,
-      handleQuery,
-      userList,
-      columns,
-      pagination,
-
-      isUpdate,
+      treeRef,
       formRef,
+      rules,
+      isUpdate,
       open,
+      drawerTitle,
       deptOptions,
       normalizer,
-      treeRef,
-      drawerTitle,
       handleClose,
       handleSubmit,
       labelCol: { span: 6 },
       wrapperCol: { span: 18 },
       formState,
-      rules,
-      onSubmit,
-      resetForm,
       roleOptions,
       handleTreeSelect,
+
+      visible,
+      ...toRefs(resetformState),
+      handleResetPwd,
+      showModal,
     }
+  },
+  computed: {
+    ...mapState(useAppStore, ['loading']),
   },
 })
 </script>

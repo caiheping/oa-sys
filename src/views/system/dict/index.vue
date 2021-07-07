@@ -1,45 +1,7 @@
 <template>
   <div class="p-4">
     <div class="mb-3">
-      <a-form layout="inline" :model="queryParams">
-        <a-form-item label="字典名称">
-          <a-input
-            allowClear="true"
-            v-model:value="queryParams.dictName"
-            placeholder="请输入字典名称"
-          />
-        </a-form-item>
-        <a-form-item label="字典类型">
-          <a-input
-            allowClear="true"
-            v-model:value="queryParams.dictType"
-            placeholder="请输入字典类型"
-          />
-        </a-form-item>
-        <a-form-item label="状态">
-          <a-select
-            allowClear="true"
-            v-model:value="queryParams.status"
-            placeholder="请选择状态"
-            style="width: 200px"
-            @select="handleQuery"
-          >
-            <a-select-option
-              v-for="dict in statusOptions"
-              :key="dict.dictValue"
-              :value="dict.dictValue"
-            >
-              {{ dict.dictLabel }}
-            </a-select-option>
-          </a-select>
-        </a-form-item>
-        <a-form-item>
-          <a-space>
-            <a-button type="primary" @click="handleQuery">搜索</a-button>
-            <a-button>重置</a-button>
-          </a-space>
-        </a-form-item>
-      </a-form>
+      <form-search :formFields="formFields" @search="handleQuery" />
     </div>
     <a-row :gutter="10" class="mb-2">
       <a-col>
@@ -192,6 +154,8 @@ import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
 import { useAppStore } from '@/store/modules/app'
 import { mapState } from 'pinia'
 
+import FormSearch from '@/components/FormSearch/index.vue'
+
 interface FormState {
   id: null | number
   dictName: string
@@ -242,7 +206,11 @@ const columns = [
 ]
 
 export default defineComponent({
+  components: {
+    FormSearch,
+  },
   setup() {
+    const statusOptions = ref([])
     const rules = {
       dictName: [
         { required: true, message: '字典名称不能为空', trigger: 'blur' },
@@ -252,13 +220,41 @@ export default defineComponent({
       ],
       status: [{ required: true, message: '状态不能为空', trigger: 'change' }],
     }
+    const formFields = reactive([
+      {
+        type: 'input',
+        label: '字典名称',
+        name: 'dictName',
+        value: '',
+        placeholder: '请输入字典名称',
+      },
+      {
+        type: 'input',
+        label: '字典类型',
+        name: 'dictType',
+        value: '',
+        placeholder: '请输入字典类型',
+      },
+      {
+        type: 'select',
+        label: '状态',
+        name: 'status',
+        value: [],
+        placeholder: '请选择角色状态',
+        normalizer: {
+          value: 'dictValue',
+          label: 'dictLabel',
+        },
+        options: statusOptions,
+      },
+    ])
     // 查询表单操作
     const queryParams = reactive({
       pageNum: 1,
       pageSize: 10,
-      dictName: undefined,
-      dictType: undefined,
-      status: undefined,
+      dictName: '',
+      dictType: '',
+      status: '',
     })
     // 表格操作
     const userList = ref([])
@@ -272,7 +268,14 @@ export default defineComponent({
     })
     const hasSelected = computed(() => state.selectedRowKeys.length > 0)
 
-    const handleQuery = () => {
+    const handleQuery = (query: {
+      dictName: string
+      dictType: string
+      status: string
+    }) => {
+      queryParams.dictName = query.dictName
+      queryParams.dictType = query.dictType
+      queryParams.status = query.status
       getList(queryParams)
     }
     const onSelectChange = (selectedRowKeys) => {
@@ -370,7 +373,6 @@ export default defineComponent({
       })
     }
 
-    const statusOptions = ref([])
     onMounted(async () => {
       statusOptions.value = await getDict('sys_normal_disable')
       console.log(statusOptions)
@@ -379,6 +381,7 @@ export default defineComponent({
 
     return {
       queryParams,
+      formFields,
       handleQuery,
       userList,
       columns,

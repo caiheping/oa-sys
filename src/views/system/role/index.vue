@@ -1,38 +1,7 @@
 <template>
   <div class="p-4">
     <div class="mb-3">
-      <a-form layout="inline" :model="queryParams">
-        <a-form-item label="角色名称">
-          <a-input
-            allowClear="true"
-            v-model:value="queryParams.roleName"
-            placeholder="请输入角色名称"
-          />
-        </a-form-item>
-        <a-form-item label="状态">
-          <a-select
-            allowClear="true"
-            v-model:value="queryParams.status"
-            placeholder="请选择角色状态"
-            style="width: 200px"
-            @select="handleQuery"
-          >
-            <a-select-option
-              v-for="dict in statusOptions"
-              :key="dict.dictValue"
-              :value="dict.dictValue"
-            >
-              {{ dict.dictLabel }}
-            </a-select-option>
-          </a-select>
-        </a-form-item>
-        <a-form-item>
-          <a-space>
-            <a-button type="primary" @click="handleQuery">搜索</a-button>
-            <a-button>重置</a-button>
-          </a-space>
-        </a-form-item>
-      </a-form>
+      <form-search :formFields="formFields" @search="handleQuery" />
     </div>
     <a-row :gutter="10" class="mb-2">
       <a-col>
@@ -207,6 +176,8 @@ import { message as Message } from 'ant-design-vue'
 import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
 import { handleTree } from '@/utils/tools'
 
+import FormSearch from '@/components/FormSearch/index.vue'
+
 interface FormState {
   id: null | number
   roleName: string
@@ -268,7 +239,11 @@ const columns = [
 ]
 
 export default defineComponent({
+  components: {
+    FormSearch,
+  },
   setup() {
+    const statusOptions = ref([])
     const checkMenus = () => {
       if (checkedKeys.value.length) {
         return Promise.resolve()
@@ -297,10 +272,30 @@ export default defineComponent({
     const queryParams = reactive({
       pageNum: 1,
       pageSize: 10,
-      roleName: undefined,
-      roleKey: undefined,
-      status: undefined,
+      roleName: '',
+      status: '',
     })
+    const formFields = reactive([
+      {
+        type: 'input',
+        label: '角色名称',
+        name: 'roleName',
+        value: '',
+        placeholder: '请输入角色名称',
+      },
+      {
+        type: 'select',
+        label: '状态',
+        name: 'status',
+        value: '',
+        placeholder: '请选择角色状态',
+        normalizer: {
+          value: 'dictValue',
+          label: 'dictLabel',
+        },
+        options: statusOptions,
+      },
+    ])
     // 表格操作
     const roleList = ref<RoleList[]>([])
     const pagination = reactive({
@@ -313,7 +308,10 @@ export default defineComponent({
     })
     const hasSelected = computed(() => state.selectedRowKeys.length > 0)
 
-    const handleQuery = () => {
+    const handleQuery = (query: { roleName: string; status: string }) => {
+      console.log(query)
+      queryParams.roleName = query.roleName
+      queryParams.status = query.status
       getList(queryParams)
     }
     const onSelectChange = (selectedRowKeys) => {
@@ -424,8 +422,6 @@ export default defineComponent({
       })
     }
 
-    const statusOptions = ref([])
-
     /** 查询菜单树结构 */
     const menuOptions = ref([])
     const checkedKeys = ref([])
@@ -439,7 +435,6 @@ export default defineComponent({
       getMenu().then((res) => {
         menuOptions.value = handleTree(res.data.rows, 'id', 'parentId').tree
       })
-      console.log(999999999, menuOptions)
     }
     onMounted(async () => {
       statusOptions.value = await getDict('sys_normal_disable')
@@ -449,6 +444,7 @@ export default defineComponent({
 
     return {
       queryParams,
+      formFields,
       handleQuery,
       roleList,
       columns,
