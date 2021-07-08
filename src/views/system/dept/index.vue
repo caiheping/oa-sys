@@ -11,6 +11,7 @@
       :columns="columns"
       :data-source="deptList"
       :defaultExpandAllRows="true"
+      :pagination="false"
     >
       <template #icon="{ record }">
         <div class="flex justify-center">

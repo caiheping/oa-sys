@@ -34,6 +34,7 @@
       :columns="columns"
       :data-source="userList"
       :pagination="pagination"
+      @change="handleTableChange"
     >
       <template #dictType="{ record }">
         <router-link :to="'dictData/' + record.id">
@@ -157,6 +158,7 @@ import { message as Message } from 'ant-design-vue'
 import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
 import { useAppStore } from '@/store/modules/app'
 import { mapState } from 'pinia'
+import { TableState } from 'ant-design-vue/es/table/interface'
 
 import FormSearch from '@/components/FormSearch/index.vue'
 
@@ -167,6 +169,7 @@ interface FormState {
   status: undefined | string
   remark: undefined | string
 }
+type Pagination = TableState['pagination']
 
 const columns = [
   {
@@ -266,6 +269,8 @@ export default defineComponent({
       dictType: string
       status: string
     }) => {
+      pagination.value.current = 1
+      queryParams.pageNum = pagination.value.current
       queryParams.dictName = query.dictName
       queryParams.dictType = query.dictType
       queryParams.status = query.status
@@ -273,11 +278,18 @@ export default defineComponent({
     }
     // 表格操作
     const userList = ref([])
-    const pagination = reactive({
+    const pagination = ref({
       total: 0,
       current: 1,
       pageSize: 10,
+      showSizeChanger: true,
     })
+    const handleTableChange = (page: Pagination) => {
+      (pagination.value as Pagination) = page
+      queryParams.pageNum = pagination.value.current
+      queryParams.pageSize = pagination.value.pageSize
+      getList(queryParams)
+    }
     const state = reactive({
       selectedRowKeys: [],
     })
@@ -292,13 +304,13 @@ export default defineComponent({
       listType(queryParams).then((res) => {
         console.log(res)
         userList.value = res.data.rows
-        pagination.total = res.data.count
+        pagination.value.total = res.data.count
         state.selectedRowKeys = []
       })
     }
 
     const init = () => {
-      getList()
+      getList(queryParams)
     }
 
     const formRef = ref()
@@ -326,7 +338,7 @@ export default defineComponent({
           if (formState.id) {
             updateType(formState).then((res) => {
               Message.success(res.message)
-              getList()
+              getList(queryParams)
               formState.id = undefined
               formRef.value.resetFields()
               open.value = false
@@ -334,7 +346,7 @@ export default defineComponent({
           } else {
             addType(formState).then((res) => {
               Message.success(res.message)
-              getList()
+              getList(queryParams)
               formState.id = undefined
               formRef.value.resetFields()
               open.value = false
@@ -349,7 +361,7 @@ export default defineComponent({
     const confirm = (row) => {
       const dictId = row.id || state.selectedRowKeys
       delType(dictId).then(() => {
-        getList()
+        getList(queryParams)
         Message.success('删除成功')
       })
     }
@@ -391,6 +403,7 @@ export default defineComponent({
       userList,
       columns,
       pagination,
+      handleTableChange,
       selectDictLabel,
       statusOptions,
       ...toRefs(state),

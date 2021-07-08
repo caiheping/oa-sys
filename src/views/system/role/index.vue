@@ -34,6 +34,7 @@
       :columns="columns"
       :data-source="roleList"
       :pagination="pagination"
+      @change="handleTableChange"
     >
       <template #roleKey="{ record }">
         <router-link :to="'dictData/' + record.id">
@@ -250,6 +251,7 @@ import { mapState } from 'pinia'
 import { message as Message } from 'ant-design-vue'
 import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
 import { handleTree } from '@/utils/tools'
+import { TableState } from 'ant-design-vue/es/table/interface'
 
 import FormSearch from '@/components/FormSearch/index.vue'
 
@@ -277,6 +279,8 @@ interface FormScopeState {
 interface RoleList extends FormState {
   checked: boolean
 }
+
+type Pagination = TableState['pagination']
 
 const columns = [
   {
@@ -383,18 +387,27 @@ export default defineComponent({
       },
     ])
     const handleQuery = (query: { roleName: string; status: string }) => {
-      console.log(query)
+      pagination.value.current = 1
+      queryParams.pageNum = pagination.value.current
       queryParams.roleName = query.roleName
       queryParams.status = query.status
       getList(queryParams)
     }
     // 表格操作
     const roleList = ref<RoleList[]>([])
-    const pagination = reactive({
+    const pagination = ref({
       total: 0,
       current: 1,
       pageSize: 10,
+      showSizeChanger: true,
     })
+
+    const handleTableChange = (page: Pagination) => {
+      (pagination.value as Pagination) = page
+      queryParams.pageNum = pagination.value.current
+      queryParams.pageSize = pagination.value.pageSize
+      getList(queryParams)
+    }
     const state = reactive({
       selectedRowKeys: [],
     })
@@ -409,7 +422,7 @@ export default defineComponent({
       getRole(queryParams).then((res) => {
         console.log(res)
         roleList.value = res.data.rows
-        pagination.total = res.data.count
+        pagination.value.total = res.data.count
         state.selectedRowKeys = []
         roleList.value.forEach((list) => {
           if (list.status === '1') {
@@ -422,7 +435,7 @@ export default defineComponent({
     }
 
     const init = () => {
-      getList()
+      getList(queryParams)
       getMenuTreeselect()
     }
 
@@ -455,7 +468,7 @@ export default defineComponent({
           if (formState.id) {
             updateRole(formState).then((res) => {
               Message.success(res.message)
-              getList()
+              getList(queryParams)
               formState.id = undefined
               formRef.value.resetFields()
               open.value = false
@@ -463,7 +476,7 @@ export default defineComponent({
           } else {
             addRole(formState).then((res) => {
               Message.success(res.message)
-              getList()
+              getList(queryParams)
               formState.id = undefined
               formRef.value.resetFields()
               open.value = false
@@ -478,7 +491,7 @@ export default defineComponent({
     const confirm = (row) => {
       const dictId = row.id || state.selectedRowKeys
       delRole(dictId).then(() => {
-        getList()
+        getList(queryParams)
         Message.success('删除成功')
       })
     }
@@ -579,7 +592,7 @@ export default defineComponent({
           updateRole(formScopeState).then((res) => {
             Message.success(res.message)
             dataScopeOpen.value = false
-            getList()
+            getList(queryParams)
           })
         })
         .catch((error: ValidateErrorEntity) => {
@@ -600,6 +613,7 @@ export default defineComponent({
       roleList,
       columns,
       pagination,
+      handleTableChange,
       selectDictLabel,
       statusOptions,
       ...toRefs(state),

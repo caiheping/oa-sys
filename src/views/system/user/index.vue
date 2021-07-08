@@ -51,6 +51,7 @@
           :columns="columns"
           :data-source="userList"
           :pagination="pagination"
+          @change="handleTableChange"
         >
           <template #department="{ text }">
             <span>
@@ -268,6 +269,7 @@ import { useUserStore } from '@/store/modules/user'
 import { formRules } from '@/utils/validate'
 import { useAppStore } from '@/store/modules/app'
 import { mapState } from 'pinia'
+import { TableState } from 'ant-design-vue/es/table/interface'
 
 // 组件
 import DeptSearch from '@/components/DeptSearch/index.vue'
@@ -286,6 +288,8 @@ interface FormState {
   email: undefined | string
   remark: undefined | string
 }
+
+type Pagination = TableState['pagination']
 
 const columns = [
   {
@@ -374,6 +378,8 @@ export default defineComponent({
       userName: undefined || '',
       deptId: 0,
       role: undefined || '',
+      pageNum: 1,
+      pageSize: 10,
     })
     const formFields = reactive([
       {
@@ -398,6 +404,8 @@ export default defineComponent({
     ])
 
     const handleQuery = (query: { userName: string; role: string }) => {
+      pagination.value.current = 1
+      queryParams.pageNum = pagination.value.current
       queryParams.userName = query.userName
       queryParams.role = query.role
       getList(queryParams)
@@ -411,11 +419,20 @@ export default defineComponent({
       selectedRowKeys: [],
     })
     const userList = ref([])
-    const pagination = reactive({
+    const pagination = ref({
       total: 0,
       current: 1,
       pageSize: 10,
+      showSizeChanger: true,
+      // showTotal: () => `共 ${pagination.value.total} 条`,
     })
+
+    const handleTableChange = (page: Pagination) => {
+      (pagination.value as Pagination) = page
+      queryParams.pageNum = pagination.value.current
+      queryParams.pageSize = pagination.value.pageSize
+      getList(queryParams)
+    }
     // 判断删除按钮是否可点击
     const hasSelected = computed(() => state.selectedRowKeys.length > 0)
     // 多选框选择操作
@@ -457,7 +474,7 @@ export default defineComponent({
       const id = row.id || state.selectedRowKeys
       console.log(id)
       delUser(id).then(() => {
-        getList()
+        getList(queryParams)
         Message.success('删除成功')
       })
     }
@@ -474,7 +491,7 @@ export default defineComponent({
       listUser(queryParams).then((res) => {
         console.log(res)
         userList.value = res.data.rows
-        pagination.total = res.data.count
+        pagination.value.total = res.data.count
       })
 
       getDept().then((res) => {
@@ -507,7 +524,7 @@ export default defineComponent({
       userName: undefined,
       password: undefined,
       sex: '1',
-      roleIds: undefined,
+      roleIds: undefined || [],
       mobile: undefined,
       status: '1',
       email: undefined,
@@ -556,17 +573,19 @@ export default defineComponent({
             updateUser(formState).then((res) => {
               Message.success(res.message)
               formState.id = undefined
+              formState.roleIds = undefined
               formRef.value.resetFields()
               open.value = false
-              getList()
+              getList(queryParams)
             })
           } else {
             addUser(formState).then((res) => {
               Message.success(res.message)
               formState.id = undefined
+              formState.roleIds = undefined
               formRef.value.resetFields()
               open.value = false
-              getList()
+              getList(queryParams)
             })
           }
         })
@@ -637,7 +656,7 @@ export default defineComponent({
 
     const init = () => {
       getDeptList()
-      getList()
+      getList(queryParams)
       getRole().then((res) => {
         roleOptions.value = res.data.rows
       })
@@ -665,6 +684,7 @@ export default defineComponent({
       ...toRefs(state),
       userList,
       pagination,
+      handleTableChange,
       selectDictLabel,
       hasSelected,
       onSelectChange,

@@ -11,6 +11,7 @@
       :columns="columns"
       :data-source="menuList"
       :defaultExpandAllRows="true"
+      :pagination="false"
     >
       <template #icon="{ record }">
         <div class="flex justify-center">
@@ -305,7 +306,6 @@ export default defineComponent({
   },
   setup() {
     const treeRef = ref()
-    console.log(Object.keys(dynamicRouter))
     const dynamicComponents = ref(Object.keys(dynamicRouter))
     const rules = {
       parentId: [
