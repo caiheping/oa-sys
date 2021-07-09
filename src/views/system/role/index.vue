@@ -505,7 +505,6 @@ export default defineComponent({
     const handleAdd = () => {
       open.value = true
       drawerTitle.value = '添加角色'
-      console.log(99)
     }
     // 更新按钮操作
     const handleUpdate = (row) => {

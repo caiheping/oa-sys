@@ -1,25 +1,23 @@
 <template>
-  <div v-if="!item.hidden">
-    <a-sub-menu v-if="item.children && item.children.length" class="subMenu">
-      <template #title>
-        <span v-if="item?.meta?.icon" class="anticon anticon-pie-chart">
-          <svg-icon :name="item?.meta?.icon" />
-        </span>
-        <span>{{ item?.meta?.title }}</span>
-      </template>
-      <SidebarItem
-        v-for="list in item.children"
-        :key="list.name"
-        :item="list"
-      />
-    </a-sub-menu>
-    <a-menu-item v-else class="subMenu">
+  <a-sub-menu
+    :key="item?.name"
+    v-if="item.children && item.children.length"
+    class="subMenu"
+  >
+    <template #icon>
       <span v-if="item?.meta?.icon" class="anticon anticon-pie-chart">
         <svg-icon :name="item?.meta?.icon" />
       </span>
-      <span>{{ item?.meta?.title }}</span>
-    </a-menu-item>
-  </div>
+    </template>
+    <template #title>{{ item?.meta?.title }}</template>
+    <SidebarItem v-for="list in item.children" :key="list.name" :item="list" />
+  </a-sub-menu>
+  <a-menu-item :key="item?.name" v-else class="subMenu">
+    <span v-if="item?.meta?.icon" class="anticon anticon-pie-chart">
+      <svg-icon :name="item?.meta?.icon" />
+    </span>
+    <span>{{ item?.meta?.title }}</span>
+  </a-menu-item>
 </template>
 
 <script lang="ts">

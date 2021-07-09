@@ -33,7 +33,6 @@ const constantRoutes: AppRouteRecordRaw[] = [
         name: "Profile",
         meta: {
           title: "个人中心",
-          icon: "user",
           menuType: "C",
         },
       },

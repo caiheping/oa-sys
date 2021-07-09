@@ -40,6 +40,7 @@ import { useRoute } from 'vue-router'
 import { Scrollbar } from '@/components/Scrollbar'
 import SidebarItem from './SidebarItem.vue'
 import router from '@/router'
+
 export default defineComponent({
   components: {
     Scrollbar,

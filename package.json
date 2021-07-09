@@ -10,7 +10,7 @@
   "dependencies": {
     "@vueuse/core": "^5.0.2",
     "all": "^0.0.0",
-    "ant-design-vue": "^2.1.6",
+    "ant-design-vue": "^2.2.0",
     "axios": "^0.21.1",
     "js-cookie": "^2.2.1",
     "lodash-es": "^4.17.21",

@@ -12,10 +12,17 @@ function filterAsyncRouter(asyncRouterMap: any) {
   asyncRouterMap.forEach((item: any) => {
     item.children = [];
     item.component = dynamicRouter[item.component];
+    item.meta = {
+      title: item.title,
+      menuType: item.menuType,
+      noCache: item.keepAlive,
+      icon: item.icon,
+    }
     routesObj[item.id] = item;
   });
+
   const routes: any = [];
-  const menus: any = [];
+
   asyncRouterMap.forEach((list: any) => {
     const obj = {
       path: list.path,
@@ -26,7 +33,7 @@ function filterAsyncRouter(asyncRouterMap: any) {
       meta: {
         title: list.title,
         menuType: list.menuType,
-        noCache: true, // 不缓存
+        noCache: list.keepAlive,
         icon: list.icon,
       },
     };
@@ -36,7 +43,7 @@ function filterAsyncRouter(asyncRouterMap: any) {
       if (list.path.indexOf("/layout") !== -1) {
         routes.push({
           path: list.path,
-          // name: list.name,
+          name: list.name,
           component: dynamicRouter.Layout,
           hidden: list.visible !== "1",
           children: [obj],
@@ -49,7 +56,43 @@ function filterAsyncRouter(asyncRouterMap: any) {
       } else {
         routes.push(obj);
       }
-      menus.push(obj);
+    }
+  });
+
+  // 菜单列表
+  const menuDatas = JSON.parse(JSON.stringify(asyncRouterMap.filter((item: any) => item.visible === "1")))
+  const menusObj: any = {};
+  const menus: any = [];
+  menuDatas.forEach((item: any) => {
+    item.children = [];
+    item.component = dynamicRouter[item.component];
+    item.meta = {
+      title: item.title,
+      menuType: item.menuType,
+      noCache: item.keepAlive,
+      icon: item.icon,
+    }
+    menusObj[item.id] = item;
+  });
+
+  menuDatas.forEach((list: any) => {
+    const obj = {
+      path: list.path,
+      name: list.name,
+      component: list.component,
+      hidden: list.visible !== "1",
+      children: list.children,
+      meta: {
+        title: list.title,
+        menuType: list.menuType,
+        noCache: list.keepAlive,
+        icon: list.icon,
+      },
+    };
+    if (list.parentId !== 0) {
+      menusObj[list.parentId].children.push(obj);
+    } else {
+      menus.push(menusObj[list.id])
     }
   });
   return {

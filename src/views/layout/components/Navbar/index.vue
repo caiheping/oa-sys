@@ -107,17 +107,20 @@
       >
         <a-dropdown>
           <a class="flex items-center" @click.prevent>
-            <img :src="avatar" class="w-8 h-8 rounded-full mr-2" alt="" />
-            <span class="text-size-[18px] text-gray-600">Cai</span>
+            <img
+              :src="userInfo.avatar ? baseUrl + userInfo.avatar : avatar"
+              class="w-8 h-8 rounded-full mr-2"
+              alt=""
+            />
+            <span class="text-size-[18px] text-gray-600">{{
+              userInfo.nickName
+            }}</span>
           </a>
           <template #overlay>
             <a-menu @click="handleMenuClick">
-              <a-menu-item key="0">
+              <a-menu-item key="1">
                 <span>个人中心</span>
               </a-menu-item>
-              <!-- <a-menu-item key="1">
-                <span>布局设置</span>
-              </a-menu-item> -->
               <a-menu-divider />
               <a-menu-item key="3">退出登录</a-menu-item>
             </a-menu>
@@ -147,7 +150,7 @@
         title="系统配置"
         :placement="placement"
         :maskClosable="false"
-        :visible="visible"
+        :visible="openSetting"
         @close="onClose"
       >
         <a-divider>侧边栏</a-divider>
@@ -236,7 +239,8 @@ export default defineComponent({
   },
   setup() {
     const placement = ref<string>('right')
-    const visible = ref<boolean>(false)
+    const openSetting = ref<boolean>(false)
+    const baseUrl = import.meta.env.VITE_GLOB_API_URL
     const appStore = useAppStore()
     const userStore = useUserStore()
     const { toggle, isFullscreen } = useFullscreen()
@@ -251,6 +255,9 @@ export default defineComponent({
 
     const handleMenuClick = async (e: MenuInfo) => {
       console.log(e)
+      if (e.key === '1') {
+        router.push('/user/profile')
+      }
       if (e.key === '3') {
         const res = await userStore.Logout()
         if (res.code === 0) {
@@ -266,11 +273,11 @@ export default defineComponent({
     }
 
     const showDrawer = () => {
-      visible.value = true
+      openSetting.value = true
     }
 
     const onClose = () => {
-      visible.value = false
+      openSetting.value = false
     }
 
     const handleSaveSetting = () => {
@@ -280,6 +287,7 @@ export default defineComponent({
       }
       localStorage.setItem('sysSettings', JSON.stringify(settings))
       Message.success('保存成功')
+      openSetting.value = false
     }
 
     const handleResetSetting = () => {
@@ -290,13 +298,14 @@ export default defineComponent({
     return {
       toggleCollapsed,
       avatar,
+      baseUrl,
       settings,
       handleMenuClick,
       handleLocaleClick,
       toggle,
       isFullscreen,
       placement,
-      visible,
+      openSetting,
       showDrawer,
       onClose,
       handleSaveSetting,
@@ -304,6 +313,7 @@ export default defineComponent({
     }
   },
   computed: {
+    ...mapState(useUserStore, ['userInfo']),
     ...mapState(useAppStore, ['collapsed', 'headerConfig', 'sideBarConfig']),
   },
 })

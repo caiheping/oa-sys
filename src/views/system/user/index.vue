@@ -53,9 +53,9 @@
           :pagination="pagination"
           @change="handleTableChange"
         >
-          <template #department="{ text }">
+          <template #department="{ record }">
             <span>
-              {{ text.department.deptName }}
+              {{ record.department.deptName }}
             </span>
           </template>
           <template #status="{ record }">
@@ -227,10 +227,18 @@
     </a-drawer>
 
     <!-- 重置密码 -->
-    <a-modal v-model:visible="visible" title="重置密码" @ok="handleResetPwd">
+    <a-modal
+      v-model:visible="visible"
+      title="重置密码"
+      @ok="handleResetPwd"
+      @cancel="handleResetClose"
+    >
       <div class="flex items-center">
         <span class="whitespace-nowrap">新密码：</span>
-        <a-input v-model:value="newPassword" placeholder="请输入密码" />
+        <a-input-password
+          v-model:value="newPassword"
+          placeholder="请输入密码"
+        />
       </div>
     </a-modal>
   </div>
@@ -629,12 +637,22 @@ export default defineComponent({
     }
     // 重置密码
     const handleResetPwd = () => {
+      if (!resetformState.newPassword) {
+        Message.error('新密码不能为空')
+        return
+      }
       resetUserPwd(resetformState.id, {
         newPassword: resetformState.newPassword,
       }).then((res) => {
         Message.success(res.message)
+        resetformState.newPassword = ''
         visible.value = false
       })
+    }
+    // 取消重置密码
+    const handleResetClose = () => {
+      resetformState.newPassword = ''
+      visible.value = false
     }
 
     // 获取部门数据
@@ -713,6 +731,7 @@ export default defineComponent({
       visible,
       ...toRefs(resetformState),
       handleResetPwd,
+      handleResetClose,
       showModal,
     }
   },

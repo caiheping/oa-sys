@@ -44,6 +44,7 @@ function errorState(error: any) {
       message = "token失效";
       Message.error(message);
       removeToken();
+      window.location.reload()
       break;
     case 403:
       message = "拒绝访问";
