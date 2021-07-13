@@ -19,10 +19,10 @@
           />
         </div>
         <a-row :gutter="10" class="mb-2">
-          <a-col>
-            <a-button color="success" @click="handleAdd">新增</a-button>
+          <a-col v-has-permi="['system:user:add']">
+            <a-button color="success" @click="handleAdd"> 新增 </a-button>
           </a-col>
-          <a-col>
+          <a-col v-has-permi="['system:user:delete']">
             <a-popconfirm
               title="确定要删除选中数据吗？"
               ok-text="确定"
@@ -71,6 +71,7 @@
                 color="success"
                 class="mr-3"
                 @click="handleUpdate(record)"
+                v-has-permi="['system:user:update']"
               >
                 修改
               </a-button>
@@ -79,6 +80,7 @@
                 color="success"
                 class="mr-3"
                 @click="showModal(record)"
+                v-has-permi="['system:user:resetPwd']"
               >
                 重置密码
               </a-button>
@@ -89,7 +91,13 @@
                 @confirm="confirm(record)"
                 @cancel="cancel"
               >
-                <a-button type="link" color="error">删除</a-button>
+                <a-button
+                  type="link"
+                  color="error"
+                  v-has-permi="['system:user:delete']"
+                >
+                  删除
+                </a-button>
               </a-popconfirm>
             </span>
           </template>

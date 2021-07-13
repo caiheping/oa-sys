@@ -8,10 +8,10 @@
       />
     </div>
     <a-row :gutter="10" class="mb-2">
-      <a-col>
-        <a-button color="success" @click="handleAdd">新增</a-button>
+      <a-col v-has-permi="['system:role:add']">
+        <a-button color="success" @click="handleAdd"> 新增 </a-button>
       </a-col>
-      <a-col>
+      <a-col v-has-permi="['system:role:delete']">
         <a-popconfirm
           title="确定要删除选中数据吗？"
           ok-text="确定"
@@ -51,6 +51,7 @@
             color="success"
             class="mr-3"
             @click="handleUpdate(record)"
+            v-has-permi="['system:role:update']"
           >
             修改
           </a-button>
@@ -59,6 +60,7 @@
             color="warning"
             class="mr-3"
             @click="handleScopeOpen(record)"
+            v-has-permi="['system:role:update']"
           >
             数据权限
           </a-button>
@@ -69,7 +71,13 @@
             @confirm="confirm(record)"
             @cancel="cancel"
           >
-            <a-button type="link" color="error">删除</a-button>
+            <a-button
+              type="link"
+              color="error"
+              v-has-permi="['system:role:delete']"
+            >
+              删除
+            </a-button>
           </a-popconfirm>
         </span>
       </template>

@@ -2,8 +2,15 @@
   <a-row :gutter="24">
     <a-col :span="8">
       <a-card title="基本信息">
-        <div>
-          <img :src="userInfo.avatar" alt="" />
+        <div class="flex justify-center">
+          <img
+            @click="isShowDialog = true"
+            class="rounded-full block w-50 h-50"
+            :src="
+              userInfo.avatar ? baseImgUrl + userInfo.avatar : defaultAvatar
+            "
+            alt=""
+          />
         </div>
         <ul>
           <li
@@ -78,6 +85,7 @@
               html-type="submit"
               class="mr-3"
               @click="handleSubmit"
+              v-has-permi="['system:user:update']"
             >
               保存修改
             </a-button>
@@ -87,6 +95,62 @@
       </a-card>
     </a-col>
   </a-row>
+
+  <!-- 用于裁切的弹窗 -->
+  <a-modal
+    v-model:visible="isShowDialog"
+    title="上传图片"
+    :maskClosable="false"
+    width="750px"
+    @cancel="handleCancle"
+  >
+    <template #footer>
+      <a-button class="select-picture">
+        <span>选择图片</span>
+        <input
+          class="absolute top-0 left-0 w-[100%] h-[100%] opacity-0"
+          ref="uploadInput"
+          type="file"
+          accept="image/jpg, image/jpeg, image/png, image/gif"
+          @change="selectFile"
+        />
+      </a-button>
+      <a-button
+        type="primary"
+        @click="getResult"
+        v-has-permi="['system:user:update']"
+      >
+        上传
+      </a-button>
+    </template>
+    <div class="flex justify-between">
+      <p v-show="!pic" class="text-center w-[100%] text-color-[#999]">
+        请选择图片
+      </p>
+      <!-- 图片裁切插件 -->
+      <vue-picture-cropper
+        v-show="pic"
+        :boxStyle="{
+          width: '75%',
+          height: '100%',
+          backgroundColor: '#f8f8f8',
+          margin: 'auto',
+        }"
+        :img="pic"
+        :options="{
+          viewMode: 1,
+          dragMode: 'crop',
+          aspectRatio: 1 / 1,
+          preview: '.preview',
+        }"
+      />
+      <!-- 图片裁切插件 -->
+      <div v-show="pic" class="preview" ref="preview">
+        <img :src="result" alt="" />
+      </div>
+    </div>
+  </a-modal>
+  <!-- 用于裁切的弹窗 -->
 </template>
 
 <script lang="ts">
@@ -95,8 +159,14 @@ import { message as Message } from 'ant-design-vue'
 import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
 import { useUserStore } from '@/store/modules/user'
 import { mapState } from 'pinia'
+import VuePictureCropper, { cropper } from 'vue-picture-cropper/dist/esm'
 
-import { updateUser } from '@/api/admin/system/user'
+import {
+  updateUser,
+  uploadAvatar,
+  updateUserImg,
+} from '@/api/admin/system/user'
+import defaultAvatar from '../../../../assets/images/profile.jpg'
 
 interface FormState {
   nickName: undefined | string
@@ -106,8 +176,12 @@ interface FormState {
 }
 
 export default defineComponent({
+  components: {
+    VuePictureCropper,
+  },
   setup() {
     const userStore = useUserStore()
+    const baseImgUrl = import.meta.env.VITE_GLOB_IMAGE_URL
     console.log(userStore)
     const getRoleName = (roles) => {
       return roles.map((item) => item.roleName).join()
@@ -154,13 +228,94 @@ export default defineComponent({
     const resetForm = () => {
       formRef.value.resetFields()
     }
+
+    const pic = ref<string>('')
+    const result = ref<string>('')
+    const uploadInput = ref<HTMLInputElement | null>(null)
+    const isShowDialog = ref<boolean>(false)
+    /**
+     * 选择图片
+     */
+    const selectFile = (e: Event): void => {
+      // 获取选取的文件
+      const target = e.target as HTMLInputElement
+      const { files } = target
+      if (!files) return
+      const file: File = files[0]
+      // 转换为base64传给裁切组件
+      const reader: FileReader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = (): void => {
+        // 更新裁切弹窗的图片源
+        pic.value = String(reader.result)
+      }
+    }
+
+    /**
+     * 获取裁切结果
+     */
+    const getResult = (): void => {
+      // 获取生成的base64图片地址
+      const base64: string = cropper.getDataURL()
+      // 获取生成的blob文件信息
+      const blob: Blob = cropper.getBlob()
+      console.log({ base64, blob })
+      // 把base64赋给结果展示区
+      result.value = base64
+      const formData = new FormData()
+      console.log(
+        (uploadInput.value as any).files[0].name,
+        (uploadInput.value as any).files[0].type
+      )
+      const file = new window.File(
+        [blob],
+        (uploadInput.value as any).files[0].name,
+        {
+          type: (uploadInput.value as any).files[0].type,
+        }
+      )
+      formData.append('file', file)
+      uploadAvatar(formData)
+        .then((res) => {
+          console.log(res)
+          const query = {
+            avatar: res.data.path,
+          }
+          updateUserImg(userStore.userInfo.id, query).then((res) => {
+            Message.success(res.message)
+            isShowDialog.value = false
+            window.location.reload()
+          })
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    }
+
+    const handleCancle = () => {
+      // 清空已选择的文件
+      if (uploadInput.value) {
+        uploadInput.value.value = ''
+      }
+      pic.value = ''
+      result.value = ''
+      isShowDialog.value = false
+    }
     return {
+      baseImgUrl,
+      defaultAvatar,
       getRoleName,
 
       formState,
       formRef,
       resetForm,
       handleSubmit,
+      selectFile,
+      getResult,
+      isShowDialog,
+      pic,
+      uploadInput,
+      handleCancle,
     }
   },
   computed: {
@@ -168,3 +323,17 @@ export default defineComponent({
   },
 })
 </script>
+
+<style lang="less" scoped>
+.preview {
+  display: block;
+  overflow: hidden;
+  width: 125px;
+  height: 125px;
+  border-radius: 50%;
+  img {
+    width: 100%;
+    height: 100%;
+  }
+}
+</style>

@@ -32,7 +32,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, computed, nextTick } from 'vue'
+import { defineComponent, ref, watch, computed } from 'vue'
 import { TreeDataItem } from 'ant-design-vue/es/tree/Tree'
 
 export default defineComponent({

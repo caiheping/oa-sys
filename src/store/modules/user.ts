@@ -64,7 +64,7 @@ export const useUserStore = defineStore({
         res.data.user.avatar === ""
           ? require("@/assets/images/profile.jpg")
           : res.data.user.avatar;
-        if (res.data?.roles && res.data.roles.length > 0) {
+        if (res.data?.user?.roles && res.data.user?.roles.length > 0) {
           // 验证返回的roles是否是一个非空数组
           this.roles = res.data.roles;
           this.permissions = res.data.permissions;

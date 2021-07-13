@@ -44,8 +44,8 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
   // The boolean type read by loadEnv is a string. This function can be converted to boolean type
   const viteEnv = wrapperEnv(env);
 
-  const { VITE_PORT, VITE_PROXY, VITE_DROP_CONSOLE, OUT_DIR, VITE_GLOB_API_URL } = viteEnv
-  // console.log(VITE_PORT, VITE_GLOB_API_URL, VITE_PROXY, VITE_DROP_CONSOLE)
+  const { VITE_PORT, VITE_PROXY, VITE_DROP_CONSOLE, OUT_DIR, VITE_GLOB_API_URL, VITE_GLOB_IMAGE_URL } = viteEnv
+  // console.log(VITE_PORT, VITE_GLOB_API_URL, VITE_PROXY, VITE_DROP_CONSOLE, VITE_GLOB_IMAGE_URL)
   return {
     base: '/',
     root,
@@ -74,6 +74,11 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, ''),
         },
+        [VITE_GLOB_IMAGE_URL]: {
+          target: 'http://127.0.0.1:7002',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/img_url/, ''),
+        }
       },
     },
     build: {

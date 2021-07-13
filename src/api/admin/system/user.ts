@@ -54,3 +54,9 @@ export function importTemplate(params = {}) {
 export function getInfo(params = {}) {
   return HttpRequest('/admin/system/getInfo', Methods.get, params, false)
 }
+
+// 上传头像
+export function uploadAvatar(params = {}) {
+  return HttpRequest('/upload', Methods.post, params)
+}
+

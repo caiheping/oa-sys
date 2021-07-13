@@ -108,7 +108,7 @@
         <a-dropdown>
           <a class="flex items-center" @click.prevent>
             <img
-              :src="userInfo.avatar ? baseUrl + userInfo.avatar : avatar"
+              :src="userInfo.avatar ? baseImgUrl + userInfo.avatar : avatar"
               class="w-8 h-8 rounded-full mr-2"
               alt=""
             />
@@ -240,7 +240,7 @@ export default defineComponent({
   setup() {
     const placement = ref<string>('right')
     const openSetting = ref<boolean>(false)
-    const baseUrl = import.meta.env.VITE_GLOB_API_URL
+    const baseImgUrl = import.meta.env.VITE_GLOB_IMAGE_URL
     const appStore = useAppStore()
     const userStore = useUserStore()
     const { toggle, isFullscreen } = useFullscreen()
@@ -298,7 +298,7 @@ export default defineComponent({
     return {
       toggleCollapsed,
       avatar,
-      baseUrl,
+      baseImgUrl,
       settings,
       handleMenuClick,
       handleLocaleClick,

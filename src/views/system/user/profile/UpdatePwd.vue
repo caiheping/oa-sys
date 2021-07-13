@@ -35,6 +35,7 @@
         html-type="submit"
         class="mr-3"
         @click="handleSubmit"
+        v-has-permi="['system:user:update']"
       >
         保存修改
       </a-button>
