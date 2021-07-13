@@ -17,7 +17,7 @@ import "ant-design-vue/dist/antd.less";
 import "./assets/styles/index.less";
 
 (async () => {
-  // console.log(import.meta.env.VITE_GLOB_API_URL)
+  console.log(import.meta.env.MODE)
   const app = createApp(App);
   app.use(Antd);
 

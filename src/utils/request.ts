@@ -1,7 +1,8 @@
 import axios from "axios";
 import { useAppStore } from "@/store/modules/app";
-import { message as Message } from "ant-design-vue";
+import { message as Message, Modal } from "ant-design-vue";
 import { getToken, removeToken } from "@/utils/auth";
+import { baseUrl } from '@/config'
 
 axios.defaults.withCredentials = true; // 跨域访问需要发送cookie时一定要加这句
 
@@ -41,10 +42,16 @@ function errorState(error: any) {
       }
       break;
     case 401:
-      message = "token失效";
-      Message.error(message);
-      removeToken();
-      window.location.reload()
+      Modal.confirm({
+        title: '系统信息',
+        content: '登录状态已过期，您可以继续留在该页面，或者重新登录',
+        onOk() {
+          removeToken();
+          window.location.reload()
+        },
+        onCancel() { },
+      });
+
       break;
     case 403:
       message = "拒绝访问";
@@ -82,7 +89,7 @@ function HttpRequest(
   // 设置token
   const token = getToken();
   const httpDefault = {
-    baseURL: import.meta.env.VITE_GLOB_API_URL as string,
+    baseURL: baseUrl,
     method,
     url,
     headers: {

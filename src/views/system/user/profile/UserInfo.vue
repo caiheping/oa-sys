@@ -166,7 +166,8 @@ import {
   uploadAvatar,
   updateUserImg,
 } from '@/api/admin/system/user'
-import defaultAvatar from '../../../../assets/images/profile.jpg'
+import defaultAvatar from '@/assets/images/profile.jpg'
+import { imageUrl } from '@/config'
 
 interface FormState {
   nickName: undefined | string
@@ -181,7 +182,7 @@ export default defineComponent({
   },
   setup() {
     const userStore = useUserStore()
-    const baseImgUrl = import.meta.env.VITE_GLOB_IMAGE_URL
+    const baseImgUrl = imageUrl
     console.log(userStore)
     const getRoleName = (roles) => {
       return roles.map((item) => item.roleName).join()

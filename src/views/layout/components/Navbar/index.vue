@@ -225,6 +225,7 @@ import avatar from '@/assets/images/profile.jpg'
 import settings from '@/settings'
 import router from '@/router'
 import { useFullscreen } from '@vueuse/core'
+import { imageUrl } from '@/config'
 
 interface MenuInfo {
   key: string
@@ -240,7 +241,7 @@ export default defineComponent({
   setup() {
     const placement = ref<string>('right')
     const openSetting = ref<boolean>(false)
-    const baseImgUrl = import.meta.env.VITE_GLOB_IMAGE_URL
+    const baseImgUrl = imageUrl
     const appStore = useAppStore()
     const userStore = useUserStore()
     const { toggle, isFullscreen } = useFullscreen()

@@ -1,54 +1,17 @@
-import { UserConfig, ConfigEnv, defineConfig, loadEnv } from 'vite';
+import { UserConfig, defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import viteSvgIcons from 'vite-plugin-svg-icons';
-
 
 // vite.config.js
 import WindiCSS from 'vite-plugin-windicss'
 
 import { resolve } from 'path';
 
-import { Recordable, ViteEnv } from './types/global'
 
-// function pathResolve(dir: string) {
-//   return resolve(process.cwd(), '.', dir);
-// }
-
-function wrapperEnv(envConf: Recordable): ViteEnv {
-  const ret: any = {};
-
-  for (const envName of Object.keys(envConf)) {
-    let realName = envConf[envName].replace(/\\n/g, '\n');
-    realName = realName === 'true' ? true : realName === 'false' ? false : realName;
-
-    if (envName === 'VITE_PORT') {
-      realName = Number(realName);
-    }
-    if (envName === 'VITE_PROXY') {
-      try {
-        realName = JSON.parse(realName);
-      } catch (error) { }
-    }
-    ret[envName] = realName;
-    process.env[envName] = realName;
-  }
-  return ret;
-}
-
-export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
-  console.log(command)
-  const root = process.cwd();
-
-  const env = loadEnv(mode, root);
-
-  // The boolean type read by loadEnv is a string. This function can be converted to boolean type
-  const viteEnv = wrapperEnv(env);
-
-  const { VITE_PORT, VITE_PROXY, VITE_DROP_CONSOLE, OUT_DIR, VITE_GLOB_API_URL, VITE_GLOB_IMAGE_URL } = viteEnv
-  // console.log(VITE_PORT, VITE_GLOB_API_URL, VITE_PROXY, VITE_DROP_CONSOLE, VITE_GLOB_IMAGE_URL)
+export default defineConfig((): UserConfig => {
   return {
     base: '/',
-    root,
+    // root,
     resolve: {
       alias: {
         '@': resolve(__dirname, 'src'), //设置别名
@@ -66,15 +29,15 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
     ],
     server: {
       host: '0.0.0.0',
-      port: VITE_PORT,
+      port: 8088,
       open: false,
       proxy: {
-        [VITE_GLOB_API_URL]: {
-          target: VITE_PROXY,
+        '/api': {
+          target: 'http://127.0.0.1:7002/api/v1',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, ''),
         },
-        [VITE_GLOB_IMAGE_URL]: {
+        '/img_url': {
           target: 'http://127.0.0.1:7002',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/img_url/, ''),
@@ -82,7 +45,7 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
       },
     },
     build: {
-      outDir: OUT_DIR,
+      outDir: 'www',
       rollupOptions: {
         output: {
           manualChunks: {
@@ -93,7 +56,7 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
       terserOptions: {
         compress: {
           keep_infinity: true,
-          drop_console: VITE_DROP_CONSOLE,
+          drop_console: false,
         },
       },
       brotliSize: false,
