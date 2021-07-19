@@ -393,7 +393,7 @@ export default defineComponent({
     const queryParams = reactive({
       userName: undefined || '',
       deptId: 0,
-      role: undefined || '',
+      roleId: undefined || '',
       pageNum: 1,
       pageSize: 10,
     })
@@ -408,7 +408,7 @@ export default defineComponent({
       {
         type: 'select',
         label: '角色',
-        name: 'role',
+        name: 'roleId',
         value: undefined,
         placeholder: '请选择角色',
         normalizer: {
@@ -419,11 +419,11 @@ export default defineComponent({
       },
     ])
 
-    const handleQuery = (query: { userName: string; role: string }) => {
+    const handleQuery = (query: { userName: string; roleId: string }) => {
       pagination.value.current = 1
       queryParams.pageNum = pagination.value.current
       queryParams.userName = query.userName
-      queryParams.role = query.role
+      queryParams.roleId = query.roleId
       getList(queryParams)
     }
 
