@@ -1,27 +1,40 @@
-# Vue 3 + Typescript + Vite
+# OA
 
-This template should help get you started developing with Vue 3 and Typescript in Vite.
+## 描述
 
-## Recommended IDE Setup
+OA 为前后端分离的企业员工管理系统。
 
-[VSCode](https://code.visualstudio.com/) + [Vetur](https://marketplace.visualstudio.com/items?itemName=octref.vetur). Make sure to enable `vetur.experimental.templateInterpolationService` in settings!
+## 技术栈
 
-### If Using `<script setup>`
+后端技术栈：egg.js + mysql + sequelize + jwt 等
 
-[`<script setup>`](https://github.com/vuejs/rfcs/pull/227) is a feature that is currently in RFC stage. To get proper IDE support for the syntax, use [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar) instead of Vetur (and disable Vetur).
+前端技术栈：vue全家桶 + TypeScript + axios + ant-design-vue+ pinia等
 
-## Type Support For `.vue` Imports in TS
+后端项目地址：https://gitee.com/caiheping/oa-api
 
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates. However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can use the following:
+## 项目运行
 
-### If Using Volar
+### 后端项目运行
 
-Run `Volar: Switch TS Plugin on/off` from VSCode command palette.
+请移到：https://gitee.com/caiheping/oa-api
 
-### If Using Vetur
+### 前端项目运行
 
-1. Install and add `@vuedx/typescript-plugin-vue` to the [plugins section](https://www.typescriptlang.org/tsconfig#plugins) in `tsconfig.json`
-2. Delete `src/shims-vue.d.ts` as it is no longer needed to provide module info to Typescript
-3. Open `src/main.ts` in VSCode
-4. Open the VSCode command palette
-5. Search and run "Select TypeScript version" -> "Use workspace version"
+> git clone https://gitee.com/caiheping/oa-api.git
+>
+> npm install
+>
+> npm run serve
+
+## 项目功能
+
+- [x] 登录 -- 完成
+- [x] 用户中心 -- 增删改查
+- [x] 角色管理 -- 增删改查
+- [x] 菜单管理 -- 增删改查
+- [x] 部门管理 -- 增删改查
+- [x] 头像上传 -- 完成
+
+
+
+如果对您有帮助，您可以点右上角 "Star" 支持一下 谢谢！ ^_^
