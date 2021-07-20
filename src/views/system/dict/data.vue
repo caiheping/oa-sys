@@ -332,6 +332,7 @@ export default defineComponent({
       current: 1,
       pageSize: 10,
       showSizeChanger: true,
+      showTotal: (total) => `共 ${total} 条`,
     })
     const handleTableChange = (page: Pagination) => {
       (pagination.value as Pagination) = page

@@ -440,7 +440,7 @@ export default defineComponent({
       current: 1,
       pageSize: 10,
       showSizeChanger: true,
-      // showTotal: () => `共 ${pagination.value.total} 条`,
+      showTotal: (total) => `共 ${total} 条`,
     })
 
     const handleTableChange = (page: Pagination) => {

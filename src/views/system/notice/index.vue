@@ -1,3 +1,458 @@
 <template>
-  <div>notice</div>
+  <div class="p-4">
+    <div class="mb-3">
+      <form-search
+        :formFields="formFields"
+        @search="handleQuery"
+        @reset="handleQuery"
+      />
+    </div>
+    <a-row :gutter="10" class="mb-2">
+      <a-col v-has-permi="['system:notice:add']">
+        <a-button color="success" @click="handleAdd">新增</a-button>
+      </a-col>
+      <a-col v-has-permi="['system:notice:delete']">
+        <a-popconfirm
+          title="确定要删除选中数据吗？"
+          ok-text="确定"
+          cancel-text="取消"
+          @confirm="confirm"
+          @cancel="cancel"
+        >
+          <a-button :disabled="!hasSelected" color="error"> 删除 </a-button>
+        </a-popconfirm>
+      </a-col>
+    </a-row>
+
+    <a-table
+      :loading="loading"
+      rowKey="id"
+      :row-selection="{
+        selectedRowKeys: selectedRowKeys,
+        onChange: onSelectChange,
+      }"
+      :columns="columns"
+      :data-source="userList"
+      :pagination="pagination"
+      @change="handleTableChange"
+    >
+      <template #status="{ record }">
+        <span>{{ selectDictLabel(statusOptions, record.status) }}</span>
+      </template>
+      <template #noticeType="{ record }">
+        <span>{{ selectDictLabel(typeOptions, record.noticeType) }}</span>
+      </template>
+      <template #action="{ record }">
+        <span>
+          <a-button
+            type="link"
+            color="success"
+            class="mr-3"
+            @click="handleUpdate(record)"
+            v-has-permi="['system:notice:update']"
+          >
+            修改
+          </a-button>
+          <a-popconfirm
+            title="确定要删除该数据吗？"
+            ok-text="确定"
+            cancel-text="取消"
+            @confirm="confirm(record)"
+            @cancel="cancel"
+          >
+            <a-button
+              type="link"
+              color="error"
+              v-has-permi="['system:notice:delete']"
+            >
+              删除
+            </a-button>
+          </a-popconfirm>
+        </span>
+      </template>
+    </a-table>
+
+    <!-- 新增修改推窗 -->
+    <a-drawer
+      width="600px"
+      :title="drawerTitle"
+      placement="right"
+      v-model:visible="open"
+      :maskClosable="false"
+      @close="handleClose"
+    >
+      <a-form
+        v-if="open"
+        ref="formRef"
+        :model="formState"
+        :rules="rules"
+        :label-col="labelCol"
+        :wrapper-col="wrapperCol"
+      >
+        <a-row>
+          <a-col :span="24">
+            <a-form-item label="标题" name="noticeTitle">
+              <a-input
+                v-model:value="formState.noticeTitle"
+                placeholder="请输入标题"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="24">
+            <a-form-item label="类型" name="noticeType">
+              <a-select
+                v-model:value="formState.noticeType"
+                placeholder="请输入类型"
+              >
+                <a-select-option
+                  v-for="item in typeOptions"
+                  :key="item.id"
+                  :value="item.dictValue"
+                >
+                  {{ item.dictLabel }}
+                </a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+          <a-col :span="24">
+            <a-form-item label="状态" name="status">
+              <a-radio-group
+                v-model:value="formState.status"
+                name="menuType"
+                :options="[
+                  { label: '正常', value: '1' },
+                  { label: '停用', value: '0' },
+                ]"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="24">
+            <a-form-item label="内容" name="noticeContent">
+              <a-textarea
+                :rows="3"
+                v-model:value="formState.noticeContent"
+                placeholder="请输入内容"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="24">
+            <a-form-item>
+              <a-button type="primary" class="mr-3" @click="handleSubmit">
+                确认
+              </a-button>
+              <a-button @click="handleClose">取消</a-button>
+            </a-form-item>
+          </a-col>
+        </a-row>
+      </a-form>
+    </a-drawer>
+  </div>
 </template>
+<script lang="ts">
+import {
+  defineComponent,
+  reactive,
+  ref,
+  onMounted,
+  nextTick,
+  toRefs,
+  computed,
+} from 'vue'
+import {
+  getNotice,
+  getNoticeById,
+  delNotice,
+  addNotice,
+  updateNotice,
+} from '@/api/admin/system/notice'
+import { getDict, selectDictLabel } from '@/utils/dictFormat'
+import useDrawer from '@/hooks/useDrawer'
+import { message as Message } from 'ant-design-vue'
+import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
+import { useAppStore } from '@/store/modules/app'
+import { mapState } from 'pinia'
+import { TableState } from 'ant-design-vue/es/table/interface'
+
+import FormSearch from '@/components/FormSearch/index.vue'
+
+interface FormState {
+  id: undefined | number
+  noticeTitle: undefined | string
+  noticeType: undefined | number
+  status: undefined | string
+  noticeContent: undefined | string
+}
+type Pagination = TableState['pagination']
+
+const columns = [
+  {
+    title: '标题',
+    dataIndex: 'noticeTitle',
+    key: 'noticeTitle',
+    align: 'center',
+  },
+  {
+    title: '类型',
+    dataIndex: 'noticeType',
+    key: 'noticeType',
+    align: 'center',
+    slots: { customRender: 'noticeType' },
+  },
+  {
+    title: '内容',
+    dataIndex: 'noticeContent',
+    key: 'noticeContent',
+    align: 'center',
+  },
+  {
+    title: '状态',
+    dataIndex: 'status',
+    key: 'status',
+    align: 'center',
+    slots: { customRender: 'status' },
+  },
+  {
+    title: '创建者',
+    dataIndex: 'createdBy',
+    key: 'createdBy',
+    align: 'center',
+  },
+  {
+    title: '创建时间',
+    dataIndex: 'createdAt',
+    key: 'createdAt',
+    align: 'center',
+  },
+  {
+    title: '操作',
+    key: 'action',
+    align: 'center',
+    slots: { customRender: 'action' },
+  },
+]
+
+export default defineComponent({
+  components: {
+    FormSearch,
+  },
+  setup() {
+    const statusOptions = ref([])
+    const typeOptions = ref([])
+    const rules = {
+      noticeTitle: [
+        { required: true, message: '标题不能为空', trigger: 'blur' },
+      ],
+      noticeType: [
+        { required: true, message: '类型不能为空', trigger: 'blur' },
+      ],
+      status: [{ required: true, message: '状态不能为空', trigger: 'change' }],
+    }
+    const formFields = reactive([
+      {
+        type: 'input',
+        label: '标题',
+        name: 'noticeTitle',
+        value: '',
+        placeholder: '请输入标题',
+      },
+      {
+        type: 'select',
+        label: '类型',
+        name: 'noticeType',
+        value: undefined,
+        placeholder: '请选择类型',
+        normalizer: {
+          value: 'dictValue',
+          label: 'dictLabel',
+        },
+        options: typeOptions,
+      },
+      {
+        type: 'select',
+        label: '状态',
+        name: 'status',
+        value: undefined,
+        placeholder: '请选择角色状态',
+        normalizer: {
+          value: 'dictValue',
+          label: 'dictLabel',
+        },
+        options: statusOptions,
+      },
+    ])
+    // 查询表单操作
+    const queryParams = reactive({
+      pageNum: 1,
+      pageSize: 10,
+      noticeTitle: undefined || '',
+      noticeType: undefined || '',
+      status: undefined || '',
+    })
+
+    const handleQuery = (query: {
+      noticeTitle: string
+      noticeType: string
+      status: string
+    }) => {
+      pagination.value.current = 1
+      queryParams.pageNum = pagination.value.current
+      queryParams.noticeTitle = query.noticeTitle
+      queryParams.noticeType = query.noticeType
+      queryParams.status = query.status
+      getList(queryParams)
+    }
+    // 表格操作
+    const userList = ref([])
+    const pagination = ref({
+      total: 0,
+      current: 1,
+      pageSize: 10,
+      showSizeChanger: true,
+      showTotal: (total) => `共 ${total} 条`,
+    })
+    const handleTableChange = (page: Pagination) => {
+      (pagination.value as Pagination) = page
+      queryParams.pageNum = pagination.value.current
+      queryParams.pageSize = pagination.value.pageSize
+      getList(queryParams)
+    }
+    const state = reactive({
+      selectedRowKeys: [],
+    })
+    const hasSelected = computed(() => state.selectedRowKeys.length > 0)
+
+    const onSelectChange = (selectedRowKeys) => {
+      console.log('selectedRowKeys changed: ', selectedRowKeys)
+      state.selectedRowKeys = selectedRowKeys
+    }
+
+    const getList = (queryParams?: {}) => {
+      getNotice(queryParams).then((res) => {
+        console.log(res)
+        userList.value = res.data.rows
+        pagination.value.total = res.data.count
+        state.selectedRowKeys = []
+      })
+    }
+
+    const init = () => {
+      getList(queryParams)
+    }
+
+    const formRef = ref()
+    const formState: FormState = reactive({
+      id: undefined,
+      noticeTitle: undefined,
+      noticeType: undefined,
+      status: '1',
+      noticeContent: undefined,
+    })
+    const { open, drawerTitle } = useDrawer()
+    console.log(open)
+    const handleClose = () => {
+      formState.id = undefined
+      formRef.value.resetFields()
+      console.log(formRef)
+      open.value = false
+    }
+    // 表单提交
+    const handleSubmit = () => {
+      console.log(formState)
+      formRef.value
+        .validate()
+        .then(() => {
+          if (formState.id) {
+            updateNotice(formState).then((res) => {
+              Message.success(res.message)
+              getList(queryParams)
+              formState.id = undefined
+              formRef.value.resetFields()
+              open.value = false
+            })
+          } else {
+            addNotice(formState).then((res) => {
+              Message.success(res.message)
+              getList(queryParams)
+              formState.id = undefined
+              formRef.value.resetFields()
+              open.value = false
+            })
+          }
+        })
+        .catch((error: ValidateErrorEntity) => {
+          console.log('error', error)
+        })
+    }
+    // 确认删除
+    const confirm = (row) => {
+      const dictId = row.id || state.selectedRowKeys
+      delNotice(dictId).then(() => {
+        getList(queryParams)
+        Message.success('删除成功')
+      })
+    }
+    // 取消删除
+    const cancel = (e: MouseEvent) => {
+      console.log(e)
+      Message.success('取消删除')
+    }
+
+    // 新增按钮操作
+    const handleAdd = () => {
+      open.value = true
+      drawerTitle.value = '添加消息'
+    }
+    // 更新按钮操作
+    const handleUpdate = (row) => {
+      getNoticeById(row.id).then((res) => {
+        open.value = true
+        drawerTitle.value = '修改消息'
+        nextTick(() => {
+          Object.keys(formState).forEach((key) => {
+            formState[key] = res.data[key]
+          })
+        })
+      })
+    }
+
+    onMounted(async () => {
+      statusOptions.value = await getDict('sys_normal_disable')
+      typeOptions.value = await getDict('sys_notice_type')
+      init()
+    })
+
+    return {
+      queryParams,
+      formFields,
+      handleQuery,
+      userList,
+      columns,
+      pagination,
+      handleTableChange,
+      selectDictLabel,
+      statusOptions,
+      typeOptions,
+      ...toRefs(state),
+      hasSelected,
+      onSelectChange,
+
+      open,
+      drawerTitle,
+      formState,
+      labelCol: { span: 4 },
+      wrapperCol: { span: 18 },
+      rules,
+      formRef,
+      handleClose,
+      handleSubmit,
+      confirm,
+      cancel,
+      handleAdd,
+      handleUpdate,
+    }
+  },
+  computed: {
+    ...mapState(useAppStore, ['loading']),
+  },
+})
+</script>
