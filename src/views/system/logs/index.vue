@@ -156,7 +156,9 @@ export default defineComponent({
   setup() {
     const methodOptions = ref([])
 
-    // 查询表单操作
+    /**
+     * 查询表单操作
+     */
     const queryParams = reactive({
       pageNum: 1,
       pageSize: 10,
@@ -191,7 +193,9 @@ export default defineComponent({
       queryParams.method = query.method
       getList(queryParams)
     }
-    // 表格操作
+    /**
+     * 表格操作
+    */
     const logsList = ref([])
     const pagination = ref({
       total: 0,
@@ -206,18 +210,19 @@ export default defineComponent({
     })
 
     const hasSelected = computed(() => state.selectedRowKeys.length > 0)
+    // 表格选择框改变事件
     const onSelectChange = (selectedRowKeys) => {
       console.log('selectedRowKeys changed: ', selectedRowKeys)
       state.selectedRowKeys = selectedRowKeys
     }
-
+    // 表格改变事件，页码改变，条数改变
     const handleTableChange = (page: Pagination) => {
       (pagination.value as Pagination) = page
       queryParams.pageNum = pagination.value.current
       queryParams.pageSize = pagination.value.pageSize
       getList(queryParams)
     }
-
+    // 获取表格数据
     const getList = (queryParams?: {}) => {
       getLogs(queryParams).then((res) => {
         console.log(res)
@@ -240,23 +245,26 @@ export default defineComponent({
       console.log(e)
       Message.success('取消删除')
     }
-
+    // 清空数据
     const clearAll = () => {
       delAllLogs().then(() => {
         getList(queryParams)
         Message.success('清除成功')
       })
     }
-
+    /**
+     * 推窗操作
+     */
     const { open, drawerTitle } = useDrawer()
     const detailObj = ref(null)
+    // 显示详情
     const showDetail = (record) => {
       open.value = true
       drawerTitle.value = '详细信息'
       detailObj.value = record
       console.log(record)
     }
-
+    // 关闭推窗
     const handleClose = () => {
       open.value = false
     }
@@ -274,23 +282,25 @@ export default defineComponent({
       queryParams,
       formFields,
       handleQuery,
+
       logsList,
       columns,
       pagination,
+      hasSelected,
+      methodOptions,
+      clearAll,
       handleTableChange,
       selectDictLabel,
-      methodOptions,
       confirm,
       cancel,
-      hasSelected,
       onSelectChange,
       ...toRefs(state),
-      showDetail,
+
       open,
       drawerTitle,
-      handleClose,
       detailObj,
-      clearAll,
+      handleClose,
+      showDetail,
     }
   },
   computed: {
