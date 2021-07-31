@@ -315,28 +315,7 @@ export default defineComponent({
   setup() {
     const treeRef = ref()
     const dynamicComponents = ref(Object.keys(dynamicRouter))
-    const rules = {
-      parentId: [
-        {
-          required: true,
-          validator: formRules.number,
-          message: '上级菜单不能为空',
-          trigger: 'change',
-        },
-      ],
-      title: [{ required: true, message: '菜单名称不能为空', trigger: 'blur' }],
-      orderNum: [
-        {
-          required: true,
-          validator: formRules.number,
-          message: '显示排序不能为空',
-          trigger: 'blur',
-        },
-      ],
-      path: [{ required: true, message: '路由地址不能为空', trigger: 'blur' }],
-      component: [{ required: true, message: '组件不能为空', trigger: 'blur' }],
-      perms: [{ required: true, message: '权限标识不能为空', trigger: 'blur' }],
-    }
+
     const formRef = ref()
     const normalizer = (node) => {
       return {
@@ -377,6 +356,49 @@ export default defineComponent({
       keepAlive: 1,
       isFrame: '0',
     })
+
+    const checkType = (rule, value: string) => {
+      if (formState.menuType === 'M') {
+        console.log(typeof value === 'string' && value.charAt(0) !== '/')
+        if (typeof value === 'string' && value.charAt(0) !== '/') {
+          console.log(999)
+          return Promise.reject('菜单类型为目录，必须以 / 开头')
+        }
+      }
+      return Promise.resolve()
+    }
+    const rules = {
+      parentId: [
+        {
+          required: true,
+          validator: formRules.number,
+          message: '上级菜单不能为空',
+          trigger: 'change',
+        },
+      ],
+      title: [{ required: true, message: '菜单名称不能为空', trigger: 'blur' }],
+      orderNum: [
+        {
+          required: true,
+          validator: formRules.number,
+          message: '显示排序不能为空',
+          trigger: 'blur',
+        },
+      ],
+      path: [
+        {
+          required: true,
+          message: '路由地址不能为空',
+          trigger: 'blur',
+        },
+        {
+          validator: checkType,
+          trigger: 'blur',
+        },
+      ],
+      component: [{ required: true, message: '组件不能为空', trigger: 'blur' }],
+      perms: [{ required: true, message: '权限标识不能为空', trigger: 'blur' }],
+    }
     // 取消推窗
     const { open, drawerTitle } = useDrawer()
     const handleClose = () => {
