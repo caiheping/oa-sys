@@ -4,6 +4,16 @@ import { message as Message, Modal } from "ant-design-vue";
 import { getToken, removeToken } from "@/utils/auth";
 import { baseUrl } from '@/config'
 
+
+type Methods = 'GET' | 'POST' | 'PUT' | 'DELETE'
+
+export interface HttpResponse<T = any> {
+  data: T;
+  code: number,
+  message: any,
+  [key: string]: any
+}
+
 axios.defaults.withCredentials = true; // 跨域访问需要发送cookie时一定要加这句
 
 let httpTime = 0;
@@ -68,20 +78,14 @@ function errorState(error: any) {
   }
 }
 
-export enum Methods {
-  get = "GET",
-  post = "POST",
-  put = "PUT",
-  del = "DELETE",
-}
 
 // 封装axios
-function HttpRequest(
+function HttpRequest<T = any>(
   url: string,
-  method: Methods = Methods.get,
+  method: Methods,
   params: any = {},
   isLoading = true
-): Promise<any> {
+): Promise<HttpResponse<T>> {
   const appStore = useAppStore();
   if (isLoading && method === "GET" && !appStore.loading) {
     appStore.loading = true;
@@ -105,7 +109,7 @@ function HttpRequest(
   };
   return new Promise((resolve, reject) => {
     axios(httpDefault)
-      .then((response) => {
+      .then((response: any) => {
         resolve(response);
       })
       .catch((response) => {

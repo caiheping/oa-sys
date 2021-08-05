@@ -276,6 +276,7 @@ import {
   resetUserPwd,
   // importTemplate,
 } from '@/api/admin/system/user'
+import { IUser } from '@/api/admin/system/user/type'
 import { getRole } from '@/api/admin/system/role'
 import { handleTree } from '@/utils/tools'
 import useDrawer from '@/hooks/useDrawer'
@@ -434,7 +435,7 @@ export default defineComponent({
     const state = reactive({
       selectedRowKeys: [],
     })
-    const userList = ref([])
+    const userList = ref<IUser[]>([])
     const pagination = ref({
       total: 0,
       current: 1,
@@ -505,7 +506,6 @@ export default defineComponent({
     // 获取表格数据
     const getList = (queryParams?: {}) => {
       listUser(queryParams).then((res) => {
-        console.log(res)
         userList.value = res.data.rows
         pagination.value.total = res.data.count
       })
