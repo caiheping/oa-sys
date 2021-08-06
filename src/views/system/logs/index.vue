@@ -79,12 +79,13 @@
       @close="handleClose"
     >
       <div v-if="detailObj">
-        <p>操作人员: {{ detailObj.createdBy }}</p>
-        <p>请求地址: {{ detailObj.url }}</p>
-        <p>请求方式: {{ detailObj.method }}</p>
-        <p>请求参数: {{ detailObj.data }}</p>
-        <p>ip: {{ detailObj.ip }}</p>
-        <p>创建时间: {{ detailObj.createdAt }}</p>
+        <p class="mb-2">操作人员: {{ detailObj.createdBy }}</p>
+        <p class="mb-2">接口地址: {{ detailObj.url }}</p>
+        <p class="mb-2">ip地址: {{ detailObj.ip }}</p>
+        <p class="mb-2">请求方式: {{ detailObj.method }}</p>
+        <p class="mb-2">http状态码: {{ detailObj.status }}</p>
+        <p class="mb-2">请求参数: {{ detailObj.data }}</p>
+        <p class="mb-2">创建时间: {{ detailObj.createdAt }}</p>
       </div>
     </a-drawer>
   </div>
@@ -120,7 +121,7 @@ const columns = [
     align: 'center',
   },
   {
-    title: '请求地址',
+    title: '接口地址',
     dataIndex: 'url',
     key: 'url',
     align: 'center',
@@ -132,9 +133,15 @@ const columns = [
     align: 'center',
   },
   {
-    title: 'ip',
+    title: 'ip地址',
     dataIndex: 'ip',
     key: 'ip',
+    align: 'center',
+  },
+  {
+    title: 'http状态码',
+    dataIndex: 'status',
+    key: 'status',
     align: 'center',
   },
   {

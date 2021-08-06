@@ -629,6 +629,8 @@ export default defineComponent({
     const handleClose = () => {
       formState.id = undefined
       formState.deptId = undefined
+      formState.password = undefined
+      formState.userName = undefined
       formRef.value.resetFields()
       console.log(formState)
       open.value = false
