@@ -1,4 +1,22 @@
-import type { AppRouteRecordRaw } from "types/permission";
+import type { RouteRecordRaw } from 'vue-router'
+
+// @ts-ignore
+interface AppRouteRecordRaw extends RouteRecordRaw {
+  path: string;
+  name?: string;
+  component?: any;
+  hidden?: boolean;
+  redirect?: string;
+  children?: AppRouteRecordRaw[];
+  meta?: RouteMeta
+}
+
+interface RouteMeta {
+  title: string,
+  menuType?: string,
+  noCache?: boolean, // 不缓存
+  icon?: string
+}
 
 const constantRoutes: AppRouteRecordRaw[] = [
   {

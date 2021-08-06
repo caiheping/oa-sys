@@ -16,13 +16,13 @@ export function setLoclastorage(key: string, val: string) {
  * @param rootId 根Id 默认 0
  * @returns {{obj, list: Array}}
  */
-export function handleTree(data: [], id = 'id', parentId = 'parentId', children = 'children', rootId = 0) {
+export function handleTree(data: any[], id = 'id', parentId = 'parentId', children = 'children', rootId = 0) {
   const obj: any = {}
   data.forEach((item: any) => {
     item[children] = []
     obj[item[id]] = item
   })
-  const tree: [] = []
+  const tree: any[] = []
   data.forEach(list => {
     if (list[parentId] !== rootId) {
       if (obj[list[parentId]]) {

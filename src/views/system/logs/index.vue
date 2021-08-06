@@ -107,6 +107,8 @@ import { message as Message } from 'ant-design-vue'
 
 import FormSearch from '@/components/FormSearch/index.vue'
 import useDrawer from '@/hooks/useDrawer'
+import { ILog } from '@/api/admin/system/logs/type'
+import { IData } from '@/api/admin/system/dict/data/type'
 
 type Pagination = TableState['pagination']
 
@@ -154,7 +156,7 @@ export default defineComponent({
     FormSearch,
   },
   setup() {
-    const methodOptions = ref([])
+    const methodOptions = ref<IData[]>([])
 
     /**
      * 查询表单操作
@@ -195,8 +197,8 @@ export default defineComponent({
     }
     /**
      * 表格操作
-    */
-    const logsList = ref([])
+     */
+    const logsList = ref<ILog[]>([])
     const pagination = ref({
       total: 0,
       current: 1,

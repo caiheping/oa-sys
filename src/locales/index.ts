@@ -1,8 +1,9 @@
 import { App } from "vue";
 import { I18n, I18nOptions, createI18n } from "vue-i18n";
-import { LocaleType } from 'types/locale'
 
 export let i18n: ReturnType<typeof createI18n>;
+
+type LocaleType = "zh-cn" | "en";
 
 const availableLocales = ["zh-cn", "en"];
 

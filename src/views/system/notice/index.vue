@@ -32,7 +32,7 @@
         onChange: onSelectChange,
       }"
       :columns="columns"
-      :data-source="userList"
+      :data-source="noticeList"
       :pagination="pagination"
       @change="handleTableChange"
     >
@@ -174,6 +174,7 @@ import { mapState } from 'pinia'
 import { TableState } from 'ant-design-vue/es/table/interface'
 
 import FormSearch from '@/components/FormSearch/index.vue'
+import { INotice } from '@/api/admin/system/notice/type'
 
 interface FormState {
   id: undefined | number
@@ -302,7 +303,7 @@ export default defineComponent({
       getList(queryParams)
     }
     // 表格操作
-    const userList = ref([])
+    const noticeList = ref<INotice[]>([])
     const pagination = ref({
       total: 0,
       current: 1,
@@ -329,7 +330,7 @@ export default defineComponent({
     const getList = (queryParams?: {}) => {
       getNotice(queryParams).then((res) => {
         console.log(res)
-        userList.value = res.data.rows
+        noticeList.value = res.data.rows
         pagination.value.total = res.data.count
         state.selectedRowKeys = []
       })
@@ -425,7 +426,7 @@ export default defineComponent({
       queryParams,
       formFields,
       handleQuery,
-      userList,
+      noticeList,
       columns,
       pagination,
       handleTableChange,

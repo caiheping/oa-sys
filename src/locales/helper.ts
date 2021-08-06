@@ -1,5 +1,6 @@
 import { set } from "lodash-es";
-import { Recordable } from "types/global";
+
+type Recordable<T = any> = Record<string, T>;
 
 export function genMessage(
   langs: Record<string, Record<string, any>>,

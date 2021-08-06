@@ -1,13 +1,14 @@
 import HttpRequest from "@/utils/request";
+import { IRows, IRole } from './type'
 
 // 查询角色
 export function getRole(params = {}) {
-  return HttpRequest('/admin/system/role', 'GET', params)
+  return HttpRequest<IRows>('/admin/system/role', 'GET', params)
 }
 
 // 查询某个角色
 export function getRoleById(id: number) {
-  return HttpRequest('/admin/system/role/' + id, 'GET', {}, false)
+  return HttpRequest<IRole>('/admin/system/role/' + id, 'GET', {}, false)
 }
 
 // 添加角色

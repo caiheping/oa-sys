@@ -1,13 +1,14 @@
 import HttpRequest from "@/utils/request";
+import { IRows, INotice } from './type'
 
 // 查询列表
 export function getNotice(params = {}) {
-  return HttpRequest('/admin/system/notice', 'GET', params, false)
+  return HttpRequest<IRows>('/admin/system/notice', 'GET', params, false)
 }
 
 // 查询单个
 export function getNoticeById(id: number) {
-  return HttpRequest('/admin/system/notice/' + id, 'GET', {}, false)
+  return HttpRequest<INotice>('/admin/system/notice/' + id, 'GET', {}, false)
 }
 
 // 删除

@@ -263,6 +263,10 @@ import { TableState } from 'ant-design-vue/es/table/interface'
 
 import FormSearch from '@/components/FormSearch/index.vue'
 
+import { IRole } from '@/api/admin/system/role/type'
+import { IData } from '@/api/admin/system/dict/data/type'
+import { IMenu } from '@/api/admin/system/menu/type'
+
 interface FormState {
   id: undefined | number
   roleName: undefined | string
@@ -282,10 +286,6 @@ interface FormScopeState {
   menuIds: undefined | number[]
   remark: undefined | string
   dataScope: undefined
-}
-
-interface RoleList extends FormState {
-  checked: boolean
 }
 
 type Pagination = TableState['pagination']
@@ -341,7 +341,7 @@ export default defineComponent({
     FormSearch,
   },
   setup() {
-    const statusOptions = ref([])
+    const statusOptions = ref<IData[]>([])
     const checkMenus = () => {
       if (checkedKeys.value.length) {
         return Promise.resolve()
@@ -402,7 +402,7 @@ export default defineComponent({
       getList(queryParams)
     }
     // 表格操作
-    const roleList = ref<RoleList[]>([])
+    const roleList = ref<IRole[]>([])
     const pagination = ref({
       total: 0,
       current: 1,
@@ -459,7 +459,6 @@ export default defineComponent({
       remark: undefined,
     })
     const { open, drawerTitle } = useDrawer()
-    console.log(open)
     const handleClose = () => {
       formState.id = undefined
       checkedKeys.value = []
@@ -530,7 +529,7 @@ export default defineComponent({
     }
 
     /** 查询菜单树结构 */
-    const menuOptions = ref([])
+    const menuOptions = ref<IMenu[]>([])
     const checkedKeys = ref([])
     // 树形控件操作
     const replaceFields = {
@@ -610,7 +609,6 @@ export default defineComponent({
 
     onMounted(async () => {
       statusOptions.value = await getDict('sys_normal_disable')
-      console.log(statusOptions)
       init()
     })
 

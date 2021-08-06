@@ -1,13 +1,14 @@
 import HttpRequest from "@/utils/request";
+import { IRows, IDept } from "./type";
 
 // 查询列表
 export function getDept(params = {}) {
-  return HttpRequest('/admin/system/department', 'GET', params, false)
+  return HttpRequest<IRows>('/admin/system/department', 'GET', params, false)
 }
 
 // 查询单个
 export function getDeptById(id: number) {
-  return HttpRequest('/admin/system/department/' + id, 'GET', {}, false)
+  return HttpRequest<IDept>('/admin/system/department/' + id, 'GET', {}, false)
 }
 
 // 删除

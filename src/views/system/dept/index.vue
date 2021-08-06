@@ -155,6 +155,7 @@ import useDrawer from '@/hooks/useDrawer'
 import { useAppStore } from '@/store/modules/app'
 import { mapState } from 'pinia'
 import 'vue3-treeselect/dist/vue3-treeselect.css'
+import { IDept } from '@/api/admin/system/dept/type'
 
 interface FormState {
   deptId: undefined | number
@@ -238,8 +239,8 @@ export default defineComponent({
     }
 
     // 获取部门树
-    const deptOptions = ref([])
-    const deptList = ref([])
+    const deptOptions = ref<IDept[]>([])
+    const deptList = ref<IDept[]>([])
     // 获取部门列表
     const getList = () => {
       getDept().then((res) => {

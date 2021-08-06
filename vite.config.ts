@@ -15,7 +15,6 @@ export default defineConfig((): UserConfig => {
     resolve: {
       alias: {
         '@': resolve(__dirname, 'src'), //设置别名
-        'types': resolve(__dirname, 'types'),
       },
     },
     plugins: [

@@ -1,13 +1,14 @@
 import HttpRequest from "@/utils/request";
+import { IRows, ILog } from "./type";
 
 // 查询列表
 export function getLogs(params = {}) {
-  return HttpRequest('/admin/system/logs', 'GET', params, false)
+  return HttpRequest<IRows>('/admin/system/logs', 'GET', params, false)
 }
 
 // 查询单个
 export function getLogsById(id: number) {
-  return HttpRequest('/admin/system/logs/' + id, 'GET', {}, false)
+  return HttpRequest<ILog>('/admin/system/logs/' + id, 'GET', {}, false)
 }
 
 // 删除

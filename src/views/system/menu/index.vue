@@ -253,6 +253,7 @@ import useDrawer from '@/hooks/useDrawer'
 import { useAppStore } from '@/store/modules/app'
 import { mapState } from 'pinia'
 import 'vue3-treeselect/dist/vue3-treeselect.css'
+import { IMenu } from '@/api/admin/system/menu/type'
 
 // 表头配置
 const columns = [
@@ -326,14 +327,14 @@ export default defineComponent({
     }
 
     // 获取菜单树
-    const treeOptions = ref([
+    const treeOptions = ref<any[]>([
       {
         id: 0,
         title: '主目录',
         children: [],
       },
     ])
-    const menuList = ref([])
+    const menuList = ref<IMenu[]>([])
     // 获取菜单列表/转成树格式
     const getList = () => {
       getMenu().then((res) => {

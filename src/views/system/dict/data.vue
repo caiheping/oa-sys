@@ -32,7 +32,7 @@
         onChange: onSelectChange,
       }"
       :columns="columns"
-      :data-source="userList"
+      :data-source="dataList"
       :pagination="pagination"
       @change="handleTableChange"
     >
@@ -183,6 +183,7 @@ import { mapState } from 'pinia'
 import { TableState } from 'ant-design-vue/es/table/interface'
 
 import FormSearch from '@/components/FormSearch/index.vue'
+import { IData } from '@/api/admin/system/dict/data/type'
 
 interface FormState {
   id: undefined | number
@@ -248,7 +249,7 @@ export default defineComponent({
   setup() {
     const route = useRoute()
     const typeOptions = ref()
-    const statusOptions = ref([])
+    const statusOptions = ref<IData[]>([])
     const rules = {
       dictName: [
         { required: true, message: '字典名称不能为空', trigger: 'blur' },
@@ -326,7 +327,7 @@ export default defineComponent({
       })
     }
     // 表格操作
-    const userList = ref([])
+    const dataList = ref<IData[]>([])
     const pagination = ref({
       total: 0,
       current: 1,
@@ -353,7 +354,7 @@ export default defineComponent({
     const getList = (queryParams?: {}) => {
       listData(queryParams).then((res) => {
         console.log(res)
-        userList.value = res.data.rows
+        dataList.value = res.data.rows
         pagination.value.total = res.data.count
         state.selectedRowKeys = []
       })
@@ -464,7 +465,7 @@ export default defineComponent({
       formFields,
       handleQuery,
       handleReset,
-      userList,
+      dataList,
       columns,
       pagination,
       handleTableChange,

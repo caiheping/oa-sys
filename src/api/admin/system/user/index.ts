@@ -1,5 +1,5 @@
 import HttpRequest from "@/utils/request";
-import { IRows } from './type'
+import { IRows, IUser } from './type';
 
 // 查询列表
 export function listUser(params = {}) {
@@ -8,7 +8,7 @@ export function listUser(params = {}) {
 
 // 查询某个用户
 export function getUser(id: number) {
-  return HttpRequest('/admin/system/user/' + id, 'GET', {}, false)
+  return HttpRequest<IUser>('/admin/system/user/' + id, 'GET', {}, false)
 }
 
 // 删除

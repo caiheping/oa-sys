@@ -276,7 +276,6 @@ import {
   resetUserPwd,
   // importTemplate,
 } from '@/api/admin/system/user'
-import { IUser } from '@/api/admin/system/user/type'
 import { getRole } from '@/api/admin/system/role'
 import { handleTree } from '@/utils/tools'
 import useDrawer from '@/hooks/useDrawer'
@@ -291,6 +290,10 @@ import { TableState } from 'ant-design-vue/es/table/interface'
 // 组件
 import DeptSearch from '@/components/DeptSearch/index.vue'
 import FormSearch from '@/components/FormSearch/index.vue'
+import { IUser } from '@/api/admin/system/user/type'
+import { IRole } from '@/api/admin/system/role/type'
+import { IData } from '@/api/admin/system/dict/data/type'
+import { IDept } from '@/api/admin/system/dept/type'
 
 interface FormState {
   id: undefined | number
@@ -372,12 +375,12 @@ export default defineComponent({
   },
   setup() {
     const userStore = useUserStore()
-    const roleOptions = ref([])
+    const roleOptions = ref<IRole[]>([])
     /**
      * 左侧树形控件操作
      */
     const deptSearchRef = ref()
-    const originalTree = ref([])
+    const originalTree = ref<IDept[]>([])
     const replaceFields = {
       children: 'children',
       title: 'deptName',
@@ -431,7 +434,7 @@ export default defineComponent({
     /**
      * 表格操作
      */
-    const statusOptions = ref([])
+    const statusOptions = ref<IData[]>([])
     const state = reactive({
       selectedRowKeys: [],
     })
@@ -501,7 +504,7 @@ export default defineComponent({
       Message.success('取消删除')
     }
     // 部门树选项
-    const deptOptions = ref([])
+    const deptOptions = ref<IDept[]>([])
 
     // 获取表格数据
     const getList = (queryParams?: {}) => {
