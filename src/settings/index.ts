@@ -52,6 +52,6 @@ const settings: Settings = {
   version: "1.0.1",
   companyName: "版权所有 ©2021 广州云积软件技术有限公司",
   title: "xxx系统",
-};
+}
 
-export default settings;
+export default settings

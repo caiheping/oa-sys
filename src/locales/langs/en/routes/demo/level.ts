@@ -1,3 +1,3 @@
 export default {
   level: "MultiMenu",
-};
+}

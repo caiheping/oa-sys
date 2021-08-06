@@ -1,5 +1,5 @@
-import HttpRequest from "@/utils/request";
-import { IRows, ILog } from "./type";
+import HttpRequest from "@/utils/request"
+import { IRows, ILog } from "./type"
 
 // 查询列表
 export function getLogs(params = {}) {

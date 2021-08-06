@@ -1,3 +1,3 @@
-import Button from './src/BasicButton.vue';
+import Button from './src/BasicButton.vue'
 
-export { Button };
+export { Button }

@@ -1,4 +1,4 @@
-import { reactive, toRefs } from "vue";
+import { reactive, toRefs } from "vue"
 
 function useDrawer() {
   const handleClose = () => {
@@ -12,11 +12,11 @@ function useDrawer() {
     placement: 'right',
     width: '50%',
     handleClose
-  });
+  })
 
   return {
     ...toRefs(drawer),
-  };
+  }
 }
 
-export default useDrawer;
+export default useDrawer

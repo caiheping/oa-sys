@@ -25,4 +25,4 @@ export default {
 
   breadcrumbChildren: "层级模式",
   breadcrumbChildrenDetail: "层级详情",
-};
+}

@@ -1,4 +1,4 @@
-import { RuleObject } from 'ant-design-vue/es/form/interface';
+import { RuleObject } from 'ant-design-vue/es/form/interface'
 export const formRules = {
   validPwd: (rule: RuleObject, value: string) => {
     const re = /^[0-9a-zA-Z]*$/
@@ -11,12 +11,12 @@ export const formRules = {
     } else if (!re.test(value.trim())) {
       return Promise.reject('密码只能是字母、数字的组合')
     } else {
-      return Promise.resolve();
+      return Promise.resolve()
     }
   },
   checkRoleLength: (rule: RuleObject, value: any[]) => {
     if (value.length) {
-      return Promise.resolve();
+      return Promise.resolve()
     } else {
       return Promise.reject('角色不能为空')
     }
@@ -26,19 +26,19 @@ export const formRules = {
     if (value && !reg.test(value)) {
       return Promise.reject('非法的邮箱格式')
     } else {
-      return Promise.resolve();
+      return Promise.resolve()
     }
   },
   moblie: (rule: RuleObject, value: string) => {
     if (!(/^1[34578]\d{9}$/.test(value))) {
       return Promise.reject('不合格的手机号码')
     } else {
-      return Promise.resolve();
+      return Promise.resolve()
     }
   },
   checkTel(rule: RuleObject, value: string) {
     if ((/^1[34578]\d{9}$/.test(value)) || /^(\(\d{3,4}\)|\d{3,4}-|\s)?\d{7,14}$/.test(value)) {
-      return Promise.resolve();
+      return Promise.resolve()
     } else {
       return Promise.reject('请填写合法的手机号码或者固话号码')
     }
@@ -48,7 +48,7 @@ export const formRules = {
     if (!reg.test(value)) {
       return Promise.reject('请填纯数字')
     } else {
-      return Promise.resolve();
+      return Promise.resolve()
     }
   },
   // 正整数
@@ -59,14 +59,14 @@ export const formRules = {
     } else if (!reg.test(value)) {
       return Promise.reject('请填正整数')
     } else {
-      return Promise.resolve();
+      return Promise.resolve()
     }
   },
   str: (rule: RuleObject, value: string) => {
     if (!value.replace(/^(\s*)|(\s*)$/g, '')) {
       return Promise.reject('请填字符串')
     } else {
-      return Promise.resolve();
+      return Promise.resolve()
     }
   },
   username: (rule: RuleObject, value: string) => {
@@ -74,7 +74,7 @@ export const formRules = {
     if (!reg.test(value)) {
       return Promise.reject('登录名只能包含字母数字下划线')
     } else {
-      return Promise.resolve();
+      return Promise.resolve()
     }
   },
   time: (rule: RuleObject, value) => {
@@ -86,7 +86,7 @@ export const formRules = {
     if (currentTime < nowTime) {
       return Promise.reject('不能选择过去时间')
     } else {
-      return Promise.resolve();
+      return Promise.resolve()
     }
   },
   timerange: (rule: RuleObject, value) => {
@@ -99,7 +99,7 @@ export const formRules = {
     if (startTime < nowTime || endTime < nowTime) {
       return Promise.reject('不能选择过去时间')
     } else {
-      return Promise.resolve();
+      return Promise.resolve()
     }
   },
   year: (rule: RuleObject, value) => {
@@ -110,7 +110,7 @@ export const formRules = {
     if (value < nowTime) {
       return Promise.reject('不能选择过去年份')
     } else {
-      return Promise.resolve();
+      return Promise.resolve()
     }
   },
   name: (rule: RuleObject, value: string) => {
@@ -118,7 +118,7 @@ export const formRules = {
     if (!reg.test(value)) {
       return Promise.reject('含有非法字符')
     } else {
-      return Promise.resolve();
+      return Promise.resolve()
     }
   },
   idCard(rule: RuleObject, value: string) {
@@ -126,7 +126,7 @@ export const formRules = {
     if (!reg.test(value)) {
       return Promise.reject('请输入正确身份证')
     } else {
-      return Promise.resolve();
+      return Promise.resolve()
     }
   },
   ip(rule: RuleObject, value: string) {
@@ -134,7 +134,7 @@ export const formRules = {
     if (!reg.test(value)) {
       return Promise.reject('请输入正确ip格式')
     } else {
-      return Promise.resolve();
+      return Promise.resolve()
     }
   },
   port(rule: RuleObject, value: string) {
@@ -142,7 +142,7 @@ export const formRules = {
     if (!reg.test(value)) {
       return Promise.reject('请输入正确端口号')
     } else {
-      return Promise.resolve();
+      return Promise.resolve()
     }
   }
 }

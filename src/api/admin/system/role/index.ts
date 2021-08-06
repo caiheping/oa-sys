@@ -1,4 +1,4 @@
-import HttpRequest from "@/utils/request";
+import HttpRequest from "@/utils/request"
 import { IRows, IRole } from './type'
 
 // 查询角色

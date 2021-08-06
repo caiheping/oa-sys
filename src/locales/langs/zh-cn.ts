@@ -1,8 +1,8 @@
-import { genMessage } from "../helper";
+import { genMessage } from "../helper"
 
-const modules = import.meta.globEager("./zh-cn/**/*.ts");
+const modules = import.meta.globEager("./zh-cn/**/*.ts")
 export default {
   message: {
     ...genMessage(modules, "zh-cn"),
   },
-};
+}

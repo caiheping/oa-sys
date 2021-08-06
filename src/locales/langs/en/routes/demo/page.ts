@@ -27,4 +27,4 @@ export default {
   basic: "Basic list",
   listBasic: "Basic list",
   listSearch: "Search list",
-};
+}

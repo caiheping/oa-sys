@@ -26,4 +26,4 @@ export default {
   listCard: "卡片列表",
   listBasic: "标准列表",
   listSearch: "搜索列表",
-};
+}

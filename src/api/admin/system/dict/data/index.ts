@@ -1,5 +1,5 @@
-import HttpRequest from "@/utils/request";
-import { IData, IRows } from "./type";
+import HttpRequest from "@/utils/request"
+import { IData, IRows } from "./type"
 
 // 查询字典数据列表
 export function listData(params) {

@@ -1,16 +1,16 @@
-import type { BarMap } from "./types";
+import type { BarMap } from "./types"
 export declare type Recordable<T = any> = Record<string, T>;
 export declare type Nullable<T> = T | null;
-const isServer = typeof window === "undefined";
+const isServer = typeof window === "undefined"
 
 /* istanbul ignore next */
 function resizeHandler(entries: any[]) {
   for (const entry of entries) {
-    const listeners = entry.target.__resizeListeners__ || [];
+    const listeners = entry.target.__resizeListeners__ || []
     if (listeners.length) {
       listeners.forEach((fn: () => any) => {
-        fn();
-      });
+        fn()
+      })
     }
   }
 }
@@ -40,33 +40,33 @@ export const BAR_MAP: BarMap = {
     client: "clientX",
     direction: "left",
   },
-};
+}
 
 // @ts-ignore
 export function renderThumbStyle({ move, size, bar }) {
-  const style = {} as any;
-  const translate = `translate${bar.axis}(${move}%)`;
+  const style = {} as any
+  const translate = `translate${bar.axis}(${move}%)`
 
-  style[bar.size] = size;
-  style.transform = translate;
-  style.msTransform = translate;
-  style.webkitTransform = translate;
+  style[bar.size] = size
+  style.transform = translate
+  style.msTransform = translate
+  style.webkitTransform = translate
 
-  return style;
+  return style
 }
 
 function extend<T, K>(to: T, _from: K): T & K {
-  return Object.assign(to, _from);
+  return Object.assign(to, _from)
 }
 
 export function toObject<T>(arr: Array<T>): Recordable<T> {
-  const res = {};
+  const res = {}
   for (let i = 0; i < arr.length; i++) {
     if (arr[i]) {
-      extend(res, arr[i]);
+      extend(res, arr[i])
     }
   }
-  return res;
+  return res
 }
 
 /* istanbul ignore next */
@@ -76,7 +76,7 @@ export function on(
   handler: EventListenerOrEventListenerObject
 ): void {
   if (element && event && handler) {
-    element.addEventListener(event, handler, false);
+    element.addEventListener(event, handler, false)
   }
 }
 
@@ -87,29 +87,29 @@ export function off(
   handler: Fn
 ): void {
   if (element && event && handler) {
-    element.removeEventListener(event, handler, false);
+    element.removeEventListener(event, handler, false)
   }
 }
 
 /* istanbul ignore next */
 export function addResizeListener(element: any, fn: () => any) {
-  if (isServer) return;
+  if (isServer) return
   if (!element.__resizeListeners__) {
-    element.__resizeListeners__ = [];
-    element.__ro__ = new ResizeObserver(resizeHandler);
-    element.__ro__.observe(element);
+    element.__resizeListeners__ = []
+    element.__ro__ = new ResizeObserver(resizeHandler)
+    element.__ro__.observe(element)
   }
-  element.__resizeListeners__.push(fn);
+  element.__resizeListeners__.push(fn)
 }
 
 /* istanbul ignore next */
 export function removeResizeListener(element: any, fn: () => any) {
-  if (!element || !element.__resizeListeners__) return;
+  if (!element || !element.__resizeListeners__) return
   element.__resizeListeners__.splice(
     element.__resizeListeners__.indexOf(fn),
     1
-  );
+  )
   if (!element.__resizeListeners__.length) {
-    element.__ro__.disconnect();
+    element.__ro__.disconnect()
   }
 }

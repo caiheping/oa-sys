@@ -25,4 +25,4 @@ export default {
 
   breadcrumbChildren: "Level mode",
   breadcrumbChildrenDetail: "Level mode detail",
-};
+}

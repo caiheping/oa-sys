@@ -1,11 +1,11 @@
-import { UserConfig, defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
-import viteSvgIcons from 'vite-plugin-svg-icons';
+import { UserConfig, defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import viteSvgIcons from 'vite-plugin-svg-icons'
 
 // vite.config.js
 import WindiCSS from 'vite-plugin-windicss'
 
-import { resolve } from 'path';
+import { resolve } from 'path'
 
 
 export default defineConfig((): UserConfig => {

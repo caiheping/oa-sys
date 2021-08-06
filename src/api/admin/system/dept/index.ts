@@ -1,5 +1,5 @@
-import HttpRequest from "@/utils/request";
-import { IRows, IDept } from "./type";
+import HttpRequest from "@/utils/request"
+import { IRows, IDept } from "./type"
 
 // 查询列表
 export function getDept(params = {}) {

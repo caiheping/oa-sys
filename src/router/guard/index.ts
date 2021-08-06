@@ -1,7 +1,7 @@
-import router from "@/router";
+import router from "@/router"
 
-import { createPermissionGuard } from "./permissionGuard"; // 权限导航
+import { createPermissionGuard } from "./permissionGuard" // 权限导航
 
 export async function setupRouterGuard() {
-  await createPermissionGuard(router);
+  await createPermissionGuard(router)
 }

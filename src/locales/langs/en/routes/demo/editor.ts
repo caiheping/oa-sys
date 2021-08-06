@@ -6,4 +6,4 @@ export default {
   tinymce: "Rich text",
   tinymceBasic: "Basic",
   tinymceForm: "embedded form",
-};
+}

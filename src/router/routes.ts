@@ -80,6 +80,6 @@ const constantRoutes: AppRouteRecordRaw[] = [
       title: "test",
     },
   }
-];
+]
 
-export default constantRoutes;
+export default constantRoutes

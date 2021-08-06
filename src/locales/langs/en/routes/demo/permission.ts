@@ -10,4 +10,4 @@ export default {
   back: "background",
   backPage: "Page",
   backBtn: "Button",
-};
+}

@@ -9,4 +9,4 @@ export default {
 
   menu: "Menu management",
   role: "Role management",
-};
+}

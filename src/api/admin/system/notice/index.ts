@@ -1,4 +1,4 @@
-import HttpRequest from "@/utils/request";
+import HttpRequest from "@/utils/request"
 import { IRows, INotice } from './type'
 
 // 查询列表

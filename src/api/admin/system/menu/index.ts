@@ -1,5 +1,5 @@
-import HttpRequest from "@/utils/request";
-import { IRows, IMenu } from "./type";
+import HttpRequest from "@/utils/request"
+import { IRows, IMenu } from "./type"
 
 // 获取用户路由
 export function getRouters(params = {}) {

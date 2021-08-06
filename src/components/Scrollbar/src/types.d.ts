@@ -1,7 +1,7 @@
-import { PropType, VNodeChild, Plugin } from "vue";
+import { PropType, VNodeChild, Plugin } from "vue"
 export declare type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
-export declare const tuple: <T extends string[]>(...args: T) => T;
-export declare const tupleNum: <T extends number[]>(...args: T) => T;
+export declare const tuple: <T extends string[]>(...args: T) => T
+export declare const tupleNum: <T extends number[]>(...args: T) => T
 /**
  * https://stackoverflow.com/a/59187769
  * Extract the type of an element of an array/tuple without performing indexing
@@ -25,8 +25,8 @@ export interface PropOptions<T = any, D = T> {
   validator?(value: unknown): boolean;
 }
 export declare type VueNode = VNodeChild | JSX.Element;
-export declare const withInstall: <T>(comp: T) => T & Plugin;
-export {};
+export declare const withInstall: <T>(comp: T) => T & Plugin
+export {}
 
 export interface BarMapItem {
   offset: string;

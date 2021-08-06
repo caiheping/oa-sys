@@ -109,4 +109,4 @@ export default {
     dragText: "Hold down the slider and drag",
     successText: "Verified",
   },
-};
+}

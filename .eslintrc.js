@@ -1,5 +1,5 @@
 // @ts-check
-const { defineConfig } = require("eslint-define-config");
+const { defineConfig } = require("eslint-define-config")
 module.exports = defineConfig({
   root: true,
   env: {
@@ -24,6 +24,7 @@ module.exports = defineConfig({
     // 'plugin:prettier/recommended',
   ],
   rules: {
+    "semi": ["error", "never"], // 强制不能加分号
     "@typescript-eslint/ban-ts-ignore": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-explicit-any": "off",
@@ -74,4 +75,4 @@ module.exports = defineConfig({
       },
     ],
   },
-});
+})

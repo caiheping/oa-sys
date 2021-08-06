@@ -10,4 +10,4 @@ export default {
   back: "基于后台权限",
   backPage: "页面权限",
   backBtn: "按钮权限",
-};
+}

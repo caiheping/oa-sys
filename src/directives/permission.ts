@@ -1,6 +1,6 @@
-import type { App, Directive, DirectiveBinding } from 'vue';
+import type { App, Directive, DirectiveBinding } from 'vue'
 
-import { useUserStore } from "@/store/modules/user";
+import { useUserStore } from "@/store/modules/user"
 
 function hasPermi(el: Element, binding: any) {
   const { value } = binding
@@ -47,20 +47,20 @@ function hasRole(el: Element, binding: any) {
 
 const hasPermiDirective: Directive = {
   mounted: (el: Element, binding: DirectiveBinding<any>) => {
-    hasPermi(el, binding);
+    hasPermi(el, binding)
   },
-};
+}
 
 const hasRoleDirective: Directive = {
   mounted: (el: Element, binding: DirectiveBinding<any>) => {
-    hasRole(el, binding);
+    hasRole(el, binding)
   },
-};
+}
 
 export function setupPermissionDirective(app: App) {
-  app.directive('hasPermi', hasPermiDirective);
+  app.directive('hasPermi', hasPermiDirective)
 }
 
 export function setupRoleDirective(app: App) {
-  app.directive('hasRole', hasRoleDirective);
+  app.directive('hasRole', hasRoleDirective)
 }

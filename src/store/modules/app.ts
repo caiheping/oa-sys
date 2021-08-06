@@ -1,6 +1,6 @@
-import { defineStore } from "pinia";
-import { getLocalStorage } from "@/utils/tools";
-import { RouteLocationNormalizedLoaded } from "vue-router";
+import { defineStore } from "pinia"
+import { getLocalStorage } from "@/utils/tools"
+import { RouteLocationNormalizedLoaded } from "vue-router"
 
 // 侧边栏配置
 interface SideBarConfig {
@@ -78,21 +78,21 @@ export const useAppStore = defineStore({
       sidebarStatus: getLocalStorage("sidebarStatus")
         ? Boolean(getLocalStorage("sidebarStatus"))
         : false, // 左侧栏是否展开，默认展开
-    };
+    }
   },
   getters: {},
   actions: {
     setMobile(val: boolean) {
-      this.isMobile = val;
+      this.isMobile = val
     },
     setCollapsed(val: boolean) {
-      this.collapsed = val;
+      this.collapsed = val
     },
     setSidebar(val: boolean) {
-      this.sidebarStatus = val;
+      this.sidebarStatus = val
     },
     setFixedNav(val: boolean) {
-      this.isFixedNav = val;
+      this.isFixedNav = val
     },
     setSideBarWidth(val: number) {
       this.sideBarConfig.width = val
@@ -104,4 +104,4 @@ export const useAppStore = defineStore({
       this.locale = 'zh-cn'
     }
   },
-});
+})

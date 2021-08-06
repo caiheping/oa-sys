@@ -1,5 +1,5 @@
-import HttpRequest from "@/utils/request";
-import { IRows, IType } from "./type";
+import HttpRequest from "@/utils/request"
+import { IRows, IType } from "./type"
 
 // 查询列表
 export function listType(params = {}) {

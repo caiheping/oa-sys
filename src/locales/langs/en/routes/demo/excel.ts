@@ -4,4 +4,4 @@ export default {
   jsonExport: "JSON data export",
   arrayExport: "Array data export",
   importExcel: "Import",
-};
+}

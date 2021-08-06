@@ -3,4 +3,4 @@ export default {
   antv: "antVue doc (embedded)",
   doc: "Project doc (embedded)",
   docExternal: "Project doc (external)",
-};
+}

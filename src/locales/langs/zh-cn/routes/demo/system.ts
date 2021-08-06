@@ -9,4 +9,4 @@ export default {
 
   menu: "菜单管理",
   role: "角色管理",
-};
+}

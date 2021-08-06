@@ -1,4 +1,4 @@
-import { Recordable } from "./util";
+import { Recordable } from "./util"
 declare type Data = Record<string, unknown>;
 declare type DefaultFactory<T> = (props: Data) => T | null | undefined;
 export declare type Prop<T, D = T> = PropOptions<T, D> | PropType<T>;
@@ -145,7 +145,7 @@ export declare const columnProps: {
   sortDirections: import("vue-types").VueTypeValidableDef<unknown[]> & {
     default: () => unknown[];
   };
-};
+}
 export declare type ColumnProps = Partial<
   ExtractPropTypes<typeof columnProps>
 > & {
@@ -180,17 +180,17 @@ export default {
     defaultPageSize: 10,
     // Custom general sort function
     defaultSortFn: (sortInfo: SorterResult) => {
-      const { field, order } = sortInfo;
+      const { field, order } = sortInfo
       return {
         // The sort field passed to the backend you
         field,
         // Sorting method passed to the background asc/desc
         order,
-      };
+      }
     },
     // Custom general filter function
     defaultFilterFn: (data: Partial<Recordable<string[]>>) => {
-      return data;
+      return data
     },
   },
   // scrollbar setting
@@ -199,4 +199,4 @@ export default {
     // After opening, the menu, modal, drawer will change the pop-up scroll bar to native
     native: false,
   },
-};
+}

@@ -5,14 +5,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import Login from "./Login.vue";
+import { defineComponent } from "vue"
+import Login from "./Login.vue"
 
 export default defineComponent({
   components: {
     Login,
   },
-});
+})
 </script>
 
 <style lang="less" scope>

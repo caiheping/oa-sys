@@ -1,4 +1,4 @@
-import HttpRequest from "@/utils/request";
+import HttpRequest from "@/utils/request"
 
 // 登录
 export function login(params = {}) {

@@ -14,6 +14,6 @@ const dynamicRouter: IDynamicRouter = {
   Dept: () => import("@/views/system/dept/index.vue"),
   Notice: () => import("@/views/system/notice/index.vue"),
   Logs: () => import("@/views/system/logs/index.vue")
-};
+}
 
-export default dynamicRouter;
+export default dynamicRouter
