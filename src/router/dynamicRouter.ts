@@ -13,7 +13,19 @@ const dynamicRouter: IDynamicRouter = {
   DictData: () => import("@/views/system/dict/data.vue"),
   Dept: () => import("@/views/system/dept/index.vue"),
   Notice: () => import("@/views/system/notice/index.vue"),
-  Logs: () => import("@/views/system/logs/index.vue")
+  Logs: () => import("@/views/system/logs/index.vue"),
+
+
+  // 审批管理
+  Evection: () => import("@/views/approvalManagement/evection/index.vue"), // 出差
+  Leave: () => import("@/views/approvalManagement/leave/index.vue"), // 请假
+  MakeUpCard: () => import("@/views/approvalManagement/makeUpCard/index.vue"), // 打卡
+  WorkOvertime: () => import("@/views/approvalManagement/workOvertime/index.vue"), // 加班
+
+  // 基础数据
+  ClockIn: () => import("@/views/baseInfo/clockIn/index.vue"), // 出差
+  Salary: () => import("@/views/baseInfo/salary/index.vue"), // 工资详细
+
 }
 
 export default dynamicRouter

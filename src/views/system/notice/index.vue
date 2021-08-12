@@ -118,11 +118,7 @@
             <a-form-item label="状态" name="status">
               <a-radio-group
                 v-model:value="formState.status"
-                name="menuType"
-                :options="[
-                  { label: '正常', value: '1' },
-                  { label: '停用', value: '0' },
-                ]"
+                :options="disableOptions"
               />
             </a-form-item>
           </a-col>
@@ -175,6 +171,7 @@ import { TableState } from 'ant-design-vue/es/table/interface'
 
 import FormSearch from '@/components/FormSearch/index.vue'
 import { INotice } from '@/api/admin/system/notice/type'
+import { IData } from '@/api/admin/system/dict/data/type'
 
 interface FormState {
   id: undefined | number
@@ -237,8 +234,9 @@ export default defineComponent({
     FormSearch,
   },
   setup() {
-    const statusOptions = ref([])
-    const typeOptions = ref([])
+    const statusOptions = ref<IData[]>([])
+    const disableOptions = ref<IData[]>([])
+    const typeOptions = ref<IData[]>([])
     const rules = {
       noticeTitle: [
         { required: true, message: '标题不能为空', trigger: 'blur' },
@@ -419,6 +417,11 @@ export default defineComponent({
     onMounted(async () => {
       statusOptions.value = await getDict('sys_normal_disable')
       typeOptions.value = await getDict('sys_notice_type')
+      disableOptions.value = await getDict('sys_normal_disable')
+      disableOptions.value.forEach(item => {
+        item.label = item.dictLabel
+        item.value = item.dictValue
+      })
       init()
     })
 
@@ -450,6 +453,7 @@ export default defineComponent({
       cancel,
       handleAdd,
       handleUpdate,
+      disableOptions
     }
   },
   computed: {

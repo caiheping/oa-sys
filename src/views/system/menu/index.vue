@@ -23,6 +23,11 @@
           <span>{{ record.status === '1' ? '正常' : '停用' }}</span>
         </div>
       </template>
+      <template #visible="{ record }">
+        <div class="flex justify-center">
+          <span>{{ record.visible === '1' ? '显示' : '隐藏' }}</span>
+        </div>
+      </template>
       <template #action="{ record }">
         <span>
           <a-button
@@ -97,7 +102,6 @@
             <a-form-item label="菜单类型" name="menuType">
               <a-radio-group
                 v-model:value="formState.menuType"
-                name="menuType"
                 :options="[
                   { label: '目录', value: 'M' },
                   { label: '菜单', value: 'C' },
@@ -175,11 +179,7 @@
             <a-form-item label="显示状态" name="visible">
               <a-radio-group
                 v-model:value="formState.visible"
-                name="menuType"
-                :options="[
-                  { label: '显示', value: '1' },
-                  { label: '隐藏', value: '0' },
-                ]"
+                :options="showOrHideOptions"
               />
             </a-form-item>
           </a-col>
@@ -187,11 +187,7 @@
             <a-form-item label="菜单状态" name="status">
               <a-radio-group
                 v-model:value="formState.status"
-                name="menuType"
-                :options="[
-                  { label: '正常', value: '1' },
-                  { label: '停用', value: '0' },
-                ]"
+                :options="disableOptions"
               />
             </a-form-item>
           </a-col>
@@ -199,7 +195,6 @@
             <a-form-item label="是否缓存" name="keepAlive">
               <a-radio-group
                 v-model:value="formState.keepAlive"
-                name="menuType"
                 :options="[
                   { label: '缓存', value: 1 },
                   { label: '不缓存', value: 0 },
@@ -211,7 +206,6 @@
             <a-form-item label="是否外链" name="isFrame">
               <a-radio-group
                 v-model:value="formState.isFrame"
-                name="menuType"
                 :options="[
                   { label: '是', value: '1' },
                   { label: '否', value: '0' },
@@ -254,6 +248,8 @@ import { useAppStore } from '@/store/modules/app'
 import { mapState } from 'pinia'
 import 'vue3-treeselect/dist/vue3-treeselect.css'
 import { IMenu } from '@/api/admin/system/menu/type'
+import { IData } from '@/api/admin/system/dict/data/type'
+import { getDict } from '@/utils/dictFormat'
 
 // 表头配置
 const columns = [
@@ -295,6 +291,13 @@ const columns = [
     slots: { customRender: 'status' },
   },
   {
+    title: '是否显示',
+    dataIndex: 'visible',
+    key: 'visible',
+    align: 'center',
+    slots: { customRender: 'visible' },
+  },
+  {
     title: '创建时间',
     dataIndex: 'createdAt',
     key: 'createdAt',
@@ -314,6 +317,8 @@ export default defineComponent({
     Treeselect,
   },
   setup() {
+    const disableOptions = ref<IData[]>([])
+    const showOrHideOptions = ref<IData[]>([])
     const treeRef = ref()
     const dynamicComponents = ref(Object.keys(dynamicRouter))
 
@@ -502,7 +507,17 @@ export default defineComponent({
     const init = () => {
       getList()
     }
-    onMounted(() => {
+    onMounted(async () => {
+      disableOptions.value = await getDict('sys_normal_disable')
+      showOrHideOptions.value = await getDict('sys_show_hide')
+      disableOptions.value.forEach(item => {
+        item.label = item.dictLabel
+        item.value = item.dictValue
+      })
+      showOrHideOptions.value.forEach(item => {
+        item.label = item.dictLabel
+        item.value = item.dictValue
+      })
       init()
     })
 
@@ -529,6 +544,8 @@ export default defineComponent({
       handleIconChange,
       treeRef,
       handleTreeSelect,
+      disableOptions,
+      showOrHideOptions
     }
   },
   computed: {

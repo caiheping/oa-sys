@@ -130,11 +130,7 @@
             <a-form-item label="状态" name="status">
               <a-radio-group
                 v-model:value="formState.status"
-                name="menuType"
-                :options="[
-                  { label: '正常', value: '1' },
-                  { label: '停用', value: '0' },
-                ]"
+                :options="disableOptions"
               />
             </a-form-item>
           </a-col>
@@ -342,6 +338,7 @@ export default defineComponent({
   },
   setup() {
     const statusOptions = ref<IData[]>([])
+    const disableOptions = ref<IData[]>([])
     const checkMenus = () => {
       if (checkedKeys.value.length) {
         return Promise.resolve()
@@ -609,6 +606,11 @@ export default defineComponent({
 
     onMounted(async () => {
       statusOptions.value = await getDict('sys_normal_disable')
+      disableOptions.value = await getDict('sys_normal_disable')
+      disableOptions.value.forEach(item => {
+        item.label = item.dictLabel
+        item.value = item.dictValue
+      })
       init()
     })
 
@@ -642,6 +644,7 @@ export default defineComponent({
       menuOptions,
       checkedKeys,
       replaceFields,
+      disableOptions,
 
       dataScopeOptions,
       formScopeRef,

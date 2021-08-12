@@ -114,11 +114,7 @@
             <a-form-item label="部门状态" name="status">
               <a-radio-group
                 v-model:value="formState.status"
-                name="menuType"
-                :options="[
-                  { label: '正常', value: '1' },
-                  { label: '停用', value: '0' },
-                ]"
+                :options="disableOptions"
               />
             </a-form-item>
           </a-col>
@@ -156,6 +152,8 @@ import { useAppStore } from '@/store/modules/app'
 import { mapState } from 'pinia'
 import 'vue3-treeselect/dist/vue3-treeselect.css'
 import { IDept } from '@/api/admin/system/dept/type'
+import { IData } from '@/api/admin/system/dict/data/type'
+import { getDict } from '@/utils/dictFormat'
 
 interface FormState {
   deptId: undefined | number
@@ -203,6 +201,7 @@ export default defineComponent({
     Treeselect,
   },
   setup() {
+    const disableOptions = ref<IData[]>([])
     const userStore = useUserStore()
     const treeRef = ref()
     const rules = {
@@ -394,7 +393,12 @@ export default defineComponent({
     const init = () => {
       getList()
     }
-    onMounted(() => {
+    onMounted(async () => {
+      disableOptions.value = await getDict('sys_normal_disable')
+      disableOptions.value.forEach(item => {
+        item.label = item.dictLabel
+        item.value = item.dictValue
+      })
       init()
     })
 
@@ -419,6 +423,7 @@ export default defineComponent({
       formRef,
       treeRef,
       handleTreeSelect,
+      disableOptions
     }
   },
   computed: {

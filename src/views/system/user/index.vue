@@ -177,11 +177,7 @@
             <a-form-item label="性别" name="sex">
               <a-radio-group
                 v-model:value="formState.sex"
-                name="menuType"
-                :options="[
-                  { label: '男', value: '1' },
-                  { label: '女', value: '0' },
-                ]"
+                :options="sexOptions"
               />
             </a-form-item>
           </a-col>
@@ -197,11 +193,7 @@
             <a-form-item label="状态" name="status">
               <a-radio-group
                 v-model:value="formState.status"
-                name="menuType"
-                :options="[
-                  { label: '正常', value: '1' },
-                  { label: '停用', value: '0' },
-                ]"
+                :options="disableOptions"
               />
             </a-form-item>
           </a-col>
@@ -211,6 +203,69 @@
                 v-model:value="formState.email"
                 placeholder="请输入邮箱"
               />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="薪资" name="salary">
+              <a-input-number
+                class="!w-[100%]"
+                v-model:value="formState.salary"
+                placeholder="请输入薪资"
+                :formatter="
+                  (value) => `￥ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                "
+                :parser="(value) => value.replace(/\￥\s?|(,*)/g, '')"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="岗位" name="position">
+              <a-select
+                v-model:value="formState.position"
+                placeholder="请选择岗位"
+              >
+                <a-select-option
+                  :value="item.dictValue"
+                  v-for="item in positionOptions"
+                  :key="item.id"
+                >
+                  {{ item.dictLabel }}
+                </a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="入职时间" name="entryTime">
+              <a-date-picker
+                class="!w-[100%]"
+                v-model:value="formState.entryTime"
+                placeholder="请输入入职时间"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="出生日期" name="birthday">
+              <a-date-picker
+                class="!w-[100%]"
+                v-model:value="formState.birthday"
+                placeholder="请输入出生日期"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="学历" name="education">
+              <a-select
+                v-model:value="formState.education"
+                placeholder="请选择学历"
+              >
+                <a-select-option
+                  :value="item.dictValue"
+                  v-for="item in educationOptions"
+                  :key="item.id"
+                >
+                  {{ item.dictLabel }}
+                </a-select-option>
+              </a-select>
             </a-form-item>
           </a-col>
           <a-col :span="12">
@@ -306,6 +361,11 @@ interface FormState {
   mobile: undefined | number | string
   status: undefined | string
   email: undefined | string
+  salary: undefined | string
+  position: undefined | string
+  entryTime: undefined | string
+  birthday: undefined | string
+  education: undefined | string
   remark: undefined | string
 }
 
@@ -376,6 +436,11 @@ export default defineComponent({
   setup() {
     const userStore = useUserStore()
     const roleOptions = ref<IRole[]>([])
+    const statusOptions = ref<IData[]>([])
+    const positionOptions = ref<IData[]>([])
+    const educationOptions = ref<IData[]>([])
+    const disableOptions = ref<IData[]>([])
+    const sexOptions = ref<IData[]>([])
     /**
      * 左侧树形控件操作
      */
@@ -434,7 +499,6 @@ export default defineComponent({
     /**
      * 表格操作
      */
-    const statusOptions = ref<IData[]>([])
     const state = reactive({
       selectedRowKeys: [],
     })
@@ -547,6 +611,11 @@ export default defineComponent({
       mobile: undefined,
       status: '1',
       email: undefined,
+      salary: undefined,
+      position: '1',
+      entryTime: '',
+      birthday: '',
+      education: undefined,
       remark: undefined,
     })
     const rules = {
@@ -592,6 +661,9 @@ export default defineComponent({
             updateUser(formState).then((res) => {
               Message.success(res.message)
               formState.id = undefined
+              formState.deptId = undefined
+              formState.password = undefined
+              formState.userName = undefined
               formState.roleIds = undefined
               formRef.value.resetFields()
               open.value = false
@@ -601,6 +673,9 @@ export default defineComponent({
             addUser(formState).then((res) => {
               Message.success(res.message)
               formState.id = undefined
+              formState.deptId = undefined
+              formState.password = undefined
+              formState.userName = undefined
               formState.roleIds = undefined
               formRef.value.resetFields()
               open.value = false
@@ -695,6 +770,18 @@ export default defineComponent({
 
     onMounted(async () => {
       statusOptions.value = await getDict('sys_normal_disable')
+      positionOptions.value = await getDict('sys_user_position')
+      educationOptions.value = await getDict('sys_user_education')
+      disableOptions.value = await getDict('sys_normal_disable')
+      sexOptions.value = await getDict('sys_user_sex')
+      disableOptions.value.forEach(item => {
+        item.label = item.dictLabel
+        item.value = item.dictValue
+      })
+      sexOptions.value.forEach(item => {
+        item.label = item.dictLabel
+        item.value = item.dictValue
+      })
       init()
     })
 
@@ -740,6 +827,10 @@ export default defineComponent({
       formState,
       roleOptions,
       handleTreeSelect,
+      positionOptions,
+      educationOptions,
+      disableOptions,
+      sexOptions,
 
       visible,
       ...toRefs(resetformState),

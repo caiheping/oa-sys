@@ -112,11 +112,7 @@
             <a-form-item label="状态" name="status">
               <a-radio-group
                 v-model:value="formState.status"
-                name="menuType"
-                :options="[
-                  { label: '正常', value: '1' },
-                  { label: '停用', value: '0' },
-                ]"
+                :options="disableOptions"
               />
             </a-form-item>
           </a-col>
@@ -226,6 +222,7 @@ export default defineComponent({
     FormSearch,
   },
   setup() {
+    const disableOptions = ref<IData[]>([])
     const statusOptions = ref<IData[]>([])
     const rules = {
       dictName: [
@@ -400,6 +397,11 @@ export default defineComponent({
     }
 
     onMounted(async () => {
+      disableOptions.value = await getDict('sys_normal_disable')
+      disableOptions.value.forEach(item => {
+        item.label = item.dictLabel
+        item.value = item.dictValue
+      })
       statusOptions.value = await getDict('sys_normal_disable')
       console.log(statusOptions)
       init()
@@ -432,6 +434,7 @@ export default defineComponent({
       cancel,
       handleAdd,
       handleUpdate,
+      disableOptions
     }
   },
   computed: {

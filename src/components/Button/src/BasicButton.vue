@@ -4,9 +4,9 @@
     :class="[getColor, $attrs.class]"
     @click="onClick"
   >
-    <template #default="data">
+    <template #default>
       <svg-icon :name="preIcon" v-if="preIcon" :size="14" />
-      <slot v-bind="data"></slot>
+      <slot></slot>
       <svg-icon :name="postIcon" v-if="postIcon" :size="14" />
     </template>
   </Button>
