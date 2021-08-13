@@ -24,7 +24,9 @@ const dynamicRouter: IDynamicRouter = {
 
   // 基础数据
   ClockIn: () => import("@/views/baseInfo/clockIn/index.vue"), // 出差
-  Salary: () => import("@/views/baseInfo/salary/index.vue"), // 工资详细
+
+  // 财务管理
+  Salary: () => import("@/views/finance/salary/index.vue"), // 工资详细
 
 }
 
