@@ -3,7 +3,7 @@ import { IRows, ILog } from "./type"
 
 // 查询列表
 export function getLogs(params = {}) {
-  return HttpRequest<IRows>('/admin/system/logs', 'GET', params, false)
+  return HttpRequest<IRows>('/admin/system/logs', 'GET', params)
 }
 
 // 查询单个

@@ -42,8 +42,8 @@
     "typescript": "^4.1.3",
     "vite": "^2.4.2",
     "vite-plugin-svg-icons": "^0.6.2",
-    "vite-plugin-windicss": "^0.16.0",
+    "vite-plugin-windicss": "^1.2.7",
     "vue-tsc": "^0.0.8",
-    "windicss": "^3.0.12"
+    "windicss": "^3.1.7"
   }
 }

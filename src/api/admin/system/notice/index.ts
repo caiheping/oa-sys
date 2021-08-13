@@ -3,7 +3,7 @@ import { IRows, INotice } from './type'
 
 // 查询列表
 export function getNotice(params = {}) {
-  return HttpRequest<IRows>('/admin/system/notice', 'GET', params, false)
+  return HttpRequest<IRows>('/admin/system/notice', 'GET', params)
 }
 
 // 查询单个
