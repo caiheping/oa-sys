@@ -10,6 +10,12 @@
 
     <a-row :gutter="10" class="mb-2">
       <a-col>
+        <a-button color="success" @click="handleAdd"> 新增 </a-button>
+      </a-col>
+      <a-col>
+        <a-button :disabled="!hasSelected" color="error"> 删除 </a-button>
+      </a-col>
+      <a-col>
         <a-button color="normal">导出</a-button>
       </a-col>
     </a-row>
@@ -28,13 +34,15 @@
     >
       <template #action="{ record }">
         <span>
+          <a-button type="link" color="success" class="mr-3"> 审批 </a-button>
+          <a-button type="link" color="success" class="mr-3"> 修改 </a-button>
           <a-button
             type="link"
-            color="success"
+            color="error"
             class="mr-3"
             @click="showDetail(record)"
           >
-            审批
+            删除
           </a-button>
         </span>
       </template>
@@ -110,6 +118,18 @@ const columns = [
     align: 'center',
   },
   {
+    title: '请假原因',
+    dataIndex: 'method',
+    key: 'method',
+    align: 'center',
+  },
+  {
+    title: '状态',
+    dataIndex: 'method',
+    key: 'method',
+    align: 'center',
+  },
+  {
     title: '开始时间',
     dataIndex: 'method',
     key: 'method',
@@ -158,6 +178,30 @@ export default defineComponent({
         name: 'createdBy',
         value: '',
         placeholder: '请输入姓名',
+      },
+      {
+        type: 'select',
+        label: '状态',
+        name: 'status',
+        value: undefined,
+        placeholder: '请选择类型',
+        normalizer: {
+          value: 'dictValue',
+          label: 'dictLabel',
+        },
+        options: methodOptions,
+      },
+      {
+        type: 'select',
+        label: '类型',
+        name: 'method',
+        value: undefined,
+        placeholder: '请选择类型',
+        normalizer: {
+          value: 'dictValue',
+          label: 'dictLabel',
+        },
+        options: methodOptions,
       },
     ])
     const handleQuery = (query: { createdBy: string; method: string }) => {

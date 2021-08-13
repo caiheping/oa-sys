@@ -64,8 +64,8 @@
           <svg-icon name="exitFullScreen" size="20px" />
         </a-tooltip>
       </div>
-
-      <div
+      <a-dropdown
+        :trigger="['click']"
         v-if="headerConfig.showLocale"
         class="
           flex
@@ -77,24 +77,22 @@
           hover:bg-[rgba(0,0,0,0.05)]
         "
       >
-        <a-dropdown :trigger="['click']">
-          <a class="flex items-center" @click.prevent>
-            <svg-icon name="language" size="20px" />
-          </a>
-          <template #overlay>
-            <a-menu @click="handleLocaleClick">
-              <a-menu-item key="zh-cn">
-                <span>中文</span>
-              </a-menu-item>
-              <a-menu-item key="en">
-                <span>English</span>
-              </a-menu-item>
-            </a-menu>
-          </template>
-        </a-dropdown>
-      </div>
+        <a class="flex items-center" @click.prevent>
+          <svg-icon name="language" size="20px" />
+        </a>
+        <template #overlay>
+          <a-menu @click="handleLocaleClick">
+            <a-menu-item key="zh-cn">
+              <span>中文</span>
+            </a-menu-item>
+            <a-menu-item key="en">
+              <span>English</span>
+            </a-menu-item>
+          </a-menu>
+        </template>
+      </a-dropdown>
 
-      <div
+      <a-dropdown
         class="
           flex
           items-center
@@ -105,28 +103,26 @@
           hover:bg-[rgba(0,0,0,0.05)]
         "
       >
-        <a-dropdown>
-          <a class="flex items-center" @click.prevent>
-            <img
-              :src="userInfo.avatar ? baseImgUrl + userInfo.avatar : avatar"
-              class="w-8 h-8 rounded-full mr-2"
-              alt=""
-            />
-            <span class="text-size-[18px] text-gray-600">{{
-              userInfo.nickName
-            }}</span>
-          </a>
-          <template #overlay>
-            <a-menu @click="handleMenuClick">
-              <a-menu-item key="1">
-                <span>个人中心</span>
-              </a-menu-item>
-              <a-menu-divider />
-              <a-menu-item key="3">退出登录</a-menu-item>
-            </a-menu>
-          </template>
-        </a-dropdown>
-      </div>
+        <a class="flex items-center" @click.prevent>
+          <img
+            :src="userInfo.avatar ? baseImgUrl + userInfo.avatar : avatar"
+            class="w-8 h-8 rounded-full mr-2"
+            alt=""
+          />
+          <span class="text-size-[18px] text-gray-600">{{
+            userInfo.nickName
+          }}</span>
+        </a>
+        <template #overlay>
+          <a-menu @click="handleMenuClick">
+            <a-menu-item key="1">
+              <span>个人中心</span>
+            </a-menu-item>
+            <a-menu-divider />
+            <a-menu-item key="3">退出登录</a-menu-item>
+          </a-menu>
+        </template>
+      </a-dropdown>
       <div
         @click="showDrawer"
         class="

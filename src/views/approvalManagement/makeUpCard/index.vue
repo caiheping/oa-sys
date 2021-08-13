@@ -10,6 +10,12 @@
 
     <a-row :gutter="10" class="mb-2">
       <a-col>
+        <a-button color="success" @click="handleAdd"> 新增 </a-button>
+      </a-col>
+      <a-col>
+        <a-button :disabled="!hasSelected" color="error"> 删除 </a-button>
+      </a-col>
+      <a-col>
         <a-button color="normal">导出</a-button>
       </a-col>
     </a-row>
@@ -28,36 +34,96 @@
     >
       <template #action="{ record }">
         <span>
-          <a-button
-            type="link"
-            color="success"
-            class="mr-3"
-            @click="showDetail(record)"
+          <a-button type="link" color="success" class="mr-3"> 审批 </a-button>
+          <a-button type="link" color="success" class="mr-3"> 修改 </a-button>
+          <a-popconfirm
+            title="确定要删除该数据吗？"
+            ok-text="确定"
+            cancel-text="取消"
+            @confirm="confirm(record)"
+            @cancel="cancel"
           >
-            审批
-          </a-button>
+            <a-button
+              type="link"
+              color="error"
+              v-has-permi="['system:notice:delete']"
+            >
+              删除
+            </a-button>
+          </a-popconfirm>
         </span>
       </template>
     </a-table>
 
     <!-- 推窗 -->
     <a-drawer
-      width="50%"
+      width="600px"
       :title="drawerTitle"
       placement="right"
       v-model:visible="open"
       :maskClosable="false"
       @close="handleClose"
     >
-      <div v-if="detailObj">
-        <p class="mb-2">操作人员: {{ detailObj.createdBy }}</p>
-        <p class="mb-2">接口地址: {{ detailObj.url }}</p>
-        <p class="mb-2">ip地址: {{ detailObj.ip }}</p>
-        <p class="mb-2">请求方式: {{ detailObj.method }}</p>
-        <p class="mb-2">http状态码: {{ detailObj.status }}</p>
-        <p class="mb-2">请求参数: {{ detailObj.data }}</p>
-        <p class="mb-2">创建时间: {{ detailObj.createdAt }}</p>
-      </div>
+      <a-form
+        v-if="open"
+        ref="formRef"
+        :model="formState"
+        :rules="rules"
+        :label-col="labelCol"
+        :wrapper-col="wrapperCol"
+      >
+        <a-row>
+          <a-col :span="24">
+            <a-form-item label="标题" name="noticeTitle">
+              <a-input
+                v-model:value="formState.noticeTitle"
+                placeholder="请输入标题"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="24">
+            <a-form-item label="类型" name="noticeType">
+              <a-select
+                v-model:value="formState.noticeType"
+                placeholder="请输入类型"
+              >
+                <a-select-option
+                  v-for="item in typeOptions"
+                  :key="item.id"
+                  :value="item.dictValue"
+                >
+                  {{ item.dictLabel }}
+                </a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+          <a-col :span="24">
+            <a-form-item label="状态" name="status">
+              <a-radio-group
+                v-model:value="formState.status"
+                :options="disableOptions"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="24">
+            <a-form-item label="内容" name="noticeContent">
+              <a-textarea
+                :rows="3"
+                v-model:value="formState.noticeContent"
+                placeholder="请输入内容"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="24">
+            <a-form-item>
+              <a-button type="primary" class="mr-3" @click="handleSubmit">
+                确认
+              </a-button>
+              <a-button @click="handleClose">取消</a-button>
+            </a-form-item>
+          </a-col>
+        </a-row>
+      </a-form>
     </a-drawer>
   </div>
 </template>
@@ -93,6 +159,12 @@ const columns = [
   },
   {
     title: '补卡时间',
+    dataIndex: 'method',
+    key: 'method',
+    align: 'center',
+  },
+  {
+    title: '状态',
     dataIndex: 'method',
     key: 'method',
     align: 'center',
@@ -140,6 +212,18 @@ export default defineComponent({
         name: 'createdBy',
         value: '',
         placeholder: '请输入姓名',
+      },
+      {
+        type: 'select',
+        label: '状态',
+        name: 'status',
+        value: undefined,
+        placeholder: '请选择类型',
+        normalizer: {
+          value: 'dictValue',
+          label: 'dictLabel',
+        },
+        options: methodOptions,
       },
     ])
     const handleQuery = (query: { createdBy: string; method: string }) => {

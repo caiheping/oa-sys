@@ -10,6 +10,12 @@
 
     <a-row :gutter="10" class="mb-2">
       <a-col>
+        <a-button color="success" @click="handleAdd"> 新增 </a-button>
+      </a-col>
+      <a-col>
+        <a-button :disabled="!hasSelected" color="error"> 删除 </a-button>
+      </a-col>
+      <a-col>
         <a-button color="normal">导出</a-button>
       </a-col>
     </a-row>
@@ -28,13 +34,14 @@
     >
       <template #action="{ record }">
         <span>
+          <a-button type="link" color="success" class="mr-3"> 修改 </a-button>
           <a-button
             type="link"
-            color="success"
+            color="error"
             class="mr-3"
             @click="showDetail(record)"
           >
-            详细
+            删除
           </a-button>
         </span>
       </template>
@@ -184,7 +191,7 @@ export default defineComponent({
         placeholder: '请输入操作人员',
       },
       {
-        type: 'select',
+        type: 'month-picker',
         label: '年/月',
         name: 'method',
         value: undefined,
