@@ -3,7 +3,7 @@ import { IRows, IDept } from "./type"
 
 // 查询列表
 export function getDept(params = {}) {
-  return HttpRequest<IRows>('/admin/system/department', 'GET', params)
+  return HttpRequest<IRows>('/admin/system/department', 'GET', params, false)
 }
 
 // 查询单个

@@ -8,7 +8,7 @@ export function getRouters(params = {}) {
 
 // 获取路由
 export function getMenu(params = {}) {
-  return HttpRequest<IRows>('/admin/system/menu', 'GET', params)
+  return HttpRequest<IRows>('/admin/system/menu', 'GET', params, false)
 }
 
 // 获取某条菜单
