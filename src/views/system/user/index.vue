@@ -206,69 +206,6 @@
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="薪资" name="salary">
-              <a-input-number
-                class="!w-[100%]"
-                v-model:value="formState.salary"
-                placeholder="请输入薪资"
-                :formatter="
-                  (value) => `￥ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-                "
-                :parser="(value) => value.replace(/\￥\s?|(,*)/g, '')"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="12">
-            <a-form-item label="岗位" name="position">
-              <a-select
-                v-model:value="formState.position"
-                placeholder="请选择岗位"
-              >
-                <a-select-option
-                  :value="item.dictValue"
-                  v-for="item in positionOptions"
-                  :key="item.id"
-                >
-                  {{ item.dictLabel }}
-                </a-select-option>
-              </a-select>
-            </a-form-item>
-          </a-col>
-          <a-col :span="12">
-            <a-form-item label="入职时间" name="entryTime">
-              <a-date-picker
-                class="!w-[100%]"
-                v-model:value="formState.entryTime"
-                placeholder="请输入入职时间"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="12">
-            <a-form-item label="出生日期" name="birthday">
-              <a-date-picker
-                class="!w-[100%]"
-                v-model:value="formState.birthday"
-                placeholder="请输入出生日期"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="12">
-            <a-form-item label="学历" name="education">
-              <a-select
-                v-model:value="formState.education"
-                placeholder="请选择学历"
-              >
-                <a-select-option
-                  :value="item.dictValue"
-                  v-for="item in educationOptions"
-                  :key="item.id"
-                >
-                  {{ item.dictLabel }}
-                </a-select-option>
-              </a-select>
-            </a-form-item>
-          </a-col>
-          <a-col :span="12">
             <a-form-item label="备注" name="remark">
               <a-textarea
                 :rows="3"

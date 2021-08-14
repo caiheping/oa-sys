@@ -73,10 +73,7 @@
           <a-form-item has-feedback label="性别" name="sex">
             <a-radio-group
               v-model:value="formState.sex"
-              :options="[
-                { label: '男', value: '1' },
-                { label: '女', value: '0' },
-              ]"
+              :options="sexOptions"
             />
           </a-form-item>
           <a-form-item>
@@ -154,12 +151,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, UnwrapRef, reactive, ref } from 'vue'
+import { defineComponent, UnwrapRef, reactive, ref, onMounted } from 'vue'
 import { message as Message } from 'ant-design-vue'
 import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
 import { useUserStore } from '@/store/modules/user'
 import { mapState } from 'pinia'
 import VuePictureCropper, { cropper } from 'vue-picture-cropper/dist/esm'
+import { getDict } from '@/utils/dictFormat'
 
 import {
   updateUser,
@@ -168,6 +166,7 @@ import {
 } from '@/api/admin/system/user'
 import defaultAvatar from '@/assets/images/profile.jpg'
 import { imageUrl } from '@/config'
+import { IData } from '@/api/admin/system/dict/data/type'
 
 interface FormState {
   nickName: undefined | string
@@ -182,6 +181,7 @@ export default defineComponent({
   },
   setup() {
     const userStore = useUserStore()
+    const sexOptions = ref<IData[]>([])
     const baseImgUrl = imageUrl
     console.log(userStore)
     const getRoleName = (roles) => {
@@ -302,12 +302,21 @@ export default defineComponent({
       result.value = ''
       isShowDialog.value = false
     }
+
+    onMounted(async () => {
+      sexOptions.value = await getDict('sys_user_sex')
+      sexOptions.value.forEach(item => {
+        item.label = item.dictLabel
+        item.value = item.dictValue
+      })
+    })
     return {
       baseImgUrl,
       defaultAvatar,
       getRoleName,
 
       formState,
+      sexOptions,
       formRef,
       resetForm,
       handleSubmit,
