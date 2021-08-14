@@ -36,7 +36,7 @@
         onChange: onSelectChange,
       }"
       :columns="columns"
-      :data-source="logsList"
+      :data-source="tableList"
       :pagination="pagination"
       @change="handleTableChange"
     >
@@ -296,7 +296,7 @@ export default defineComponent({
     /**
      * 表格操作
      */
-    const logsList = ref<IClockIn[]>([])
+    const tableList = ref<IClockIn[]>([])
     const pagination = ref({
       total: 0,
       current: 1,
@@ -326,9 +326,26 @@ export default defineComponent({
     const getList = (queryParams?: {}) => {
       getClockIn(queryParams).then((res) => {
         console.log(res)
-        logsList.value = res.data.rows
+        tableList.value = res.data.rows
         pagination.value.total = res.data.count
         state.selectedRowKeys = []
+      })
+    }
+    // 新增按钮操作
+    const handleAdd = () => {
+      open.value = true
+      drawerTitle.value = '添加打卡'
+    }
+    // 更新按钮操作
+    const handleUpdate = (row) => {
+      getClockInById(row.id).then((res) => {
+        open.value = true
+        drawerTitle.value = '修改打卡'
+        nextTick(() => {
+          Object.keys(formState).forEach((key) => {
+            formState[key] = res.data[key]
+          })
+        })
       })
     }
     // 确认删除
@@ -393,24 +410,6 @@ export default defineComponent({
       open.value = false
     }
 
-    // 新增按钮操作
-    const handleAdd = () => {
-      open.value = true
-      drawerTitle.value = '添加打卡'
-    }
-    // 更新按钮操作
-    const handleUpdate = (row) => {
-      getClockInById(row.id).then((res) => {
-        open.value = true
-        drawerTitle.value = '修改打卡'
-        nextTick(() => {
-          Object.keys(formState).forEach((key) => {
-            formState[key] = res.data[key]
-          })
-        })
-      })
-    }
-
     const init = () => {
       getList(queryParams)
     }
@@ -429,7 +428,7 @@ export default defineComponent({
       formFields,
       handleQuery,
 
-      logsList,
+      tableList,
       columns,
       pagination,
       hasSelected,
@@ -438,6 +437,8 @@ export default defineComponent({
       confirm,
       cancel,
       onSelectChange,
+      handleAdd,
+      handleUpdate,
       ...toRefs(state),
 
       open,
@@ -446,8 +447,6 @@ export default defineComponent({
       clockInOptions,
       formState,
       handleClose,
-      handleAdd,
-      handleUpdate,
       handleSubmit
     }
   },
