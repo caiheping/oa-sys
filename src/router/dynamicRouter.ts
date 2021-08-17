@@ -20,7 +20,7 @@ const dynamicRouter: IDynamicRouter = {
   Evection: () => import("@/views/approvalManagement/evection/index.vue"), // 出差
   Leave: () => import("@/views/approvalManagement/leave/index.vue"), // 请假
   MakeUpCard: () => import("@/views/approvalManagement/makeUpCard/index.vue"), // 打卡
-  WorkOvertime: () => import("@/views/approvalManagement/workOvertime/index.vue"), // 加班
+  WorkOverTime: () => import("@/views/approvalManagement/workOverTime/index.vue"), // 加班
 
   // 基础数据
   ClockIn: () => import("@/views/baseInfo/clockIn/index.vue"), // 出差

@@ -43,19 +43,27 @@
       <template #user="{ record }">
         <span>{{ record.user.nickName }}</span>
       </template>
-      <template #type="{ record }">
-        <span>{{ selectDictLabel(clockInOptions, record.type) }}</span>
+      <template #status="{ record }">
+        <span>{{
+          selectDictLabel(examineAndApproveStatusOptions, record.status)
+        }}</span>
       </template>
       <template #action="{ record }">
         <span>
-          <a-button
-            type="link"
-            color="success"
-            class="mr-3"
-            @click="handleUpdate(record)"
-          >
-            审批
-          </a-button>
+          <a-dropdown :trigger="['click']" @click="handleClickDropdown(record)">
+            <span class="mr-3 text-[#faad14] cursor-pointer"> 审批 </span>
+            <template #overlay>
+              <a-menu @click="handleExamineAndApprove">
+                <a-menu-item
+                  :disabled="item.dictValue === '0'"
+                  v-for="item in examineAndApproveStatusOptions"
+                  :key="item.dictValue"
+                >
+                  {{ item.dictLabel }}
+                </a-menu-item>
+              </a-menu>
+            </template>
+          </a-dropdown>
           <a-button
             type="link"
             color="success"
@@ -102,59 +110,24 @@
       >
         <a-row>
           <a-col :span="24">
-            <a-form-item label="类型" name="type">
-              <a-select v-model:value="formState.type" placeholder="请输入类型">
-                <a-select-option
-                  v-for="item in clockInOptions"
-                  :key="item.id"
-                  :value="item.dictValue"
-                >
-                  {{ item.dictLabel }}
-                </a-select-option>
-              </a-select>
-            </a-form-item>
-          </a-col>
-          <a-col :span="24">
-            <a-form-item label="打卡WiFi" name="wifi">
-              <a-input
-                v-model:value="formState.wifi"
-                placeholder="请输入打卡WiFi"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="24">
-            <a-form-item label="上班打卡地址" name="firstClockInAddr">
-              <a-input
-                v-model:value="formState.firstClockInAddr"
-                placeholder="请输入上班打卡地址"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="24">
-            <a-form-item label="上班打卡时间" name="firstClockInTime">
-              <a-time-picker
-                v-model:value="formState.firstClockInTime"
+            <a-form-item label="选择时间" name="time">
+              <a-range-picker
+                :show-time="{ format: 'HH:mm' }"
+                format="YYYY-MM-DD HH:mm"
+                :placeholder="['开始时间', '结束时间']"
+                v-model:value="formState.time"
                 valueFormat="YYYY-MM-DD HH:mm"
-                placeholder="上班打卡时间"
-                format="HH:mm"
+                @ok="onOkTime"
+                @change="onOkTime"
               />
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item label="下班打卡地址" name="lastClockInAddr">
-              <a-input
-                v-model:value="formState.lastClockInAddr"
-                placeholder="请输入下班打卡地址"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="24">
-            <a-form-item label="下班打卡时间" name="lastClockInTime">
-              <a-time-picker
-                v-model:value="formState.lastClockInTime"
-                valueFormat="YYYY-MM-DD HH:mm"
-                placeholder="下班打卡时间"
-                format="HH:mm"
+            <a-form-item label="加班原因" name="workOverTimeReason">
+              <a-textarea
+                :rows="3"
+                v-model:value="formState.workOverTimeReason"
+                placeholder="请输入加班原因"
               />
             </a-form-item>
           </a-col>
@@ -180,8 +153,15 @@ import {
   computed,
   nextTick,
   toRefs,
+  VNodeChild,
 } from 'vue'
-import { getClockIn, delClockIn, updateClockIn, addClockIn, getClockInById } from '@/api/admin/baseInfo/clockIn'
+import {
+  getWorkOvertime,
+  delWorkOvertime,
+  updateWorkOvertime,
+  addWorkOvertime,
+  getWorkOvertimeById,
+} from '@/api/admin/examineAndApprove/workOverTime'
 import { getDict, selectDictLabel } from '@/utils/dictFormat'
 import { useAppStore } from '@/store/modules/app'
 import { mapState } from 'pinia'
@@ -191,10 +171,27 @@ import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
 
 import FormSearch from '@/components/FormSearch/index.vue'
 import useDrawer from '@/hooks/useDrawer'
-import { IClockIn } from '@/api/admin/baseInfo/clockIn/type'
+import { IWorkOvertime } from '@/api/admin/examineAndApprove/workOverTime/type'
 import { IData } from '@/api/admin/system/dict/data/type'
 
 type Pagination = TableState['pagination']
+
+interface MenuInfo {
+  key: string
+  keyPath: string[]
+  item: VNodeChild
+  domEvent: MouseEvent
+}
+
+interface FormState {
+  id: undefined | number
+  type: undefined | string
+  time: any[]
+  workOverTimeReason: undefined | string
+  startTime: undefined | string
+  endTime: undefined | string
+  status?: undefined | string
+}
 
 const columns = [
   {
@@ -204,45 +201,47 @@ const columns = [
     slots: { customRender: 'user' },
   },
   {
-    title: '日期',
-    key: 'type',
-    align: 'center',
-    slots: { customRender: 'type' },
-  },
-  {
     title: '加班时长',
-    dataIndex: 'wifi',
-    key: 'wifi',
+    dataIndex: 'workOverTimeDuration',
+    key: 'workOverTimeDuration',
     align: 'center',
+    slots: { customRender: 'workOverTimeDuration' },
   },
   {
-    title: '状态',
-    dataIndex: 'firstClockInAddr',
-    key: 'firstClockInAddr',
+    title: '加班原因',
+    dataIndex: 'workOverTimeReason',
+    key: 'workOverTimeReason',
     align: 'center',
   },
   {
     title: '开始时间',
-    dataIndex: 'firstClockInTime',
-    key: 'firstClockInTime',
+    dataIndex: 'startTime',
+    key: 'startTime',
     align: 'center',
   },
   {
     title: '结束时间',
-    dataIndex: 'lastClockInTime',
-    key: 'lastClockInTime',
+    dataIndex: 'endTime',
+    key: 'endTime',
     align: 'center',
   },
   {
     title: '创建时间',
-    dataIndex: 'lastClockInTime',
-    key: 'lastClockInTime',
+    dataIndex: 'createdAt',
+    key: 'createdAt',
+    align: 'center',
+  },
+  {
+    title: '审批状态',
+    dataIndex: 'status',
+    key: 'status',
+    slots: { customRender: 'status' },
     align: 'center',
   },
   {
     title: '审批备注',
-    dataIndex: 'lastClockInTime',
-    key: 'lastClockInTime',
+    dataIndex: 'remark',
+    key: 'remark',
     align: 'center',
   },
   {
@@ -253,22 +252,12 @@ const columns = [
   },
 ]
 
-interface FormState {
-  id: undefined | number;
-  type: undefined | string;
-  wifi: undefined | string;
-  firstClockInAddr: undefined | string;
-  firstClockInTime: undefined | string;
-  lastClockInAddr: undefined | string;
-  lastClockInTime: undefined | string;
-}
-
 export default defineComponent({
   components: {
     FormSearch,
   },
   setup() {
-    const clockInOptions = ref<IData[]>([])
+    const examineAndApproveStatusOptions = ref<IData[]>([])
 
     /**
      * 查询表单操作
@@ -278,6 +267,7 @@ export default defineComponent({
       pageSize: 10,
       nickName: undefined || '',
       type: undefined || '',
+      status: undefined || '',
     })
     const formFields = reactive([
       {
@@ -289,28 +279,28 @@ export default defineComponent({
       },
       {
         type: 'select',
-        label: '状态',
+        label: '审批状态',
         name: 'status',
         value: undefined,
-        placeholder: '请选择状态',
+        placeholder: '请选择审批状态',
         normalizer: {
           value: 'dictValue',
           label: 'dictLabel',
         },
-        options: clockInOptions,
+        options: examineAndApproveStatusOptions,
       },
     ])
-    const handleQuery = (query: { nickName: string; type: string }) => {
+    const handleQuery = (query: { nickName: string; status: string }) => {
       pagination.value.current = 1
       queryParams.pageNum = pagination.value.current
       queryParams.nickName = query.nickName
-      queryParams.type = query.type
+      queryParams.status = query.status
       getList(queryParams)
     }
     /**
      * 表格操作
      */
-    const tableList = ref<IClockIn[]>([])
+    const tableList = ref<IWorkOvertime[]>([])
     const pagination = ref({
       total: 0,
       current: 1,
@@ -318,6 +308,7 @@ export default defineComponent({
       showSizeChanger: true,
       showTotal: (total) => `共 ${total} 条`,
     })
+    const activeClickDropDownObj = ref<IWorkOvertime>()
 
     const state = reactive({
       selectedRowKeys: [],
@@ -329,6 +320,26 @@ export default defineComponent({
       console.log('selectedRowKeys changed: ', selectedRowKeys)
       state.selectedRowKeys = selectedRowKeys
     }
+    const handleClickDropdown = (row) => {
+      activeClickDropDownObj.value = row
+    }
+    const handleExamineAndApprove = async ({ key }: MenuInfo) => {
+      console.log(key, activeClickDropDownObj)
+      if (activeClickDropDownObj.value) {
+        await getWorkOvertimeById(activeClickDropDownObj.value.id).then(
+          (res) => {
+            Object.keys(formState).forEach((key) => {
+              formState[key] = res.data[key]
+            })
+          }
+        )
+        formState.status = key
+        updateWorkOvertime(formState).then((res) => {
+          Message.success(res.message)
+          getList(queryParams)
+        })
+      }
+    }
     // 表格改变事件，页码改变，条数改变
     const handleTableChange = (page: Pagination) => {
       (pagination.value as Pagination) = page
@@ -338,7 +349,7 @@ export default defineComponent({
     }
     // 获取表格数据
     const getList = (queryParams?: {}) => {
-      getClockIn(queryParams).then((res) => {
+      getWorkOvertime(queryParams).then((res) => {
         console.log(res)
         tableList.value = res.data.rows
         pagination.value.total = res.data.count
@@ -349,16 +360,27 @@ export default defineComponent({
     // 新增按钮操作
     const handleAdd = () => {
       open.value = true
-      drawerTitle.value = '添加打卡'
+      drawerTitle.value = '添加'
     }
     // 更新按钮操作
     const handleUpdate = (row) => {
-      getClockInById(row.id).then((res) => {
+      getWorkOvertimeById(row.id).then((res) => {
         open.value = true
-        drawerTitle.value = '修改打卡'
+        drawerTitle.value = '修改'
         nextTick(() => {
           Object.keys(formState).forEach((key) => {
             formState[key] = res.data[key]
+            formState.time = ['', '']
+            if (key === 'startTime') {
+              nextTick(() => {
+                formState.time[0] = res.data[key]
+              })
+            }
+            if (key === 'endTime') {
+              nextTick(() => {
+                formState.time[1] = res.data[key]
+              })
+            }
           })
         })
       })
@@ -366,7 +388,7 @@ export default defineComponent({
     // 确认删除
     const confirm = (row) => {
       const ids = row.id || state.selectedRowKeys
-      delClockIn(ids).then(() => {
+      delWorkOvertime(ids).then(() => {
         getList(queryParams)
         Message.success('删除成功')
       })
@@ -383,12 +405,11 @@ export default defineComponent({
     const formRef = ref()
     const formState: FormState = reactive({
       id: undefined,
-      type: '1',
-      wifi: undefined,
-      firstClockInAddr: undefined,
-      firstClockInTime: undefined,
-      lastClockInAddr: undefined,
-      lastClockInTime: undefined,
+      type: undefined,
+      workOverTimeReason: undefined,
+      time: [],
+      startTime: '',
+      endTime: '',
     })
     // 表单提交
     const handleSubmit = () => {
@@ -397,7 +418,7 @@ export default defineComponent({
         .validate()
         .then(() => {
           if (formState.id) {
-            updateClockIn(formState).then((res) => {
+            updateWorkOvertime(formState).then((res) => {
               Message.success(res.message)
               getList(queryParams)
               formState.id = undefined
@@ -405,7 +426,7 @@ export default defineComponent({
               open.value = false
             })
           } else {
-            addClockIn(formState).then((res) => {
+            addWorkOvertime(formState).then((res) => {
               Message.success(res.message)
               getList(queryParams)
               formState.id = undefined
@@ -417,6 +438,10 @@ export default defineComponent({
         .catch((error: ValidateErrorEntity) => {
           console.log('error', error)
         })
+    }
+    const onOkTime = (value) => {
+      formState.startTime = value[0]
+      formState.endTime = value[1]
     }
     // 关闭推窗
     const handleClose = () => {
@@ -430,8 +455,10 @@ export default defineComponent({
     }
 
     onMounted(async () => {
-      clockInOptions.value = await getDict('sys_user_clock_in')
-      clockInOptions.value.forEach(item => {
+      examineAndApproveStatusOptions.value = await getDict(
+        'sys_examineAndApprove_status'
+      )
+      examineAndApproveStatusOptions.value.forEach((item) => {
         item.value = item.dictValue
         item.lable = item.dictLabel
       })
@@ -453,16 +480,19 @@ export default defineComponent({
       cancel,
       onSelectChange,
       ...toRefs(state),
+      handleExamineAndApprove,
+      handleClickDropdown,
 
       open,
       formRef,
       drawerTitle,
-      clockInOptions,
+      examineAndApproveStatusOptions,
       formState,
       handleClose,
       handleAdd,
+      onOkTime,
       handleUpdate,
-      handleSubmit
+      handleSubmit,
     }
   },
   computed: {

@@ -1,22 +1,23 @@
 import { IUser } from '../../system/user/type'
-
 export interface IRows {
-  rows: IClockIn[];
+  rows: IEvection[];
   count: number;
 }
 
-export interface IClockIn {
+export interface IEvection {
   createdAt: string;
   createdBy: string;
-  firstClockInAddr: string;
-  firstClockInTime: string;
+  endTime: string;
   id: number;
-  lastClockInAddr: string;
-  lastClockInTime: string;
+  evectionDate: string;
+  evectionDuration: number;
+  evectionReason: string;
+  remark: string;
+  startTime: string;
+  status: string;
   type: string;
   updatedAt: string;
   updatedBy: string;
   user: IUser;
-  userId: 1
   [key: string]: any;
 }

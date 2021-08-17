@@ -415,7 +415,7 @@ export default defineComponent({
     }
 
     onMounted(async () => {
-      clockInOptions.value = await getDict('sys_user_clock_in')
+      clockInOptions.value = await getDict('sys_clock_in_type')
       clockInOptions.value.forEach(item => {
         item.value = item.dictValue
         item.lable = item.dictLabel

@@ -44,18 +44,29 @@
         <span>{{ record.user.nickName }}</span>
       </template>
       <template #type="{ record }">
-        <span>{{ selectDictLabel(clockInOptions, record.type) }}</span>
+        <span>{{ selectDictLabel(evectionTypeOptions, record.type) }}</span>
+      </template>
+      <template #status="{ record }">
+        <span>{{
+          selectDictLabel(examineAndApproveStatusOptions, record.status)
+        }}</span>
       </template>
       <template #action="{ record }">
         <span>
-          <a-button
-            type="link"
-            color="success"
-            class="mr-3"
-            @click="handleUpdate(record)"
-          >
-            审批
-          </a-button>
+          <a-dropdown :trigger="['click']" @click="handleClickDropdown(record)">
+            <span class="mr-3 text-[#faad14] cursor-pointer"> 审批 </span>
+            <template #overlay>
+              <a-menu @click="handleExamineAndApprove">
+                <a-menu-item
+                  :disabled="item.dictValue === '0'"
+                  v-for="item in examineAndApproveStatusOptions"
+                  :key="item.dictValue"
+                >
+                  {{ item.dictLabel }}
+                </a-menu-item>
+              </a-menu>
+            </template>
+          </a-dropdown>
           <a-button
             type="link"
             color="success"
@@ -102,10 +113,26 @@
       >
         <a-row>
           <a-col :span="24">
-            <a-form-item label="类型" name="type">
-              <a-select v-model:value="formState.type" placeholder="请输入类型">
+            <a-form-item label="选择时间" name="time">
+              <a-range-picker
+                :show-time="{ format: 'HH:mm' }"
+                format="YYYY-MM-DD HH:mm"
+                :placeholder="['开始时间', '结束时间']"
+                v-model:value="formState.time"
+                valueFormat="YYYY-MM-DD HH:mm"
+                @ok="onOkTime"
+                @change="onOkTime"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="24">
+            <a-form-item label="出差类型" name="type">
+              <a-select
+                v-model:value="formState.type"
+                placeholder="请输入出差类型"
+              >
                 <a-select-option
-                  v-for="item in clockInOptions"
+                  v-for="item in evectionTypeOptions"
                   :key="item.id"
                   :value="item.dictValue"
                 >
@@ -115,46 +142,11 @@
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item label="打卡WiFi" name="wifi">
-              <a-input
-                v-model:value="formState.wifi"
-                placeholder="请输入打卡WiFi"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="24">
-            <a-form-item label="上班打卡地址" name="firstClockInAddr">
-              <a-input
-                v-model:value="formState.firstClockInAddr"
-                placeholder="请输入上班打卡地址"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="24">
-            <a-form-item label="上班打卡时间" name="firstClockInTime">
-              <a-time-picker
-                v-model:value="formState.firstClockInTime"
-                valueFormat="YYYY-MM-DD HH:mm"
-                placeholder="上班打卡时间"
-                format="HH:mm"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="24">
-            <a-form-item label="下班打卡地址" name="lastClockInAddr">
-              <a-input
-                v-model:value="formState.lastClockInAddr"
-                placeholder="请输入下班打卡地址"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="24">
-            <a-form-item label="下班打卡时间" name="lastClockInTime">
-              <a-time-picker
-                v-model:value="formState.lastClockInTime"
-                valueFormat="YYYY-MM-DD HH:mm"
-                placeholder="下班打卡时间"
-                format="HH:mm"
+            <a-form-item label="出差原因" name="evectionReason">
+              <a-textarea
+                :rows="3"
+                v-model:value="formState.evectionReason"
+                placeholder="请输入出差原因"
               />
             </a-form-item>
           </a-col>
@@ -180,8 +172,15 @@ import {
   computed,
   nextTick,
   toRefs,
+  VNodeChild,
 } from 'vue'
-import { getClockIn, delClockIn, updateClockIn, addClockIn, getClockInById } from '@/api/admin/baseInfo/clockIn'
+import {
+  getEvection,
+  delEvection,
+  updateEvection,
+  addEvection,
+  getEvectionById,
+} from '@/api/admin/examineAndApprove/evection'
 import { getDict, selectDictLabel } from '@/utils/dictFormat'
 import { useAppStore } from '@/store/modules/app'
 import { mapState } from 'pinia'
@@ -191,10 +190,28 @@ import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
 
 import FormSearch from '@/components/FormSearch/index.vue'
 import useDrawer from '@/hooks/useDrawer'
-import { IClockIn } from '@/api/admin/baseInfo/clockIn/type'
+import { IEvection } from '@/api/admin/examineAndApprove/evection/type'
 import { IData } from '@/api/admin/system/dict/data/type'
 
 type Pagination = TableState['pagination']
+
+interface MenuInfo {
+  key: string
+  keyPath: string[]
+  item: VNodeChild
+  domEvent: MouseEvent
+}
+
+interface FormState {
+  id: undefined | number
+  evectionDate: undefined | string
+  type: undefined | string
+  evectionReason: undefined | string
+  time: any[]
+  startTime: undefined | string
+  endTime: undefined | string
+  status?: undefined | string
+}
 
 const columns = [
   {
@@ -205,44 +222,52 @@ const columns = [
   },
   {
     title: '出差类型',
-    dataIndex: 'wifi',
-    key: 'wifi',
+    dataIndex: 'type',
+    key: 'type',
+    align: 'center',
+    slots: { customRender: 'type' },
+  },
+  {
+    title: '出差时间（天）',
+    dataIndex: 'evectionDuration',
+    key: 'evectionDuration',
     align: 'center',
   },
   {
-    title: '出差时长',
-    dataIndex: 'firstClockInAddr',
-    key: 'firstClockInAddr',
-    align: 'center',
-  },
-  {
-    title: '状态',
-    dataIndex: 'lastClockInAddr',
-    key: 'lastClockInAddr',
+    title: '出差原因',
+    dataIndex: 'evectionReason',
+    key: 'evectionReason',
     align: 'center',
   },
   {
     title: '开始时间',
-    dataIndex: 'lastClockInTime',
-    key: 'lastClockInTime',
+    dataIndex: 'startTime',
+    key: 'startTime',
     align: 'center',
   },
   {
     title: '结束时间',
-    dataIndex: 'lastClockInTime',
-    key: 'lastClockInTime',
+    dataIndex: 'endTime',
+    key: 'endTime',
     align: 'center',
   },
   {
-    title: '创建时间',
-    dataIndex: 'lastClockInTime',
-    key: 'lastClockInTime',
+    title: '审批状态',
+    dataIndex: 'status',
+    key: 'status',
+    slots: { customRender: 'status' },
     align: 'center',
   },
   {
     title: '审批备注',
-    dataIndex: 'lastClockInTime',
-    key: 'lastClockInTime',
+    dataIndex: 'remark',
+    key: 'remark',
+    align: 'center',
+  },
+  {
+    title: '创建时间',
+    dataIndex: 'createdAt',
+    key: 'createdAt',
     align: 'center',
   },
   {
@@ -253,22 +278,13 @@ const columns = [
   },
 ]
 
-interface FormState {
-  id: undefined | number;
-  type: undefined | string;
-  wifi: undefined | string;
-  firstClockInAddr: undefined | string;
-  firstClockInTime: undefined | string;
-  lastClockInAddr: undefined | string;
-  lastClockInTime: undefined | string;
-}
-
 export default defineComponent({
   components: {
     FormSearch,
   },
   setup() {
-    const clockInOptions = ref<IData[]>([])
+    const evectionTypeOptions = ref<IData[]>([])
+    const examineAndApproveStatusOptions = ref<IData[]>([])
 
     /**
      * 查询表单操作
@@ -278,6 +294,7 @@ export default defineComponent({
       pageSize: 10,
       nickName: undefined || '',
       type: undefined || '',
+      status: undefined || '',
     })
     const formFields = reactive([
       {
@@ -289,40 +306,45 @@ export default defineComponent({
       },
       {
         type: 'select',
-        label: '状态',
+        label: '审批状态',
         name: 'status',
         value: undefined,
-        placeholder: '请选择状态',
+        placeholder: '请选择审批状态',
         normalizer: {
           value: 'dictValue',
           label: 'dictLabel',
         },
-        options: clockInOptions,
+        options: examineAndApproveStatusOptions,
       },
       {
         type: 'select',
-        label: '类型',
+        label: '出差类型',
         name: 'type',
         value: undefined,
-        placeholder: '请选择类型',
+        placeholder: '请选择出差类型',
         normalizer: {
           value: 'dictValue',
           label: 'dictLabel',
         },
-        options: clockInOptions,
+        options: evectionTypeOptions,
       },
     ])
-    const handleQuery = (query: { nickName: string; type: string }) => {
+    const handleQuery = (query: {
+      nickName: string
+      type: string
+      status: string
+    }) => {
       pagination.value.current = 1
       queryParams.pageNum = pagination.value.current
       queryParams.nickName = query.nickName
       queryParams.type = query.type
+      queryParams.status = query.status
       getList(queryParams)
     }
     /**
      * 表格操作
      */
-    const tableList = ref<IClockIn[]>([])
+    const tableList = ref<IEvection[]>([])
     const pagination = ref({
       total: 0,
       current: 1,
@@ -330,6 +352,7 @@ export default defineComponent({
       showSizeChanger: true,
       showTotal: (total) => `共 ${total} 条`,
     })
+    const activeClickDropDownObj = ref<IEvection>()
 
     const state = reactive({
       selectedRowKeys: [],
@@ -341,6 +364,24 @@ export default defineComponent({
       console.log('selectedRowKeys changed: ', selectedRowKeys)
       state.selectedRowKeys = selectedRowKeys
     }
+    const handleClickDropdown = (row) => {
+      activeClickDropDownObj.value = row
+    }
+    const handleExamineAndApprove = async ({ key }: MenuInfo) => {
+      console.log(key, activeClickDropDownObj)
+      if (activeClickDropDownObj.value) {
+        await getEvectionById(activeClickDropDownObj.value.id).then((res) => {
+          Object.keys(formState).forEach((key) => {
+            formState[key] = res.data[key]
+          })
+        })
+        formState.status = key
+        updateEvection(formState).then((res) => {
+          Message.success(res.message)
+          getList(queryParams)
+        })
+      }
+    }
     // 表格改变事件，页码改变，条数改变
     const handleTableChange = (page: Pagination) => {
       (pagination.value as Pagination) = page
@@ -350,7 +391,7 @@ export default defineComponent({
     }
     // 获取表格数据
     const getList = (queryParams?: {}) => {
-      getClockIn(queryParams).then((res) => {
+      getEvection(queryParams).then((res) => {
         console.log(res)
         tableList.value = res.data.rows
         pagination.value.total = res.data.count
@@ -361,16 +402,27 @@ export default defineComponent({
     // 新增按钮操作
     const handleAdd = () => {
       open.value = true
-      drawerTitle.value = '添加打卡'
+      drawerTitle.value = '添加'
     }
     // 更新按钮操作
     const handleUpdate = (row) => {
-      getClockInById(row.id).then((res) => {
+      getEvectionById(row.id).then((res) => {
         open.value = true
-        drawerTitle.value = '修改打卡'
+        drawerTitle.value = '修改'
         nextTick(() => {
           Object.keys(formState).forEach((key) => {
             formState[key] = res.data[key]
+            formState.time = ['', '']
+            if (key === 'startTime') {
+              nextTick(() => {
+                formState.time[0] = res.data[key]
+              })
+            }
+            if (key === 'endTime') {
+              nextTick(() => {
+                formState.time[1] = res.data[key]
+              })
+            }
           })
         })
       })
@@ -378,7 +430,7 @@ export default defineComponent({
     // 确认删除
     const confirm = (row) => {
       const ids = row.id || state.selectedRowKeys
-      delClockIn(ids).then(() => {
+      delEvection(ids).then(() => {
         getList(queryParams)
         Message.success('删除成功')
       })
@@ -395,12 +447,12 @@ export default defineComponent({
     const formRef = ref()
     const formState: FormState = reactive({
       id: undefined,
-      type: '1',
-      wifi: undefined,
-      firstClockInAddr: undefined,
-      firstClockInTime: undefined,
-      lastClockInAddr: undefined,
-      lastClockInTime: undefined,
+      evectionDate: '',
+      type: undefined,
+      evectionReason: undefined,
+      time: [],
+      startTime: '',
+      endTime: '',
     })
     // 表单提交
     const handleSubmit = () => {
@@ -409,7 +461,7 @@ export default defineComponent({
         .validate()
         .then(() => {
           if (formState.id) {
-            updateClockIn(formState).then((res) => {
+            updateEvection(formState).then((res) => {
               Message.success(res.message)
               getList(queryParams)
               formState.id = undefined
@@ -417,7 +469,7 @@ export default defineComponent({
               open.value = false
             })
           } else {
-            addClockIn(formState).then((res) => {
+            addEvection(formState).then((res) => {
               Message.success(res.message)
               getList(queryParams)
               formState.id = undefined
@@ -429,6 +481,10 @@ export default defineComponent({
         .catch((error: ValidateErrorEntity) => {
           console.log('error', error)
         })
+    }
+    const onOkTime = (value) => {
+      formState.startTime = value[0]
+      formState.endTime = value[1]
     }
     // 关闭推窗
     const handleClose = () => {
@@ -442,8 +498,16 @@ export default defineComponent({
     }
 
     onMounted(async () => {
-      clockInOptions.value = await getDict('sys_user_clock_in')
-      clockInOptions.value.forEach(item => {
+      evectionTypeOptions.value = await getDict('sys_evection_type')
+      examineAndApproveStatusOptions.value = await getDict(
+        'sys_examineAndApprove_status'
+      )
+
+      evectionTypeOptions.value.forEach((item) => {
+        item.value = item.dictValue
+        item.lable = item.dictLabel
+      })
+      examineAndApproveStatusOptions.value.forEach((item) => {
         item.value = item.dictValue
         item.lable = item.dictLabel
       })
@@ -465,16 +529,20 @@ export default defineComponent({
       cancel,
       onSelectChange,
       ...toRefs(state),
+      handleExamineAndApprove,
+      handleClickDropdown,
 
       open,
       formRef,
       drawerTitle,
-      clockInOptions,
+      evectionTypeOptions,
+      examineAndApproveStatusOptions,
       formState,
       handleClose,
+      onOkTime,
       handleAdd,
       handleUpdate,
-      handleSubmit
+      handleSubmit,
     }
   },
   computed: {
