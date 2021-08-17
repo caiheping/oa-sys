@@ -50,8 +50,8 @@ const settings: Settings = {
    * If you want to also use it in dev, you can pass ['production', 'development']
    */
   version: "1.0.1",
-  companyName: "版权所有 ©2021 广州云积软件技术有限公司",
-  title: "xxx系统",
+  companyName: "版权所有 ©2021 xxx公司",
+  title: "阿菜员工管理系统",
 }
 
 export default settings

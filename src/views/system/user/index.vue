@@ -64,6 +64,9 @@
           <template #roles="{ record }">
             <span>{{ getRoles(record) }}</span>
           </template>
+          <template #position="{ record }">
+            <span>{{ selectDictLabel(positionOptions, record.position) }}</span>
+          </template>
           <template #action="{ record }">
             <span>
               <a-button
@@ -174,6 +177,22 @@
             </a-form-item>
           </a-col>
           <a-col :span="12">
+            <a-form-item label="岗位" name="position">
+              <a-select
+                v-model:value="formState.position"
+                placeholder="请选择岗位"
+              >
+                <a-select-option
+                  :value="item.dictValue"
+                  v-for="item in positionOptions"
+                  :key="item.id"
+                >
+                  {{ item.dictLabel }}
+                </a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
             <a-form-item label="性别" name="sex">
               <a-radio-group
                 v-model:value="formState.sex"
@@ -205,7 +224,7 @@
               />
             </a-form-item>
           </a-col>
-          <a-col :span="12">
+          <a-col :span="12" v-if="formState.position !== '1'">
             <a-form-item label="薪资" name="salary">
               <a-input-number
                 class="!w-[100%]"
@@ -218,23 +237,7 @@
               />
             </a-form-item>
           </a-col>
-          <a-col :span="12">
-            <a-form-item label="岗位" name="position">
-              <a-select
-                v-model:value="formState.position"
-                placeholder="请选择岗位"
-              >
-                <a-select-option
-                  :value="item.dictValue"
-                  v-for="item in positionOptions"
-                  :key="item.id"
-                >
-                  {{ item.dictLabel }}
-                </a-select-option>
-              </a-select>
-            </a-form-item>
-          </a-col>
-          <a-col :span="12">
+          <a-col :span="12" v-if="formState.position !== '1'">
             <a-form-item label="入职时间" name="entryTime">
               <a-date-picker
                 class="!w-[100%]"
@@ -255,6 +258,7 @@
           <a-col :span="12">
             <a-form-item label="学历" name="education">
               <a-select
+                allowClear
                 v-model:value="formState.education"
                 placeholder="请选择学历"
               >
@@ -398,6 +402,14 @@ const columns = [
     align: 'center',
     slots: {
       customRender: 'department',
+    },
+  },
+  {
+    title: '岗位',
+    key: 'position',
+    align: 'center',
+    slots: {
+      customRender: 'position',
     },
   },
   {
@@ -639,6 +651,21 @@ export default defineComponent({
           trigger: 'change',
         },
       ],
+      position: [
+        {
+          required: true,
+          message: '岗位不能为空',
+          trigger: 'change',
+        },
+      ],
+      salary: [
+        {
+          required: true,
+          validator: formRules.number,
+          message: '薪资不能为空',
+          trigger: 'blur',
+        },
+      ],
     }
     const { open, drawerTitle } = useDrawer()
     // 是否更新操作
@@ -774,11 +801,11 @@ export default defineComponent({
       educationOptions.value = await getDict('sys_user_education')
       disableOptions.value = await getDict('sys_normal_disable')
       sexOptions.value = await getDict('sys_user_sex')
-      disableOptions.value.forEach(item => {
+      disableOptions.value.forEach((item) => {
         item.label = item.dictLabel
         item.value = item.dictValue
       })
-      sexOptions.value.forEach(item => {
+      sexOptions.value.forEach((item) => {
         item.label = item.dictLabel
         item.value = item.dictValue
       })
