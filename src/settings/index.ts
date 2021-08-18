@@ -51,7 +51,7 @@ const settings: Settings = {
    */
   version: "1.0.1",
   companyName: "版权所有 ©2021 xxx公司",
-  title: "阿菜员工管理系统",
+  title: "xxx - 员工管理系统",
 }
 
 export default settings

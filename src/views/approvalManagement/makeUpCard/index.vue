@@ -99,65 +99,21 @@
 
     <!-- 推窗 -->
     <a-drawer
-      width="600px"
+      width="540px"
       :title="drawerTitle"
       placement="right"
       v-model:visible="open"
       :maskClosable="false"
       @close="handleClose"
     >
-      <a-form
-        v-if="open"
-        ref="formRef"
-        :model="formState"
+      <BaseForm
+        ref="BaseFormRef"
+        :formData="formDataObj"
+        :data="formState"
         :rules="rules"
-        :label-col="labelCol"
-        :wrapper-col="wrapperCol"
-      >
-        <a-row>
-          <a-col :span="24">
-            <a-form-item label="打卡id" name="clockInId">
-              <a-input
-                v-model:value="formState.clockInId"
-                placeholder="请输入打卡id"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="24">
-            <a-form-item label="补卡类型" name="type">
-              <a-select
-                v-model:value="formState.type"
-                placeholder="请输入补卡类型"
-              >
-                <a-select-option
-                  v-for="item in makeUpCardTypeOptions"
-                  :key="item.id"
-                  :value="item.dictValue"
-                >
-                  {{ item.dictLabel }}
-                </a-select-option>
-              </a-select>
-            </a-form-item>
-          </a-col>
-          <a-col :span="24">
-            <a-form-item label="补卡原因" name="makeUpCardReason">
-              <a-textarea
-                :rows="3"
-                v-model:value="formState.makeUpCardReason"
-                placeholder="请输入补卡原因"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="24">
-            <a-form-item>
-              <a-button type="primary" class="mr-3" @click="handleSubmit">
-                确认
-              </a-button>
-              <a-button @click="handleClose">取消</a-button>
-            </a-form-item>
-          </a-col>
-        </a-row>
-      </a-form>
+        @submit="handleSubmit"
+        @close="handleClose"
+      />
     </a-drawer>
   </div>
 </template>
@@ -184,12 +140,13 @@ import { useAppStore } from '@/store/modules/app'
 import { mapState } from 'pinia'
 import { TableState } from 'ant-design-vue/es/table/interface'
 import { message as Message } from 'ant-design-vue'
-import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
 
 import FormSearch from '@/components/FormSearch/index.vue'
 import useDrawer from '@/hooks/useDrawer'
 import { IMakeUpCard } from '@/api/admin/examineAndApprove/makeUpCard/type'
 import { IData } from '@/api/admin/system/dict/data/type'
+import BaseForm from '@/components/BaseForm/index.vue'
+import { FormDataItem } from '@/components/BaseForm/type'
 
 type Pagination = TableState['pagination']
 
@@ -264,10 +221,12 @@ const columns = [
 export default defineComponent({
   components: {
     FormSearch,
+    BaseForm,
   },
   setup() {
     const examineAndApproveStatusOptions = ref<IData[]>([])
     const makeUpCardTypeOptions = ref<IData[]>([])
+    const BaseFormRef = ref()
 
     /**
      * 查询表单操作
@@ -285,7 +244,7 @@ export default defineComponent({
         label: '姓名',
         name: 'nickName',
         value: '',
-        placeholder: '请输入操作人员',
+        placeholder: '请输入姓名',
       },
       {
         type: 'select',
@@ -404,45 +363,82 @@ export default defineComponent({
      * 推窗操作
      */
     const { open, drawerTitle } = useDrawer()
-    const formRef = ref()
     const formState: FormState = reactive({
       id: undefined,
       clockInId: undefined,
       type: undefined,
       makeUpCardReason: undefined,
     })
+    const rules = reactive({
+      clockInId: [
+        {
+          required: true,
+          message: '打卡id',
+        },
+      ],
+      type: [
+        {
+          required: true,
+          message: '请选择补卡类型',
+        },
+      ],
+    })
+    const formDataObj = reactive<FormDataItem[]>([
+      {
+        name: 'clockInId',
+        label: '打卡id',
+        type: 'input',
+        value: undefined,
+        placeholder: '请输入打卡id',
+        span: 24,
+      },
+      {
+        name: 'type',
+        label: '补卡类型',
+        type: 'select',
+        value: undefined,
+        span: 24,
+        placeholder: '请选择补卡类型',
+        options: makeUpCardTypeOptions,
+        serialize: {
+          value: 'dictValue',
+          label: 'dictLabel',
+        },
+      },
+      {
+        name: 'makeUpCardReason',
+        label: '补卡原因',
+        type: 'textarea',
+        value: undefined,
+        span: 24,
+        placeholder: '请输入补卡原因',
+      },
+    ])
     // 表单提交
     const handleSubmit = () => {
       console.log(formState)
-      formRef.value
-        .validate()
-        .then(() => {
-          if (formState.id) {
-            updateMakeUpCard(formState).then((res) => {
-              Message.success(res.message)
-              getList(queryParams)
-              formState.id = undefined
-              formRef.value.resetFields()
-              open.value = false
-            })
-          } else {
-            addMakeUpCard(formState).then((res) => {
-              Message.success(res.message)
-              getList(queryParams)
-              formState.id = undefined
-              formRef.value.resetFields()
-              open.value = false
-            })
-          }
+      if (formState.id) {
+        updateMakeUpCard(formState).then((res) => {
+          Message.success(res.message)
+          getList(queryParams)
+          formState.id = undefined
+          BaseFormRef.value.resetFields()
+          open.value = false
         })
-        .catch((error: ValidateErrorEntity) => {
-          console.log('error', error)
+      } else {
+        addMakeUpCard(formState).then((res) => {
+          Message.success(res.message)
+          getList(queryParams)
+          formState.id = undefined
+          BaseFormRef.value.resetFields()
+          open.value = false
         })
+      }
     }
     // 关闭推窗
     const handleClose = () => {
       formState.id = undefined
-      formRef.value.resetFields()
+      BaseFormRef.value.resetFields()
       open.value = false
     }
 
@@ -484,12 +480,14 @@ export default defineComponent({
       handleExamineAndApprove,
       handleClickDropdown,
 
+      BaseFormRef,
       open,
-      formRef,
       drawerTitle,
       examineAndApproveStatusOptions,
       makeUpCardTypeOptions,
       formState,
+      formDataObj,
+      rules,
       handleClose,
       handleAdd,
       handleUpdate,

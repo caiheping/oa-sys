@@ -96,70 +96,21 @@
 
     <!-- 推窗 -->
     <a-drawer
-      width="600px"
+      width="540px"
       :title="drawerTitle"
       placement="right"
       v-model:visible="open"
       :maskClosable="false"
       @close="handleClose"
     >
-      <a-form
-        v-if="open"
-        ref="formRef"
-        :model="formState"
+      <BaseForm
+        ref="BaseFormRef"
+        :formData="formDataObj"
+        :data="formState"
         :rules="rules"
-        :label-col="labelCol"
-        :wrapper-col="wrapperCol"
-      >
-        <a-row>
-          <a-col :span="24">
-            <a-form-item label="选择时间" name="time">
-              <a-range-picker
-                :show-time="{ format: 'HH:mm' }"
-                format="YYYY-MM-DD HH:mm"
-                :placeholder="['开始时间', '结束时间']"
-                v-model:value="formState.time"
-                valueFormat="YYYY-MM-DD HH:mm"
-                @ok="onOkTime"
-                @change="onOkTime"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="24">
-            <a-form-item label="出差类型" name="type">
-              <a-select
-                v-model:value="formState.type"
-                placeholder="请输入出差类型"
-              >
-                <a-select-option
-                  v-for="item in evectionTypeOptions"
-                  :key="item.id"
-                  :value="item.dictValue"
-                >
-                  {{ item.dictLabel }}
-                </a-select-option>
-              </a-select>
-            </a-form-item>
-          </a-col>
-          <a-col :span="24">
-            <a-form-item label="出差原因" name="evectionReason">
-              <a-textarea
-                :rows="3"
-                v-model:value="formState.evectionReason"
-                placeholder="请输入出差原因"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="24">
-            <a-form-item>
-              <a-button type="primary" class="mr-3" @click="handleSubmit">
-                确认
-              </a-button>
-              <a-button @click="handleClose">取消</a-button>
-            </a-form-item>
-          </a-col>
-        </a-row>
-      </a-form>
+        @submit="handleSubmit"
+        @close="handleClose"
+      />
     </a-drawer>
   </div>
 </template>
@@ -186,12 +137,13 @@ import { useAppStore } from '@/store/modules/app'
 import { mapState } from 'pinia'
 import { TableState } from 'ant-design-vue/es/table/interface'
 import { message as Message } from 'ant-design-vue'
-import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
+import BaseForm from '@/components/BaseForm/index.vue'
 
 import FormSearch from '@/components/FormSearch/index.vue'
 import useDrawer from '@/hooks/useDrawer'
 import { IEvection } from '@/api/admin/examineAndApprove/evection/type'
 import { IData } from '@/api/admin/system/dict/data/type'
+import { FormDataItem } from '@/components/BaseForm/type'
 
 type Pagination = TableState['pagination']
 
@@ -281,10 +233,12 @@ const columns = [
 export default defineComponent({
   components: {
     FormSearch,
+    BaseForm,
   },
   setup() {
     const evectionTypeOptions = ref<IData[]>([])
     const examineAndApproveStatusOptions = ref<IData[]>([])
+    const BaseFormRef = ref()
 
     /**
      * 查询表单操作
@@ -302,7 +256,7 @@ export default defineComponent({
         label: '姓名',
         name: 'nickName',
         value: '',
-        placeholder: '请输入操作人员',
+        placeholder: '请输入姓名',
       },
       {
         type: 'select',
@@ -367,8 +321,8 @@ export default defineComponent({
     const handleClickDropdown = (row) => {
       activeClickDropDownObj.value = row
     }
+    // 审批
     const handleExamineAndApprove = async ({ key }: MenuInfo) => {
-      console.log(key, activeClickDropDownObj)
       if (activeClickDropDownObj.value) {
         await getEvectionById(activeClickDropDownObj.value.id).then((res) => {
           Object.keys(formState).forEach((key) => {
@@ -444,7 +398,6 @@ export default defineComponent({
      * 推窗操作
      */
     const { open, drawerTitle } = useDrawer()
-    const formRef = ref()
     const formState: FormState = reactive({
       id: undefined,
       evectionDate: '',
@@ -454,43 +407,91 @@ export default defineComponent({
       startTime: '',
       endTime: '',
     })
-    // 表单提交
-    const handleSubmit = () => {
-      console.log(formState)
-      formRef.value
-        .validate()
-        .then(() => {
-          if (formState.id) {
-            updateEvection(formState).then((res) => {
-              Message.success(res.message)
-              getList(queryParams)
-              formState.id = undefined
-              formRef.value.resetFields()
-              open.value = false
-            })
-          } else {
-            addEvection(formState).then((res) => {
-              Message.success(res.message)
-              getList(queryParams)
-              formState.id = undefined
-              formRef.value.resetFields()
-              open.value = false
-            })
-          }
-        })
-        .catch((error: ValidateErrorEntity) => {
-          console.log('error', error)
-        })
-    }
+    const rules = reactive({
+      time: [
+        {
+          required: true,
+          message: '请选择出差时间',
+        },
+      ],
+      type: [
+        {
+          required: true,
+          message: '请选择出差类型',
+        },
+      ],
+    })
+
     const onOkTime = (value) => {
       formState.startTime = value[0]
       formState.endTime = value[1]
     }
+
+    const formDataObj = reactive<FormDataItem[]>([
+      {
+        name: 'time',
+        label: '选择时间',
+        type: 'range-picker',
+        value: undefined,
+        span: 24,
+        props: {
+          format: 'YYYY-MM-DD HH:mm',
+          placeholder: ['开始时间', '结束时间'],
+          valueFormat: 'YYYY-MM-DD HH:mm',
+        },
+        fn: {
+          ok: onOkTime,
+          change: onOkTime,
+        },
+      },
+      {
+        name: 'type',
+        label: '出差类型',
+        type: 'select',
+        value: undefined,
+        span: 24,
+        placeholder: '请选择出差类型',
+        options: evectionTypeOptions,
+        serialize: {
+          value: 'dictValue',
+          label: 'dictLabel',
+        },
+      },
+      {
+        name: 'evectionReason',
+        label: '出差原因',
+        type: 'textarea',
+        value: undefined,
+        span: 24,
+        placeholder: '请输入出差原因',
+      },
+    ])
+    // 表单提交
+    const handleSubmit = () => {
+      console.log(formState)
+      if (formState.id) {
+        updateEvection(formState).then((res) => {
+          Message.success(res.message)
+          getList(queryParams)
+          formState.id = undefined
+          BaseFormRef.value.resetFields()
+          open.value = false
+        })
+      } else {
+        addEvection(formState).then((res) => {
+          Message.success(res.message)
+          getList(queryParams)
+          formState.id = undefined
+          BaseFormRef.value.resetFields()
+          open.value = false
+        })
+      }
+    }
     // 关闭推窗
     const handleClose = () => {
       formState.id = undefined
-      formRef.value.resetFields()
       open.value = false
+      BaseFormRef.value.resetFields()
     }
 
     const init = () => {
@@ -532,12 +533,14 @@ export default defineComponent({
       handleExamineAndApprove,
       handleClickDropdown,
 
+      BaseFormRef,
       open,
-      formRef,
       drawerTitle,
       evectionTypeOptions,
       examineAndApproveStatusOptions,
       formState,
+      formDataObj,
+      rules,
       handleClose,
       onOkTime,
       handleAdd,
