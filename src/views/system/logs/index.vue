@@ -10,7 +10,7 @@
 
     <a-row :gutter="10" class="mb-2">
       <a-col>
-        <a-button color="normal">导出</a-button>
+        <a-button color="normal" @click="handleExportFile">导出</a-button>
       </a-col>
       <a-col v-has-permi="['system:logs:deleteAllLogs']">
         <a-button color="warning" @click="clearAll">清空</a-button>
@@ -110,6 +110,7 @@ import FormSearch from '@/components/FormSearch/index.vue'
 import useDrawer from '@/hooks/useDrawer'
 import { ILog } from '@/api/admin/system/logs/type'
 import { IData } from '@/api/admin/system/dict/data/type'
+import { downLoad } from '@/utils/request'
 
 type Pagination = TableState['pagination']
 
@@ -241,6 +242,10 @@ export default defineComponent({
       })
     }
 
+    const handleExportFile = () => {
+      downLoad('/admin/system/logs/export', {}, '系统日志.xlsx')
+    }
+
     // 确认删除
     const confirm = (row) => {
       const ids = row.id || state.selectedRowKeys
@@ -297,6 +302,7 @@ export default defineComponent({
       pagination,
       hasSelected,
       methodOptions,
+      handleExportFile,
       clearAll,
       handleTableChange,
       selectDictLabel,

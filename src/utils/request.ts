@@ -3,6 +3,7 @@ import { useAppStore } from "@/store/modules/app"
 import { message as Message, Modal } from "ant-design-vue"
 import { getToken, removeToken } from "@/utils/auth"
 import { baseUrl } from '@/config'
+import { tansParams } from './tools'
 
 
 type Methods = 'GET' | 'POST' | 'PUT' | 'DELETE'
@@ -122,6 +123,38 @@ function HttpRequest<T = any>(
           appStore.loading = false
         }
       })
+  })
+}
+
+export function downLoad(url, params = {}, filename = 'filename.xlsx') {
+  console.log(baseUrl, url)
+  return axios.post(baseUrl + url, params, {
+    transformRequest: [(params) => {
+      return tansParams(params)
+    }],
+    headers: {
+      withCredentials: true,
+      Authorization: "Bearer " + getToken(),
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    responseType: 'blob'
+  }).then((data: any) => {
+    const content = data
+    const blob = new Blob([content])
+    if ('download' in document.createElement('a')) {
+      const elink = document.createElement('a')
+      elink.download = filename
+      elink.style.display = 'none'
+      elink.href = URL.createObjectURL(blob)
+      document.body.appendChild(elink)
+      elink.click()
+      URL.revokeObjectURL(elink.href)
+      document.body.removeChild(elink)
+    } else {
+      navigator.msSaveBlob(blob, filename)
+    }
+  }).catch((r) => {
+    console.error(r)
   })
 }
 
