@@ -15,7 +15,6 @@ import SvgIcon from "./components/SvgIcon/index.vue" // 全局svg图标组件
 import "normalize.css/normalize.css"
 import "ant-design-vue/dist/antd.less"
 import "./assets/styles/index.less"
-let a;
 
 (async () => {
   console.log(import.meta.env.MODE)
