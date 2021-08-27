@@ -145,15 +145,27 @@ const columns = [
     slots: { customRender: 'type' },
   },
   {
-    title: '出勤天数',
+    title: '当月应出勤时长',
     dataIndex: 'wifi',
     key: 'wifi',
     align: 'center',
   },
   {
-    title: '加班（小时）',
-    dataIndex: 'firstClockInAddr',
-    key: 'firstClockInAddr',
+    title: '出勤时长',
+    dataIndex: 'wifi',
+    key: 'wifi',
+    align: 'center',
+  },
+  {
+    title: '有薪假期（小时）',
+    dataIndex: 'wifi',
+    key: 'wifi',
+    align: 'center',
+  },
+  {
+    title: '无薪假期（小时）',
+    dataIndex: 'wifi',
+    key: 'wifi',
     align: 'center',
   },
   {
@@ -175,15 +187,15 @@ const columns = [
     align: 'center',
   },
   {
-    title: '扣税',
-    dataIndex: 'lastClockInAddr',
-    key: 'lastClockInAddr',
-    align: 'center',
-  },
-  {
     title: '其他',
     dataIndex: 'lastClockInTime',
     key: 'lastClockInTime',
+    align: 'center',
+  },
+  {
+    title: '总计（税前工资）',
+    dataIndex: 'lastClockInAddr',
+    key: 'lastClockInAddr',
     align: 'center',
   },
   {
