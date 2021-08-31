@@ -14,6 +14,7 @@ const dynamicRouter: IDynamicRouter = {
   Dept: () => import("@/views/system/dept/index.vue"),
   Notice: () => import("@/views/system/notice/index.vue"),
   Logs: () => import("@/views/system/logs/index.vue"),
+  SystemConfig: () => import("@/views/system/systemConfig/index.vue"),
 
 
   // 审批管理
