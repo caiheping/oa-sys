@@ -545,7 +545,7 @@ export default defineComponent({
     const handleAdd = () => {
       open.value = true
       isUpdate.value = false
-      drawerTitle.value = '添加字典'
+      drawerTitle.value = '添加用户'
     }
 
     // 更新按钮操作
@@ -553,7 +553,7 @@ export default defineComponent({
       getUser(row.id).then((res) => {
         open.value = true
         isUpdate.value = true
-        drawerTitle.value = '修改字典'
+        drawerTitle.value = '修改用户'
         nextTick(() => {
           Object.keys(formState).forEach((key) => {
             formState[key] = res.data[key]
@@ -567,9 +567,21 @@ export default defineComponent({
 
     // 确认删除
     const confirm = (row) => {
-      const id = row.id || state.selectedRowKeys
-      console.log(id)
-      delUser(id).then(() => {
+      const ids = row.id || state.selectedRowKeys
+      console.log(ids)
+      delUser(ids).then(() => {
+        if (
+          (ids.length && ids.length === userList.value.length) ||
+          userList.value.length === 1
+        ) {
+          if (
+            Math.ceil(pagination.value.total / queryParams.pageSize) ===
+              queryParams.pageNum &&
+            queryParams.pageNum > 1
+          ) {
+            queryParams.pageNum--
+          }
+        }
         getList(queryParams)
         Message.success('删除成功')
       })
@@ -625,8 +637,8 @@ export default defineComponent({
       email: undefined,
       salary: undefined,
       position: '1',
-      entryTime: '',
-      birthday: '',
+      entryTime: undefined,
+      birthday: undefined,
       education: undefined,
       remark: undefined,
     })

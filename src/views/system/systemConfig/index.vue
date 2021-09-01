@@ -338,8 +338,20 @@ export default defineComponent({
     }
     // 确认删除
     const confirm = (row) => {
-      const dictId = row.id || state.selectedRowKeys
-      delSystemConfig(dictId).then(() => {
+      const ids = row.id || state.selectedRowKeys
+      delSystemConfig(ids).then(() => {
+        if (
+          (ids.length && ids.length === systemConfigList.value.length) ||
+          systemConfigList.value.length === 1
+        ) {
+          if (
+            Math.ceil(pagination.value.total / queryParams.pageSize) ===
+              queryParams.pageNum &&
+            queryParams.pageNum > 1
+          ) {
+            queryParams.pageNum--
+          }
+        }
         getList(queryParams)
         Message.success('删除成功')
       })

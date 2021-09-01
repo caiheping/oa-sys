@@ -250,6 +250,18 @@ export default defineComponent({
     const confirm = (row) => {
       const ids = row.id || state.selectedRowKeys
       delLogs(ids).then(() => {
+        if (
+          (ids.length && ids.length === logsList.value.length) ||
+          logsList.value.length === 1
+        ) {
+          if (
+            Math.ceil(pagination.value.total / queryParams.pageSize) ===
+              queryParams.pageNum &&
+            queryParams.pageNum > 1
+          ) {
+            queryParams.pageNum--
+          }
+        }
         getList(queryParams)
         Message.success('删除成功')
       })

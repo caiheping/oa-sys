@@ -417,8 +417,20 @@ export default defineComponent({
     }
     // 确认删除
     const confirm = (row) => {
-      const dictId = row.id || state.selectedRowKeys
-      delData(dictId).then(() => {
+      const ids = row.id || state.selectedRowKeys
+      delData(ids).then(() => {
+        if (
+          (ids.length && ids.length === dataList.value.length) ||
+          dataList.value.length === 1
+        ) {
+          if (
+            Math.ceil(pagination.value.total / queryParams.pageSize) ===
+              queryParams.pageNum &&
+            queryParams.pageNum > 1
+          ) {
+            queryParams.pageNum--
+          }
+        }
         getList(queryParams)
         Message.success('删除成功')
       })
@@ -454,7 +466,7 @@ export default defineComponent({
       console.log(queryParams)
       statusOptions.value = await getDict('sys_normal_disable')
       disableOptions.value = await getDict('sys_normal_disable')
-      disableOptions.value.forEach(item => {
+      disableOptions.value.forEach((item) => {
         item.label = item.dictLabel
         item.value = item.dictValue
       })
@@ -491,7 +503,7 @@ export default defineComponent({
       cancel,
       handleAdd,
       handleUpdate,
-      disableOptions
+      disableOptions,
     }
   },
   computed: {

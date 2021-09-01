@@ -8,7 +8,7 @@ export interface ISystemConfig {
   createdBy: string;
   id: number;
   name: string;
-  KeyName: string;
+  keyName: string;
   key: string;
   remark: string;
   updatedAt: string;

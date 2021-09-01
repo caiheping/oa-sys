@@ -24,7 +24,8 @@ const dynamicRouter: IDynamicRouter = {
   WorkOverTime: () => import("@/views/approvalManagement/workOverTime/index.vue"), // 加班
 
   // 基础数据
-  ClockIn: () => import("@/views/baseInfo/clockIn/index.vue"), // 出差
+  ClockIn: () => import("@/views/baseInfo/clockIn/index.vue"), // 员工打卡详情
+  HolidayDetails: () => import("@/views/baseInfo/holidayDetails/index.vue"), // 员工假期详情
 
   // 财务管理
   Salary: () => import("@/views/finance/salary/index.vue"), // 工资详细
