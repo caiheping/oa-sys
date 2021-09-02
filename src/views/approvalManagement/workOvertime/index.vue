@@ -9,10 +9,10 @@
     </div>
 
     <a-row :gutter="10" class="mb-2">
-      <a-col>
+      <a-col v-has-permi="['examineAndApprove:workOverTime:add']">
         <a-button color="success" @click="handleAdd"> 新增 </a-button>
       </a-col>
-      <a-col v-has-permi="['system:notice:delete']">
+      <a-col v-has-permi="['examineAndApprove:workOverTime:delete']">
         <a-popconfirm
           title="确定要删除选中数据吗？"
           ok-text="确定"
@@ -65,6 +65,7 @@
             </template>
           </a-dropdown>
           <a-button
+            v-has-permi="['examineAndApprove:workOverTime:update']"
             type="link"
             color="success"
             class="mr-3"
@@ -82,7 +83,7 @@
             <a-button
               type="link"
               color="error"
-              v-has-permi="['system:notice:delete']"
+              v-has-permi="['examineAndApprove:workOverTime:delete']"
             >
               删除
             </a-button>

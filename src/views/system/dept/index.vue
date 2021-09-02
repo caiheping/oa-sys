@@ -395,7 +395,7 @@ export default defineComponent({
     }
     onMounted(async () => {
       disableOptions.value = await getDict('sys_normal_disable')
-      disableOptions.value.forEach(item => {
+      disableOptions.value.forEach((item) => {
         item.label = item.dictLabel
         item.value = item.dictValue
       })
@@ -423,7 +423,7 @@ export default defineComponent({
       formRef,
       treeRef,
       handleTreeSelect,
-      disableOptions
+      disableOptions,
     }
   },
   computed: {

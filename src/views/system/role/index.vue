@@ -139,6 +139,7 @@
               <a-tree
                 :blockNode="true"
                 checkable
+                checkStrictly
                 :replace-fields="replaceFields"
                 :tree-data="menuOptions"
                 v-model:checkedKeys="checkedKeys"
@@ -340,7 +341,7 @@ export default defineComponent({
     const statusOptions = ref<IData[]>([])
     const disableOptions = ref<IData[]>([])
     const checkMenus = () => {
-      if (checkedKeys.value.length) {
+      if ([...checkedKeys.value.checked].length) {
         return Promise.resolve()
       } else {
         return Promise.reject('菜单权限为空')
@@ -457,19 +458,18 @@ export default defineComponent({
     })
     const { open, drawerTitle } = useDrawer()
     const handleClose = () => {
+      checkedKeys.value.checked = []
       formState.id = undefined
-      checkedKeys.value = []
       formRef.value.resetFields()
       console.log(formRef)
       open.value = false
     }
     // 表单提交
     const handleSubmit = () => {
-      console.log(formState, checkedKeys)
       formRef.value
         .validate()
         .then(() => {
-          formState.menuIds = checkedKeys.value
+          formState.menuIds = [...checkedKeys.value.checked]
           if (formState.id) {
             updateRole(formState).then((res) => {
               Message.success(res.message)
@@ -532,14 +532,20 @@ export default defineComponent({
           Object.keys(formState).forEach((key) => {
             formState[key] = res.data[key]
           })
-          checkedKeys.value = res.data.menus.map((list) => list.id)
+          const obj = {
+            checked: res.data.menus.map((list) => list.id),
+            halfChecked: [],
+          }
+          checkedKeys.value = toRefs(obj)
         })
       })
     }
 
     /** 查询菜单树结构 */
     const menuOptions = ref<IMenu[]>([])
-    const checkedKeys = ref([])
+    const checkedKeys = ref<any>({
+      checked: [],
+    })
     // 树形控件操作
     const replaceFields = {
       children: 'children',

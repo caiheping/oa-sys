@@ -55,7 +55,7 @@
           html-type="submit"
           size="large"
           style="width: 100%"
-        >{{ t('sys.login.loginButton') }}</a-button
+          >{{ t('sys.login.loginButton') }}</a-button
         >
       </a-form-item>
     </a-form>
@@ -142,7 +142,6 @@ export default defineComponent({
     const handleFinish = async () => {
       const params = unref(formState)
       const res = await userStore.Login(params, checked.value)
-      console.log(res.code)
       if (res && res.code === 0) {
         router.replace('/layout/home')
       }

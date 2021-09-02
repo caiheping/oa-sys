@@ -259,6 +259,7 @@ export default defineComponent({
         const res = await userStore.Logout()
         if (res.code === 0) {
           router.replace(`/redirect/login`)
+          window.location.reload()
         }
       }
     }

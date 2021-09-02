@@ -510,11 +510,11 @@ export default defineComponent({
     onMounted(async () => {
       disableOptions.value = await getDict('sys_normal_disable')
       showOrHideOptions.value = await getDict('sys_show_hide')
-      disableOptions.value.forEach(item => {
+      disableOptions.value.forEach((item) => {
         item.label = item.dictLabel
         item.value = item.dictValue
       })
-      showOrHideOptions.value.forEach(item => {
+      showOrHideOptions.value.forEach((item) => {
         item.label = item.dictLabel
         item.value = item.dictValue
       })
@@ -545,7 +545,7 @@ export default defineComponent({
       treeRef,
       handleTreeSelect,
       disableOptions,
-      showOrHideOptions
+      showOrHideOptions,
     }
   },
   computed: {
