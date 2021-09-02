@@ -141,9 +141,9 @@ const columns = [
     slots: { customRender: 'type' },
   },
   {
-    title: '打卡WiFi',
-    dataIndex: 'wifi',
-    key: 'wifi',
+    title: '上班打卡WiFi',
+    dataIndex: 'wifiBefore',
+    key: 'wifiBefore',
     align: 'center',
   },
   {
@@ -156,6 +156,12 @@ const columns = [
     title: '上班打卡时间',
     dataIndex: 'firstClockInTime',
     key: 'firstClockInTime',
+    align: 'center',
+  },
+  {
+    title: '下班打卡WiFi',
+    dataIndex: 'wifiNext',
+    key: 'wifiNext',
     align: 'center',
   },
   {
@@ -181,9 +187,10 @@ const columns = [
 interface FormState {
   id: undefined | number
   type: undefined | string
-  wifi: undefined | string
+  wifiBefore: undefined | string
   firstClockInAddr: undefined | string
   firstClockInTime: undefined | string
+  wifiNext: undefined | string
   lastClockInAddr: undefined | string
   lastClockInTime: undefined | string
 }
@@ -342,8 +349,8 @@ export default defineComponent({
         },
       },
       {
-        name: 'wifi',
-        label: '打卡WiFi',
+        name: 'wifiBefore',
+        label: '上班打卡WiFi',
         type: 'input',
         value: undefined,
         span: 24,
@@ -370,6 +377,14 @@ export default defineComponent({
         },
       },
       {
+        name: 'wifiNext',
+        label: '下班打卡WiFi',
+        type: 'input',
+        value: undefined,
+        span: 24,
+        placeholder: '请输入打卡WiFi',
+      },
+      {
         name: 'lastClockInAddr',
         label: '下班打卡地址',
         type: 'input',
@@ -393,9 +408,10 @@ export default defineComponent({
     const formState: FormState = reactive({
       id: undefined,
       type: '1',
-      wifi: undefined,
+      wifiBefore: undefined,
       firstClockInAddr: undefined,
       firstClockInTime: undefined,
+      wifiNext: undefined,
       lastClockInAddr: undefined,
       lastClockInTime: undefined,
     })
