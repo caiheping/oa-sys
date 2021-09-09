@@ -1,13 +1,16 @@
 <template>
   <div class="p-4">
+    <a-button type="primary" @click="handleCreate">
+      生成当月工资数据({{ selectDates }}天)
+    </a-button>
     <a-calendar
-      v-model:value="value"
+      v-model:value="dateTime"
       @select="handleSelect"
       @panelChange="handlePanelChange"
     >
-      <template #dateCellRender="{ current: value }">
-        <div v-show="getListData(value)" class="h-[100%] bg-[#e6f7ff] p-3">
-          <a-badge status="success" :text="getListData(value).remark" />
+      <template #dateCellRender="{ current: val }">
+        <div v-show="getListData(val)" class="pl-2 pr-2">
+          <a-badge status="success" :text="getListData(val).remark" />
         </div>
       </template>
     </a-calendar>
@@ -29,7 +32,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue'
+import { computed, defineComponent, onMounted, ref } from 'vue'
 import moment, { Moment } from 'moment'
 import { Modal, message as Message } from 'ant-design-vue'
 import {
@@ -37,20 +40,29 @@ import {
   delWorkingDaySettings,
   addWorkingDaySettings,
 } from '@/api/admin/baseInfo/workingDaySettings'
+import { createEmployeeSalary } from '@/api/admin/finance/salary'
 import { IWorkingDaySettings } from '@/api/admin/baseInfo/workingDaySettings/type'
 
 export default defineComponent({
   setup() {
-    const value = ref<Moment>()
+    const dateTime = ref<Moment>(moment())
     const remark = ref<string>('')
     const time = ref<Moment>()
     const calendarMode = ref<string>('month')
     const visible = ref<boolean>(false)
     const dateLists = ref<IWorkingDaySettings[]>([])
 
+    const handleCreate = () => {
+      const params = {
+        dateTime: moment(dateTime.value).format('YYYY-MM-DD'),
+        dateLists: dateLists.value,
+      }
+      createEmployeeSalary(params).then((res) => {
+        console.log(res)
+      })
+    }
+
     const getListData = (value: Moment) => {
-      // console.log(value.format('YYYY-MM-DD'))
-      console.log(dateLists.value)
       if (
         dateLists.value.filter(
           (item) => item.day === value.format('YYYY-MM-DD')
@@ -79,7 +91,6 @@ export default defineComponent({
             okText: '确认',
             cancelText: '取消',
             onOk: () => {
-              console.log(8989)
               const id = dateLists.value.filter(
                 (item) => item.day === value.format('YYYY-MM-DD')
               )[0].id
@@ -115,22 +126,31 @@ export default defineComponent({
     const handlePanelChange = (date: Moment, mode: string) => {
       console.log(date, mode)
       calendarMode.value = mode
+      getList()
     }
 
     const getList = () => {
-      getWorkingDaySettings().then((res) => {
+      getWorkingDaySettings({
+        day: moment(dateTime.value).format('YYYY-MM-DD'),
+      }).then((res) => {
         dateLists.value = res.data.rows
       })
     }
+
+    const selectDates = computed(() => {
+      return dateLists.value.length
+    })
 
     onMounted(() => {
       getList()
     })
 
     return {
-      value,
+      dateTime,
       visible,
       remark,
+      selectDates,
+      handleCreate,
       getListData,
       handleSelect,
       showModal,

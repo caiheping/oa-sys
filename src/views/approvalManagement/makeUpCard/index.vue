@@ -160,9 +160,11 @@ interface MenuInfo {
 
 interface FormState {
   id: undefined | number
-  clockInId: undefined | number
+  createdAt: undefined | number
   type: undefined | string
   makeUpCardReason: undefined | string
+  userId: undefined | string
+  deptId: undefined | string
   status?: undefined | string
 }
 
@@ -333,6 +335,8 @@ export default defineComponent({
     // 新增按钮操作
     const handleAdd = () => {
       open.value = true
+      formState.userId = undefined
+      formState.deptId = undefined
       drawerTitle.value = '添加'
     }
     // 更新按钮操作
@@ -340,6 +344,8 @@ export default defineComponent({
       getMakeUpCardById(row.id).then((res) => {
         open.value = true
         drawerTitle.value = '修改'
+        formState.userId = row.user.id
+        formState.deptId = row.user.deptId
         nextTick(() => {
           Object.keys(formState).forEach((key) => {
             formState[key] = res.data[key]
@@ -378,15 +384,17 @@ export default defineComponent({
     const { open, drawerTitle } = useDrawer()
     const formState: FormState = reactive({
       id: undefined,
-      clockInId: undefined,
+      createdAt: undefined,
       type: undefined,
       makeUpCardReason: undefined,
+      userId: undefined,
+      deptId: undefined,
     })
     const rules = reactive({
-      clockInId: [
+      createdAt: [
         {
           required: true,
-          message: '打卡id',
+          message: '补卡日期',
         },
       ],
       type: [
@@ -398,11 +406,11 @@ export default defineComponent({
     })
     const formDataObj = reactive<FormDataItem[]>([
       {
-        name: 'clockInId',
-        label: '打卡id',
-        type: 'input',
+        name: 'createdAt',
+        label: '补卡日期',
+        type: 'date-picker',
         value: undefined,
-        placeholder: '请输入打卡id',
+        placeholder: '请选择补卡日期',
         span: 24,
       },
       {
@@ -451,6 +459,8 @@ export default defineComponent({
     // 关闭推窗
     const handleClose = () => {
       formState.id = undefined
+      formState.userId = undefined
+      formState.deptId = undefined
       BaseFormRef.value.resetFields()
       open.value = false
     }

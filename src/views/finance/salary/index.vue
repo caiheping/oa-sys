@@ -12,7 +12,7 @@
       <a-col>
         <a-button color="success" @click="handleAdd"> 新增 </a-button>
       </a-col>
-      <a-col v-has-permi="['system:notice:delete']">
+      <a-col v-has-permi="['finance:salary:add']">
         <a-popconfirm
           title="确定要删除选中数据吗？"
           ok-text="确定"
@@ -40,15 +40,19 @@
       :pagination="pagination"
       @change="handleTableChange"
     >
+      <template #yearAndMounth="{ record }">
+        <span>{{ getMounth(record.yearAndMounth) }}</span>
+      </template>
       <template #user="{ record }">
         <span>{{ record.user.nickName }}</span>
       </template>
-      <template #type="{ record }">
-        <span>{{ selectDictLabel(clockInOptions, record.type) }}</span>
+      <template #currentSalary="{ record }">
+        <span>{{ record.user.salary }}</span>
       </template>
       <template #action="{ record }">
         <span>
           <a-button
+            v-has-permi="['finance:salary:update']"
             type="link"
             color="success"
             class="mr-3"
@@ -66,7 +70,7 @@
             <a-button
               type="link"
               color="error"
-              v-has-permi="['system:notice:delete']"
+              v-has-permi="['finance:salary:delete']"
             >
               删除
             </a-button>
@@ -106,31 +110,31 @@ import {
   toRefs,
 } from 'vue'
 import {
-  getClockIn,
-  delClockIn,
-  updateClockIn,
-  addClockIn,
-  getClockInById,
-} from '@/api/admin/baseInfo/clockIn'
-import { getDict, selectDictLabel } from '@/utils/dictFormat'
+  getSalary,
+  delSalary,
+  updateSalary,
+  addSalary,
+  getSalaryById,
+} from '@/api/admin/finance/salary'
 import { useAppStore } from '@/store/modules/app'
 import { mapState } from 'pinia'
 import { TableState } from 'ant-design-vue/es/table/interface'
 import { message as Message } from 'ant-design-vue'
 import BaseForm from '@/components/BaseForm/index.vue'
+import moment from 'moment'
 
 import FormSearch from '@/components/FormSearch/index.vue'
 import useDrawer from '@/hooks/useDrawer'
-import { IClockIn } from '@/api/admin/baseInfo/clockIn/type'
-import { IData } from '@/api/admin/system/dict/data/type'
+import { ISalary } from '@/api/admin/finance/salary/type'
 
 type Pagination = TableState['pagination']
 
 const columns = [
   {
-    title: '年/月',
+    title: '年月',
     key: 'yearAndMounth',
     align: 'center',
+    slots: { customRender: 'yearAndMounth' },
   },
   {
     title: '姓名',
@@ -140,62 +144,62 @@ const columns = [
   },
   {
     title: '目前薪资',
-    key: 'type',
+    key: 'currentSalary',
     align: 'center',
-    slots: { customRender: 'type' },
+    slots: { customRender: 'currentSalary' },
   },
   {
     title: '当月应出勤时长',
-    dataIndex: 'wifi',
-    key: 'wifi',
+    dataIndex: 'expectedAttendanceHours',
+    key: 'expectedAttendanceHours',
     align: 'center',
   },
   {
     title: '出勤时长',
-    dataIndex: 'wifi',
-    key: 'wifi',
+    dataIndex: 'attendanceHours',
+    key: 'attendanceHours',
     align: 'center',
   },
   {
-    title: '有薪假期（小时）',
-    dataIndex: 'wifi',
-    key: 'wifi',
+    title: '带薪假期（小时）',
+    dataIndex: 'paidLeave',
+    key: 'paidLeave',
     align: 'center',
   },
   {
     title: '无薪假期（小时）',
-    dataIndex: 'wifi',
-    key: 'wifi',
+    dataIndex: 'unpaidLeave',
+    key: 'unpaidLeave',
     align: 'center',
   },
   {
-    title: '迟到早退（小时）',
-    dataIndex: 'firstClockInTime',
-    key: 'firstClockInTime',
+    title: '迟到早退（次数）',
+    dataIndex: 'beLateAndLeaveEarly',
+    key: 'beLateAndLeaveEarly',
     align: 'center',
   },
   {
-    title: '出差补贴',
-    dataIndex: 'lastClockInAddr',
-    key: 'lastClockInAddr',
+    title: '补贴',
+    dataIndex: 'subsidy',
+    key: 'subsidy',
     align: 'center',
   },
   {
     title: '社保/公积金',
-    dataIndex: 'lastClockInTime',
-    key: 'lastClockInTime',
+    dataIndex: 'socialSecurityAndProvidentFund',
+    key: 'socialSecurityAndProvidentFund',
     align: 'center',
   },
   {
     title: '其他',
-    dataIndex: 'lastClockInTime',
-    key: 'lastClockInTime',
+    dataIndex: 'other',
+    key: 'other',
     align: 'center',
   },
   {
     title: '总计（税前工资）',
-    dataIndex: 'lastClockInAddr',
-    key: 'lastClockInAddr',
+    dataIndex: 'total',
+    key: 'total',
     align: 'center',
   },
   {
@@ -208,12 +212,15 @@ const columns = [
 
 interface FormState {
   id: undefined | number
-  type: undefined | string
-  wifi: undefined | string
-  firstClockInAddr: undefined | string
-  firstClockInTime: undefined | string
-  lastClockInAddr: undefined | string
-  lastClockInTime: undefined | string
+  yearAndMounth: undefined | string
+  expectedAttendanceHours: undefined | string
+  attendanceHours: undefined | string
+  paidLeave: undefined | string
+  unpaidLeave: undefined | string
+  beLateAndLeaveEarly: undefined | string
+  subsidy: undefined | string
+  socialSecurityAndProvidentFund: undefined | string
+  other: undefined | string
 }
 
 export default defineComponent({
@@ -222,7 +229,6 @@ export default defineComponent({
     BaseForm,
   },
   setup() {
-    const clockInOptions = ref<IData[]>([])
     const BaseFormRef = ref()
 
     /**
@@ -232,7 +238,7 @@ export default defineComponent({
       pageNum: 1,
       pageSize: 10,
       nickName: undefined || '',
-      type: undefined || '',
+      yearAndMounth: undefined || '',
     })
     const formFields = reactive([
       {
@@ -243,29 +249,29 @@ export default defineComponent({
         placeholder: '请输入姓名',
       },
       {
-        type: 'select',
-        label: '类型',
-        name: 'type',
-        value: undefined,
-        placeholder: '请选择类型',
-        normalizer: {
-          value: 'dictValue',
-          label: 'dictLabel',
-        },
-        options: clockInOptions,
+        type: 'month-picker',
+        label: '姓名',
+        name: 'yearAndMounth',
+        value: '',
+        placeholder: '请选择年月',
       },
     ])
-    const handleQuery = (query: { nickName: string; type: string }) => {
+    const handleQuery = (query: {
+      nickName: string
+      yearAndMounth: string
+    }) => {
       pagination.value.current = 1
       queryParams.pageNum = pagination.value.current
       queryParams.nickName = query.nickName
-      queryParams.type = query.type
+      queryParams.yearAndMounth = query.yearAndMounth
+        ? moment(query.yearAndMounth).format('YYYY-MM')
+        : ''
       getList(queryParams)
     }
     /**
      * 表格操作
      */
-    const tableList = ref<IClockIn[]>([])
+    const tableList = ref<ISalary[]>([])
     const pagination = ref({
       total: 0,
       current: 1,
@@ -277,6 +283,10 @@ export default defineComponent({
     const state = reactive({
       selectedRowKeys: [],
     })
+
+    const getMounth = (date: string) => {
+      return moment(date).format('YYYY-MM')
+    }
 
     const hasSelected = computed(() => state.selectedRowKeys.length > 0)
     // 表格选择框改变事件
@@ -293,7 +303,7 @@ export default defineComponent({
     }
     // 获取表格数据
     const getList = (queryParams?: {}) => {
-      getClockIn(queryParams).then((res) => {
+      getSalary(queryParams).then((res) => {
         console.log(res)
         tableList.value = res.data.rows
         pagination.value.total = res.data.count
@@ -307,7 +317,7 @@ export default defineComponent({
     }
     // 更新按钮操作
     const handleUpdate = (row) => {
-      getClockInById(row.id).then((res) => {
+      getSalaryById(row.id).then((res) => {
         open.value = true
         drawerTitle.value = '修改打卡'
         nextTick(() => {
@@ -321,7 +331,7 @@ export default defineComponent({
     // 确认删除
     const confirm = (row) => {
       const ids = row.id || state.selectedRowKeys
-      delClockIn(ids).then(() => {
+      delSalary(ids).then(() => {
         if (
           (ids.length && ids.length === tableList.value.length) ||
           tableList.value.length === 1
@@ -347,90 +357,106 @@ export default defineComponent({
      * 推窗操作
      */
     const { open, drawerTitle } = useDrawer()
-    const rules = reactive({
-      type: [
-        {
-          required: true,
-          message: '请选择类型',
-        },
-      ],
-    })
+    const rules = reactive({})
     const formDataObj = reactive([
       {
-        name: 'type',
-        label: '类型',
-        type: 'select',
+        name: 'yearAndMounth',
+        label: '年月',
+        type: 'month-picker',
         value: undefined,
         span: 24,
-        placeholder: '请选择类型',
-        options: clockInOptions,
-        serialize: {
-          value: 'dictValue',
-          label: 'dictLabel',
+        placeholder: '请选择年月',
+      },
+      {
+        name: 'expectedAttendanceHours',
+        label: '应出勤时长',
+        type: 'input-number',
+        span: 24,
+        value: undefined,
+        placeholder: '请输入应出勤时长',
+      },
+      {
+        name: 'attendanceHours',
+        label: '出勤时长',
+        type: 'input-number',
+        span: 24,
+        value: undefined,
+        placeholder: '请输入出勤时长',
+      },
+      {
+        name: 'paidLeave',
+        label: '带薪假期',
+        type: 'input-number',
+        span: 24,
+        value: undefined,
+        placeholder: '请输入带薪假期',
+      },
+      {
+        name: 'unpaidLeave',
+        label: '无薪假期',
+        type: 'input-number',
+        span: 24,
+        value: undefined,
+        placeholder: '请输入无薪假期',
+      },
+      {
+        name: 'beLateAndLeaveEarly',
+        label: '迟到早退',
+        type: 'input-number',
+        span: 24,
+        value: undefined,
+        placeholder: '请输入迟到早退次数',
+      },
+      {
+        name: 'subsidy',
+        label: '补贴',
+        type: 'input-number',
+        span: 24,
+        value: undefined,
+        placeholder: '请输入补贴',
+        props: {
+          precision: 2,
         },
       },
       {
-        name: 'wifi',
-        label: '打卡WiFi',
-        type: 'input',
-        value: undefined,
-        span: 24,
-        placeholder: '请输入打卡WiFi',
-      },
-      {
-        name: 'firstClockInAddr',
-        label: '上班打卡地址',
-        type: 'input',
+        name: 'socialSecurityAndProvidentFund',
+        label: '公积金/社保',
+        type: 'input-number',
         span: 24,
         value: undefined,
-        placeholder: '请输入上班打卡地址',
-      },
-      {
-        name: 'firstClockInTime',
-        label: '上班打卡时间',
-        type: 'time-picker',
-        span: 24,
-        value: undefined,
-        placeholder: '上班打卡时间',
+        placeholder: '请输入公积金/社保',
         props: {
-          valueFormat: 'YYYY-MM-DD HH:mm',
-          format: 'HH:mm',
+          precision: 2,
         },
       },
       {
-        name: 'lastClockInAddr',
-        label: '下班打卡地址',
-        type: 'input',
+        name: 'other',
+        label: '其他',
+        type: 'input-number',
         span: 24,
         value: undefined,
-        placeholder: '请输入下班打卡地址',
-      },
-      {
-        name: 'lastClockInTime',
-        label: '下班打卡时间',
-        type: 'time-picker',
-        span: 24,
-        value: undefined,
-        placeholder: '下班打卡时间',
+        placeholder: '请输入其他',
         props: {
-          valueFormat: 'YYYY-MM-DD HH:mm',
-          format: 'HH:mm',
+          precision: 2,
         },
       },
     ])
     const formState: FormState = reactive({
       id: undefined,
-      type: '1',
-      wifi: undefined,
-      firstClockInAddr: undefined,
-      firstClockInTime: undefined,
-      lastClockInAddr: undefined,
-      lastClockInTime: undefined,
+      yearAndMounth: undefined,
+      expectedAttendanceHours: undefined,
+      attendanceHours: undefined,
+      paidLeave: undefined,
+      unpaidLeave: undefined,
+      beLateAndLeaveEarly: undefined,
+      subsidy: undefined,
+      socialSecurityAndProvidentFund: undefined,
+      other: undefined,
     })
     // 表单提交
     const handleSubmit = () => {
       if (formState.id) {
-        updateClockIn(formState).then((res) => {
+        updateSalary(formState).then((res) => {
           Message.success(res.message)
           getList(queryParams)
           formState.id = undefined
@@ -438,7 +464,7 @@ export default defineComponent({
           open.value = false
         })
       } else {
-        addClockIn(formState).then((res) => {
+        addSalary(formState).then((res) => {
           Message.success(res.message)
           getList(queryParams)
           formState.id = undefined
@@ -459,11 +485,6 @@ export default defineComponent({
     }
 
     onMounted(async () => {
-      clockInOptions.value = await getDict('sys_clock_in_type')
-      clockInOptions.value.forEach((item) => {
-        item.value = item.dictValue
-        item.lable = item.dictLabel
-      })
       init()
     })
 
@@ -476,8 +497,8 @@ export default defineComponent({
       columns,
       pagination,
       hasSelected,
+      getMounth,
       handleTableChange,
-      selectDictLabel,
       confirm,
       cancel,
       onSelectChange,
@@ -488,7 +509,6 @@ export default defineComponent({
       BaseFormRef,
       open,
       drawerTitle,
-      clockInOptions,
       formState,
       rules,
       formDataObj,

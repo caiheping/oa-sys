@@ -230,6 +230,7 @@
                 class="!w-[100%]"
                 v-model:value="formState.salary"
                 placeholder="请输入薪资"
+                :precision="2"
                 :formatter="
                   (value) => `￥ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
                 "
