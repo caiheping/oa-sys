@@ -42,6 +42,7 @@ import {
 } from '@/api/admin/baseInfo/workingDaySettings'
 import { createEmployeeSalary } from '@/api/admin/finance/salary'
 import { IWorkingDaySettings } from '@/api/admin/baseInfo/workingDaySettings/type'
+import router from '@/router'
 
 export default defineComponent({
   setup() {
@@ -58,7 +59,10 @@ export default defineComponent({
         dateLists: dateLists.value,
       }
       createEmployeeSalary(params).then((res) => {
-        console.log(res)
+        Message.success(res.message)
+        router.push({
+          name: 'Salary',
+        })
       })
     }
 

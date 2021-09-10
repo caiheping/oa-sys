@@ -250,7 +250,7 @@ export default defineComponent({
       },
       {
         type: 'month-picker',
-        label: '姓名',
+        label: '年月',
         name: 'yearAndMounth',
         value: '',
         placeholder: '请选择年月',
