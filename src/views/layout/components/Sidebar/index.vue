@@ -47,9 +47,12 @@ export default defineComponent({
   },
   setup() {
     const permissionStore = usePermissionStore()
-    const { sidebarRouters } = permissionStore
+    const sidebarRouters = computed(() => permissionStore.sidebarRouters)
     const appStore = useAppStore()
-    const { isMobile, sideBarConfig, sidebarStatus, collapsed } = appStore
+    const isMobile = computed(() => appStore.isMobile)
+    const sideBarConfig = computed(() => appStore.sideBarConfig)
+    const sidebarStatus = computed(() => appStore.sidebarStatus)
+    const collapsed = computed(() => appStore.collapsed)
     const route = useRoute()
     const selectedKeys = ref([''])
     const openKeys = ref([''])

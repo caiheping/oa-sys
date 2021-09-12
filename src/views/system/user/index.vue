@@ -371,7 +371,7 @@ export default defineComponent({
   },
   setup() {
     const userStore = useUserStore()
-    const { loading } = useAppStore()
+    const loading = computed(() => useAppStore().loading)
     const roleOptions = ref<IRole[]>([])
     const statusOptions = ref<IData[]>([])
     const positionOptions = ref<IData[]>([])

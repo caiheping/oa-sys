@@ -213,7 +213,7 @@
 <script lang="ts">
 import { useAppStore } from '@/store/modules/app'
 import { useUserStore } from '@/store/modules/user'
-import { defineComponent, VNodeChild, ref } from 'vue'
+import { defineComponent, VNodeChild, ref, computed } from 'vue'
 import { message as Message } from 'ant-design-vue'
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons-vue'
 import avatar from '@/assets/images/profile.jpg'
@@ -238,7 +238,9 @@ export default defineComponent({
     const openSetting = ref<boolean>(false)
     const baseImgUrl = imageUrl
     const appStore = useAppStore()
-    const { collapsed, headerConfig, sideBarConfig } = appStore
+    const collapsed = computed(() => appStore.collapsed)
+    const headerConfig = computed(() => appStore.headerConfig)
+    const sideBarConfig = computed(() => appStore.sideBarConfig)
     const userStore = useUserStore()
     const { userInfo } = userStore
     const { toggle, isFullscreen } = useFullscreen()

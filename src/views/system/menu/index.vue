@@ -228,7 +228,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, reactive, ref, nextTick } from 'vue'
+import {
+  defineComponent,
+  onMounted,
+  reactive,
+  ref,
+  nextTick,
+  computed,
+} from 'vue'
 import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
 import {
   getMenu,
@@ -316,7 +323,7 @@ export default defineComponent({
     Treeselect,
   },
   setup() {
-    const { loading } = useAppStore()
+    const loading = computed(() => useAppStore().loading)
     const disableOptions = ref<IData[]>([])
     const showOrHideOptions = ref<IData[]>([])
     const treeRef = ref()

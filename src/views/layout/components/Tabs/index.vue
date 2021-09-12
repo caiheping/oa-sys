@@ -52,7 +52,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref, watchEffect, watch } from 'vue'
+import {
+  defineComponent,
+  onMounted,
+  ref,
+  watchEffect,
+  watch,
+  computed,
+} from 'vue'
 import router from '@/router'
 import { RouteRecordRaw, useRoute } from 'vue-router'
 import { useAppStore } from '@/store/modules/app'
@@ -104,7 +111,7 @@ export default defineComponent({
     // tab路由操作
     const route = useRoute()
     const appStore = useAppStore()
-    const { tabs } = appStore
+    const tabs = computed(() => appStore.tabs)
     watch(route, () => {
       if (route.meta?.title) {
         if (!appStore.tabs.map((item) => item.name).includes(route.name)) {

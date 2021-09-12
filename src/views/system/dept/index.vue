@@ -133,7 +133,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, reactive, ref, nextTick } from 'vue'
+import {
+  defineComponent,
+  onMounted,
+  reactive,
+  ref,
+  nextTick,
+  computed,
+} from 'vue'
 import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
 import {
   getDept,
@@ -202,7 +209,7 @@ export default defineComponent({
   setup() {
     const disableOptions = ref<IData[]>([])
     const userStore = useUserStore()
-    const { loading } = useAppStore()
+    const loading = computed(() => useAppStore().loading)
     const treeRef = ref()
     const rules = {
       parentId: [

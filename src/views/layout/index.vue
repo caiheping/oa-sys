@@ -58,8 +58,11 @@ export default defineComponent({
   },
   setup() {
     const appStore = useAppStore()
-    const { isMobile, sidebarStatus, collapsed, sideBarConfig, headerConfig } =
-      appStore
+    const isMobile = computed(() => appStore.isMobile)
+    const sidebarStatus = computed(() => appStore.sidebarStatus)
+    const collapsed = computed(() => appStore.collapsed)
+    const sideBarConfig = computed(() => appStore.sideBarConfig)
+    const headerConfig = computed(() => appStore.headerConfig)
     // 改变遮罩层状态
     const toggleDrawer = () => {
       if (appStore.isMobile) {

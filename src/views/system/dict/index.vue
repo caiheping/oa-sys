@@ -221,7 +221,7 @@ export default defineComponent({
     FormSearch,
   },
   setup() {
-    const { loading } = useAppStore()
+    const loading = computed(() => useAppStore().loading)
     const disableOptions = ref<IData[]>([])
     const statusOptions = ref<IData[]>([])
     const rules = {

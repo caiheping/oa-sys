@@ -7,7 +7,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, provide } from 'vue'
+import { computed, defineComponent, provide } from 'vue'
 import AppProvider from '@/components/AppProvider/index.vue'
 import enUS from 'ant-design-vue/es/locale/en_US'
 import zhCN from 'ant-design-vue/es/locale/zh_CN'
@@ -27,7 +27,7 @@ export default defineComponent({
     }
     provide('reload', reload)
     const appStore = useAppStore()
-    const { locale } = appStore
+    const locale = computed(() => appStore.locale)
     return {
       enUS,
       zhCN,

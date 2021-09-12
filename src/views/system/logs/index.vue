@@ -162,7 +162,7 @@ export default defineComponent({
     FormSearch,
   },
   setup() {
-    const { loading } = useAppStore()
+    const loading = computed(() => useAppStore().loading)
     const methodOptions = ref<IData[]>([])
 
     /**
