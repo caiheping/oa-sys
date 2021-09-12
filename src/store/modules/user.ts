@@ -61,9 +61,6 @@ export const useUserStore = defineStore({
     async GetInfo() {
       try {
         const res = await getInfo()
-        res.data.user.avatar === ""
-          ? (await import("@/assets/images/profile.jpg")).default
-          : res.data.user.avatar
         if (res.data?.user?.roles && res.data.user?.roles.length > 0) {
           // 验证返回的roles是否是一个非空数组
           this.roles = res.data.roles
