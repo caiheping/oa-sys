@@ -252,7 +252,6 @@ import { getMenu } from '@/api/admin/system/menu'
 import { getDict, selectDictLabel } from '@/utils/dictFormat'
 import useDrawer from '@/hooks/useDrawer'
 import { useAppStore } from '@/store/modules/app'
-import { mapState } from 'pinia'
 import { message as Message } from 'ant-design-vue'
 import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
 import { handleTree } from '@/utils/tools'
@@ -338,6 +337,7 @@ export default defineComponent({
     FormSearch,
   },
   setup() {
+    const loading = computed(() => useAppStore().loading)
     const statusOptions = ref<IData[]>([])
     const disableOptions = ref<IData[]>([])
     const checkMenus = () => {
@@ -633,6 +633,7 @@ export default defineComponent({
     })
 
     return {
+      loading,
       queryParams,
       formFields,
       handleQuery,
@@ -673,9 +674,6 @@ export default defineComponent({
       handleScopeClose,
       handleScopeSubmit,
     }
-  },
-  computed: {
-    ...mapState(useAppStore, ['loading']),
   },
 })
 </script>

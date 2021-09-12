@@ -135,7 +135,6 @@ import {
 } from '@/api/admin/examineAndApprove/leave'
 import { getDict, selectDictLabel } from '@/utils/dictFormat'
 import { useAppStore } from '@/store/modules/app'
-import { mapState } from 'pinia'
 import { TableState } from 'ant-design-vue/es/table/interface'
 import { message as Message } from 'ant-design-vue'
 
@@ -237,6 +236,7 @@ export default defineComponent({
     BaseForm,
   },
   setup() {
+    const loading = computed(() => useAppStore().loading)
     const leaveTypeOptions = ref<IData[]>([])
     const examineAndApproveStatusOptions = ref<IData[]>([])
     const BaseFormRef = ref()
@@ -529,6 +529,7 @@ export default defineComponent({
     })
 
     return {
+      loading,
       queryParams,
       formFields,
       handleQuery,
@@ -560,9 +561,6 @@ export default defineComponent({
       handleUpdate,
       handleSubmit,
     }
-  },
-  computed: {
-    ...mapState(useAppStore, ['loading']),
   },
 })
 </script>

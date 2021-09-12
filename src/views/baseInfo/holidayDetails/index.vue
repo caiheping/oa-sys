@@ -88,6 +88,7 @@ import {
   onMounted,
   toRefs,
   nextTick,
+  computed,
 } from 'vue'
 import { TreeDataItem } from 'ant-design-vue/es/tree/Tree'
 import { getDict, selectDictLabel } from '@/utils/dictFormat'
@@ -107,7 +108,6 @@ import { handleTree } from '@/utils/tools'
 import useDrawer from '@/hooks/useDrawer'
 import { useUserStore } from '@/store/modules/user'
 import { useAppStore } from '@/store/modules/app'
-import { mapState } from 'pinia'
 import { TableState } from 'ant-design-vue/es/table/interface'
 
 // 组件
@@ -179,6 +179,7 @@ export default defineComponent({
   },
   setup() {
     const userStore = useUserStore()
+    const loading = computed(() => useAppStore().loading)
     const BaseFormRef = ref()
     const roleOptions = ref<IRole[]>([])
     const statusOptions = ref<IData[]>([])
@@ -458,6 +459,7 @@ export default defineComponent({
     })
 
     return {
+      loading,
       replaceFields,
       deptSearchRef,
       originalTree,
@@ -504,9 +506,6 @@ export default defineComponent({
       handleResetPwd,
       handleResetClose,
     }
-  },
-  computed: {
-    ...mapState(useAppStore, ['loading']),
   },
 })
 </script>

@@ -45,7 +45,6 @@
   </div>
 </template>
 <script lang="ts">
-import { mapState } from 'pinia'
 import { defineComponent, computed } from 'vue'
 import { useAppStore } from '@/store/modules/app'
 import Sidebar from './components/Sidebar/index.vue'
@@ -59,6 +58,11 @@ export default defineComponent({
   },
   setup() {
     const appStore = useAppStore()
+    const isMobile = computed(() => appStore.isMobile)
+    const sidebarStatus = computed(() => appStore.sidebarStatus)
+    const sideBarConfig = computed(() => appStore.sideBarConfig)
+    const collapsed = computed(() => appStore.collapsed)
+    const headerConfig = computed(() => appStore.headerConfig)
     // 改变遮罩层状态
     const toggleDrawer = () => {
       if (appStore.isMobile) {
@@ -101,16 +105,12 @@ export default defineComponent({
       toggleDrawer,
       toggleCollapsed,
       headerStyle,
+      isMobile,
+      sidebarStatus,
+      collapsed,
+      sideBarConfig,
+      headerConfig,
     }
-  },
-  computed: {
-    ...mapState(useAppStore, [
-      'isMobile',
-      'sidebarStatus',
-      'collapsed',
-      'sideBarConfig',
-      'headerConfig',
-    ]),
   },
 })
 </script>

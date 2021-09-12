@@ -133,7 +133,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, reactive, ref, nextTick } from 'vue'
+import {
+  defineComponent,
+  onMounted,
+  reactive,
+  ref,
+  nextTick,
+  computed,
+} from 'vue'
 import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
 import {
   getDept,
@@ -149,7 +156,6 @@ import Treeselect from 'vue3-treeselect'
 import { formRules } from '@/utils/validate'
 import useDrawer from '@/hooks/useDrawer'
 import { useAppStore } from '@/store/modules/app'
-import { mapState } from 'pinia'
 import 'vue3-treeselect/dist/vue3-treeselect.css'
 import { IDept } from '@/api/admin/system/dept/type'
 import { IData } from '@/api/admin/system/dict/data/type'
@@ -201,6 +207,7 @@ export default defineComponent({
     Treeselect,
   },
   setup() {
+    const loading = computed(() => useAppStore().loading)
     const disableOptions = ref<IData[]>([])
     const userStore = useUserStore()
     const treeRef = ref()
@@ -403,6 +410,7 @@ export default defineComponent({
     })
 
     return {
+      loading,
       deptList,
       confirm,
       cancel,
@@ -425,9 +433,6 @@ export default defineComponent({
       handleTreeSelect,
       disableOptions,
     }
-  },
-  computed: {
-    ...mapState(useAppStore, ['loading']),
   },
 })
 </script>

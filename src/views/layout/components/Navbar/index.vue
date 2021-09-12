@@ -213,9 +213,8 @@
 <script lang="ts">
 import { useAppStore } from '@/store/modules/app'
 import { useUserStore } from '@/store/modules/user'
-import { defineComponent, VNodeChild, ref } from 'vue'
+import { defineComponent, VNodeChild, ref, computed } from 'vue'
 import { message as Message } from 'ant-design-vue'
-import { mapState } from 'pinia'
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons-vue'
 import avatar from '@/assets/images/profile.jpg'
 import settings from '@/settings'
@@ -239,7 +238,12 @@ export default defineComponent({
     const openSetting = ref<boolean>(false)
     const baseImgUrl = imageUrl
     const appStore = useAppStore()
+    const collapsed = computed(() => appStore.collapsed)
+    const headerConfig = computed(() => appStore.headerConfig)
+    const sideBarConfig = computed(() => appStore.sideBarConfig)
     const userStore = useUserStore()
+    const userInfo = computed(() => userStore.userInfo)
+
     const { toggle, isFullscreen } = useFullscreen()
     // 改变菜单栏状态
     const toggleCollapsed = () => {
@@ -294,6 +298,10 @@ export default defineComponent({
     }
 
     return {
+      collapsed,
+      headerConfig,
+      sideBarConfig,
+      userInfo,
       toggleCollapsed,
       avatar,
       baseImgUrl,
@@ -309,10 +317,6 @@ export default defineComponent({
       handleSaveSetting,
       handleResetSetting,
     }
-  },
-  computed: {
-    ...mapState(useUserStore, ['userInfo']),
-    ...mapState(useAppStore, ['collapsed', 'headerConfig', 'sideBarConfig']),
   },
 })
 </script>

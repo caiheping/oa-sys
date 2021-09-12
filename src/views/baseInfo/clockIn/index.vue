@@ -115,7 +115,6 @@ import {
 } from '@/api/admin/baseInfo/clockIn'
 import { getDict, selectDictLabel } from '@/utils/dictFormat'
 import { useAppStore } from '@/store/modules/app'
-import { mapState } from 'pinia'
 import { TableState } from 'ant-design-vue/es/table/interface'
 import { message as Message } from 'ant-design-vue'
 import BaseForm from '@/components/BaseForm/index.vue'
@@ -201,6 +200,7 @@ export default defineComponent({
     BaseForm,
   },
   setup() {
+    const loading = computed(() => useAppStore().loading)
     const clockInOptions = ref<IData[]>([])
     const BaseFormRef = ref()
 
@@ -456,6 +456,7 @@ export default defineComponent({
     })
 
     return {
+      loading,
       queryParams,
       formFields,
       handleQuery,
@@ -483,9 +484,6 @@ export default defineComponent({
       handleClose,
       handleSubmit,
     }
-  },
-  computed: {
-    ...mapState(useAppStore, ['loading']),
   },
 })
 </script>

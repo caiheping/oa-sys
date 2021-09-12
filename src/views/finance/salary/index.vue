@@ -117,7 +117,6 @@ import {
   getSalaryById,
 } from '@/api/admin/finance/salary'
 import { useAppStore } from '@/store/modules/app'
-import { mapState } from 'pinia'
 import { TableState } from 'ant-design-vue/es/table/interface'
 import { message as Message } from 'ant-design-vue'
 import BaseForm from '@/components/BaseForm/index.vue'
@@ -229,6 +228,7 @@ export default defineComponent({
     BaseForm,
   },
   setup() {
+    const loading = computed(() => useAppStore().loading)
     const BaseFormRef = ref()
 
     /**
@@ -489,6 +489,7 @@ export default defineComponent({
     })
 
     return {
+      loading,
       queryParams,
       formFields,
       handleQuery,
@@ -515,9 +516,6 @@ export default defineComponent({
       handleClose,
       handleSubmit,
     }
-  },
-  computed: {
-    ...mapState(useAppStore, ['loading']),
   },
 })
 </script>

@@ -152,7 +152,6 @@ import useDrawer from '@/hooks/useDrawer'
 import { message as Message } from 'ant-design-vue'
 import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
 import { useAppStore } from '@/store/modules/app'
-import { mapState } from 'pinia'
 import { TableState } from 'ant-design-vue/es/table/interface'
 
 import FormSearch from '@/components/FormSearch/index.vue'
@@ -217,6 +216,7 @@ export default defineComponent({
     FormSearch,
   },
   setup() {
+    const loading = computed(() => useAppStore().loading)
     const rules = {
       name: [{ required: true, message: '参数名称不能为空', trigger: 'blur' }],
       keyName: [
@@ -385,6 +385,7 @@ export default defineComponent({
     })
 
     return {
+      loading,
       queryParams,
       formFields,
       handleQuery,
@@ -411,9 +412,6 @@ export default defineComponent({
       handleAdd,
       handleUpdate,
     }
-  },
-  computed: {
-    ...mapState(useAppStore, ['loading']),
   },
 })
 </script>

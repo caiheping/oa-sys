@@ -7,11 +7,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, provide } from 'vue'
+import { defineComponent, provide, computed } from 'vue'
 import AppProvider from '@/components/AppProvider/index.vue'
 import enUS from 'ant-design-vue/es/locale/en_US'
 import zhCN from 'ant-design-vue/es/locale/zh_CN'
-import { mapState } from 'pinia'
 import { useAppStore } from '@/store/modules/app'
 import router from './router'
 import { useRoute } from 'vue-router'
@@ -27,13 +26,13 @@ export default defineComponent({
       })
     }
     provide('reload', reload)
+    const appStore = useAppStore()
+    const locale = computed(() => appStore.locale)
     return {
       enUS,
       zhCN,
+      locale,
     }
-  },
-  computed: {
-    ...mapState(useAppStore, ['locale']),
   },
 })
 </script>

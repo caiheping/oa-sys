@@ -151,11 +151,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, UnwrapRef, reactive, ref, onMounted } from 'vue'
+import {
+  defineComponent,
+  UnwrapRef,
+  reactive,
+  ref,
+  onMounted,
+  computed,
+} from 'vue'
 import { message as Message } from 'ant-design-vue'
 import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
 import { useUserStore } from '@/store/modules/user'
-import { mapState } from 'pinia'
 import VuePictureCropper, { cropper } from 'vue-picture-cropper/dist/esm'
 import { getDict } from '@/utils/dictFormat'
 
@@ -181,6 +187,7 @@ export default defineComponent({
   },
   setup() {
     const userStore = useUserStore()
+    const userInfo = computed(() => userStore.userInfo)
     const sexOptions = ref<IData[]>([])
     const baseImgUrl = imageUrl
     console.log(userStore)
@@ -305,12 +312,13 @@ export default defineComponent({
 
     onMounted(async () => {
       sexOptions.value = await getDict('sys_user_sex')
-      sexOptions.value.forEach(item => {
+      sexOptions.value.forEach((item) => {
         item.label = item.dictLabel
         item.value = item.dictValue
       })
     })
     return {
+      userInfo,
       baseImgUrl,
       defaultAvatar,
       getRoleName,
@@ -327,9 +335,6 @@ export default defineComponent({
       uploadInput,
       handleCancle,
     }
-  },
-  computed: {
-    ...mapState(useUserStore, ['userInfo']),
   },
 })
 </script>
