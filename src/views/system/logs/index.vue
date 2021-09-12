@@ -102,7 +102,6 @@ import {
 import { getLogs, delLogs, delAllLogs } from '@/api/admin/system/logs'
 import { getDict, selectDictLabel } from '@/utils/dictFormat'
 import { useAppStore } from '@/store/modules/app'
-import { mapState } from 'pinia'
 import { TableState } from 'ant-design-vue/es/table/interface'
 import { message as Message } from 'ant-design-vue'
 
@@ -163,6 +162,7 @@ export default defineComponent({
     FormSearch,
   },
   setup() {
+    const { loading } = useAppStore()
     const methodOptions = ref<IData[]>([])
 
     /**
@@ -288,6 +288,7 @@ export default defineComponent({
     })
 
     return {
+      loading,
       queryParams,
       formFields,
       handleQuery,
@@ -311,9 +312,6 @@ export default defineComponent({
       handleClose,
       showDetail,
     }
-  },
-  computed: {
-    ...mapState(useAppStore, ['loading']),
   },
 })
 </script>

@@ -276,7 +276,6 @@ import 'vue3-treeselect/dist/vue3-treeselect.css'
 import { useUserStore } from '@/store/modules/user'
 import { formRules } from '@/utils/validate'
 import { useAppStore } from '@/store/modules/app'
-import { mapState } from 'pinia'
 import { TableState } from 'ant-design-vue/es/table/interface'
 
 // 组件
@@ -372,6 +371,7 @@ export default defineComponent({
   },
   setup() {
     const userStore = useUserStore()
+    const { loading } = useAppStore()
     const roleOptions = ref<IRole[]>([])
     const statusOptions = ref<IData[]>([])
     const positionOptions = ref<IData[]>([])
@@ -711,11 +711,11 @@ export default defineComponent({
       educationOptions.value = await getDict('sys_user_education')
       disableOptions.value = await getDict('sys_normal_disable')
       sexOptions.value = await getDict('sys_user_sex')
-      disableOptions.value.forEach(item => {
+      disableOptions.value.forEach((item) => {
         item.label = item.dictLabel
         item.value = item.dictValue
       })
-      sexOptions.value.forEach(item => {
+      sexOptions.value.forEach((item) => {
         item.label = item.dictLabel
         item.value = item.dictValue
       })
@@ -723,6 +723,7 @@ export default defineComponent({
     })
 
     return {
+      loading,
       replaceFields,
       deptSearchRef,
       originalTree,
@@ -775,9 +776,6 @@ export default defineComponent({
       handleResetClose,
       showModal,
     }
-  },
-  computed: {
-    ...mapState(useAppStore, ['loading']),
   },
 })
 </script>

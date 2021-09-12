@@ -160,7 +160,6 @@ import useDrawer from '@/hooks/useDrawer'
 import { message as Message } from 'ant-design-vue'
 import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
 import { useAppStore } from '@/store/modules/app'
-import { mapState } from 'pinia'
 import { TableState } from 'ant-design-vue/es/table/interface'
 
 import FormSearch from '@/components/FormSearch/index.vue'
@@ -222,6 +221,7 @@ export default defineComponent({
     FormSearch,
   },
   setup() {
+    const { loading } = useAppStore()
     const disableOptions = ref<IData[]>([])
     const statusOptions = ref<IData[]>([])
     const rules = {
@@ -398,7 +398,7 @@ export default defineComponent({
 
     onMounted(async () => {
       disableOptions.value = await getDict('sys_normal_disable')
-      disableOptions.value.forEach(item => {
+      disableOptions.value.forEach((item) => {
         item.label = item.dictLabel
         item.value = item.dictValue
       })
@@ -408,6 +408,7 @@ export default defineComponent({
     })
 
     return {
+      loading,
       queryParams,
       formFields,
       handleQuery,
@@ -434,11 +435,8 @@ export default defineComponent({
       cancel,
       handleAdd,
       handleUpdate,
-      disableOptions
+      disableOptions,
     }
-  },
-  computed: {
-    ...mapState(useAppStore, ['loading']),
   },
 })
 </script>

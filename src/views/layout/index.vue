@@ -17,8 +17,8 @@
       marginLeft: isMobile
         ? '0px'
         : collapsed
-          ? '80px'
-          : sideBarConfig.width + 'px',
+        ? '80px'
+        : sideBarConfig.width + 'px',
     }"
   >
     <div class="header" :style="headerStyle">
@@ -45,7 +45,6 @@
   </div>
 </template>
 <script lang="ts">
-import { mapState } from 'pinia'
 import { defineComponent, computed } from 'vue'
 import { useAppStore } from '@/store/modules/app'
 import Sidebar from './components/Sidebar/index.vue'
@@ -59,6 +58,8 @@ export default defineComponent({
   },
   setup() {
     const appStore = useAppStore()
+    const { isMobile, sidebarStatus, collapsed, sideBarConfig, headerConfig } =
+      appStore
     // 改变遮罩层状态
     const toggleDrawer = () => {
       if (appStore.isMobile) {
@@ -101,16 +102,12 @@ export default defineComponent({
       toggleDrawer,
       toggleCollapsed,
       headerStyle,
+      isMobile,
+      sidebarStatus,
+      collapsed,
+      sideBarConfig,
+      headerConfig,
     }
-  },
-  computed: {
-    ...mapState(useAppStore, [
-      'isMobile',
-      'sidebarStatus',
-      'collapsed',
-      'sideBarConfig',
-      'headerConfig',
-    ]),
   },
 })
 </script>

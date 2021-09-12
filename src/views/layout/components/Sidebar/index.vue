@@ -35,7 +35,6 @@
 import { defineComponent, computed, watchEffect, ref } from 'vue'
 import { useAppStore } from '@/store/modules/app'
 import { usePermissionStore } from '@/store/modules/permission'
-import { mapState } from 'pinia'
 import { useRoute } from 'vue-router'
 import { Scrollbar } from '@/components/Scrollbar'
 import SidebarItem from './SidebarItem.vue'
@@ -47,7 +46,10 @@ export default defineComponent({
     SidebarItem,
   },
   setup() {
+    const permissionStore = usePermissionStore()
+    const { sidebarRouters } = permissionStore
     const appStore = useAppStore()
+    const { isMobile, sideBarConfig, sidebarStatus, collapsed } = appStore
     const route = useRoute()
     const selectedKeys = ref([''])
     const openKeys = ref([''])
@@ -99,6 +101,11 @@ export default defineComponent({
       })
     }
     return {
+      isMobile,
+      sideBarConfig,
+      sidebarStatus,
+      collapsed,
+      sidebarRouters,
       changeMode,
       changeTheme,
       sidebarStyle,
@@ -106,15 +113,6 @@ export default defineComponent({
       selectedKeys,
       openKeys,
     }
-  },
-  computed: {
-    ...mapState(useAppStore, [
-      'isMobile',
-      'sidebarStatus',
-      'sideBarConfig',
-      'collapsed',
-    ]),
-    ...mapState(usePermissionStore, ['sidebarRouters']),
   },
 })
 </script>

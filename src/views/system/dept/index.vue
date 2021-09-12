@@ -149,7 +149,6 @@ import Treeselect from 'vue3-treeselect'
 import { formRules } from '@/utils/validate'
 import useDrawer from '@/hooks/useDrawer'
 import { useAppStore } from '@/store/modules/app'
-import { mapState } from 'pinia'
 import 'vue3-treeselect/dist/vue3-treeselect.css'
 import { IDept } from '@/api/admin/system/dept/type'
 import { IData } from '@/api/admin/system/dict/data/type'
@@ -203,6 +202,7 @@ export default defineComponent({
   setup() {
     const disableOptions = ref<IData[]>([])
     const userStore = useUserStore()
+    const { loading } = useAppStore()
     const treeRef = ref()
     const rules = {
       parentId: [
@@ -395,7 +395,7 @@ export default defineComponent({
     }
     onMounted(async () => {
       disableOptions.value = await getDict('sys_normal_disable')
-      disableOptions.value.forEach(item => {
+      disableOptions.value.forEach((item) => {
         item.label = item.dictLabel
         item.value = item.dictValue
       })
@@ -403,6 +403,7 @@ export default defineComponent({
     })
 
     return {
+      loading,
       deptList,
       confirm,
       cancel,
@@ -423,11 +424,8 @@ export default defineComponent({
       formRef,
       treeRef,
       handleTreeSelect,
-      disableOptions
+      disableOptions,
     }
-  },
-  computed: {
-    ...mapState(useAppStore, ['loading']),
   },
 })
 </script>

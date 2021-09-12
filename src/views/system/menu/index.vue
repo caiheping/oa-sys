@@ -245,7 +245,6 @@ import Treeselect from 'vue3-treeselect'
 import { formRules } from '@/utils/validate'
 import useDrawer from '@/hooks/useDrawer'
 import { useAppStore } from '@/store/modules/app'
-import { mapState } from 'pinia'
 import 'vue3-treeselect/dist/vue3-treeselect.css'
 import { IMenu } from '@/api/admin/system/menu/type'
 import { IData } from '@/api/admin/system/dict/data/type'
@@ -317,6 +316,7 @@ export default defineComponent({
     Treeselect,
   },
   setup() {
+    const { loading } = useAppStore()
     const disableOptions = ref<IData[]>([])
     const showOrHideOptions = ref<IData[]>([])
     const treeRef = ref()
@@ -510,11 +510,11 @@ export default defineComponent({
     onMounted(async () => {
       disableOptions.value = await getDict('sys_normal_disable')
       showOrHideOptions.value = await getDict('sys_show_hide')
-      disableOptions.value.forEach(item => {
+      disableOptions.value.forEach((item) => {
         item.label = item.dictLabel
         item.value = item.dictValue
       })
-      showOrHideOptions.value.forEach(item => {
+      showOrHideOptions.value.forEach((item) => {
         item.label = item.dictLabel
         item.value = item.dictValue
       })
@@ -522,6 +522,7 @@ export default defineComponent({
     })
 
     return {
+      loading,
       menuList,
       confirm,
       cancel,
@@ -545,11 +546,8 @@ export default defineComponent({
       treeRef,
       handleTreeSelect,
       disableOptions,
-      showOrHideOptions
+      showOrHideOptions,
     }
-  },
-  computed: {
-    ...mapState(useAppStore, ['loading']),
   },
 })
 </script>
