@@ -78,8 +78,7 @@ export const usePermissionStore = defineStore({
     async GenerateRoutes() {
       try {
         const res = await getRouters()
-        const accessedRoutes = filterAsyncRouter(res.data.rows).routes
-        const accessedMenus = filterAsyncRouter(res.data.rows).menus
+        const { routes: accessedRoutes, menus: accessedMenus } = filterAsyncRouter(res.data.rows)
         accessedRoutes.push({
           path: "/:catchAll(.*)",
           redirect: "/404",
@@ -89,7 +88,7 @@ export const usePermissionStore = defineStore({
         // console.log(accessedMenus, accessedRoutes);
         this.routes = accessedRoutes
         return accessedRoutes
-      } catch (error) {
+      } catch (error: any) {
         if (error.response.status === 401) {
           removeToken()
         }
