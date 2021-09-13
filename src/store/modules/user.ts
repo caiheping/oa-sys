@@ -70,7 +70,7 @@ export const useUserStore = defineStore({
         }
         this.userInfo = res.data.user
         return res
-      } catch (error) {
+      } catch (error: any) {
         if (error.response.status === 401) {
           removeToken()
         }
