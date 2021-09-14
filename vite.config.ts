@@ -54,8 +54,8 @@ export default defineConfig((): UserConfig => {
       },
       terserOptions: {
         compress: {
-          keep_infinity: true,
-          drop_console: false,
+          keep_infinity: true, // 传递true以防止Infinity被压缩成1/0，这可能会导致 Chrome 上的性能问题。
+          drop_console: true, // 生产环境时移除console
         },
       },
       brotliSize: false,

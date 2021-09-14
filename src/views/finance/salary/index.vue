@@ -357,7 +357,14 @@ export default defineComponent({
      * 推窗操作
      */
     const { open, drawerTitle } = useDrawer()
-    const rules = reactive({})
+    const rules = reactive({
+      yearAndMounth: [
+        {
+          required: true,
+          message: '请选择年月',
+        },
+      ]
+    })
     const formDataObj = reactive([
       {
         name: 'yearAndMounth',

@@ -24,6 +24,6 @@ export default defineComponent({
   background-size: cover;
   box-sizing: border-box;
   justify-content: flex-end;
-  background-image: url("../../assets/images/login-bg.jpg");
+  background-image: url('../../assets/images/login-bg.jpg');
 }
 </style>
