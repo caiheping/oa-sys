@@ -22,7 +22,7 @@ npm install
 
 同时你还要区clone后端项目，怎么运行请跳转到后端项目地址查看。
 
-后端项目地址：
+后端项目地址:
 
 码云：https://gitee.com/caiheping/oa-api
 
