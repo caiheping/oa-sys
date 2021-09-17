@@ -116,21 +116,21 @@ export default defineComponent({
       userName: [
         {
           required: true,
-          message: '请输入用户名',
+          message: t('sys.login.accountPlaceholder'),
           trigger: 'blur',
         },
       ],
       password: [
         {
           required: true,
-          message: '请输入密码',
+          message: t('sys.login.passwordPlaceholder'),
           trigger: 'blur',
         },
       ],
       captcha: [
         {
           required: true,
-          message: '请输入验证码',
+          message: t('sys.login.smsPlaceholder'),
           trigger: 'blur',
         },
       ],
@@ -139,6 +139,7 @@ export default defineComponent({
     // 获取验证码
     const codeHtml: any = ref()
     const getCode = () => {
+      console.log(t('sys.lock.unlock'))
       return getCodeImg().then((res) => {
         codeHtml.value = res
       })

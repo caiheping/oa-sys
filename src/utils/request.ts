@@ -4,7 +4,7 @@ import { message as Message, Modal } from "ant-design-vue"
 import { getToken, removeToken } from "@/utils/auth"
 import { baseUrl } from '@/config'
 import { tansParams } from './tools'
-
+import { i18n } from "@/locales"
 
 type Methods = 'GET' | 'POST' | 'PUT' | 'DELETE'
 
@@ -48,14 +48,14 @@ function errorState(error: any) {
     case 400:
       for (const key in error.response.data.error) {
         console.log(key)
-        message = error.response.data.error[key].message || "参数错误"
+        message = error.response.data.error[key].message || i18n.global.t("sys.api.errMsg400")
         Message.error(message)
       }
       break
     case 401:
       Modal.confirm({
-        title: '系统信息',
-        content: '登录状态已过期，您可以继续留在该页面，或者重新登录',
+        title: i18n.global.t("sys.api.errMsg500"),
+        content: i18n.global.t("sys.api.errTokenExpire"),
         onOk() {
           removeToken()
           window.location.reload()
@@ -65,16 +65,16 @@ function errorState(error: any) {
 
       break
     case 403:
-      message = "拒绝访问"
+      message = i18n.global.t("sys.api.errMsg403")
       Message.error(message)
       break
     case 500:
-      message = error.response.data.message || "服务器异常"
+      message = error.response.data.message || i18n.global.t("sys.api.errMsg500")
       Message.error(message)
 
       break
     default:
-      message = "服务器异常"
+      message = i18n.global.t("sys.api.errMsg500")
       Message.error(message)
   }
 }
