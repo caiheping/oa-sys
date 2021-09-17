@@ -10,21 +10,25 @@
 
     <a-row :gutter="10" class="mb-2">
       <a-col v-has-permi="['baseInfo:clockIn:add']">
-        <a-button color="success" @click="handleAdd"> 新增 </a-button>
+        <a-button color="success" @click="handleAdd">
+          {{ t('common.add') }}
+        </a-button>
       </a-col>
       <a-col v-has-permi="['baseInfo:clockIn:delete']">
         <a-popconfirm
-          title="确定要删除选中数据吗？"
-          ok-text="确定"
-          cancel-text="取消"
+          :title="t('common.confirmDeleteSelect')"
+          :ok-text="t('common.okText')"
+          :cancel-text="t('common.cancelText')"
           @confirm="confirm"
           @cancel="cancel"
         >
-          <a-button :disabled="!hasSelected" color="error"> 删除 </a-button>
+          <a-button :disabled="!hasSelected" color="error">
+            {{ t('common.delete') }}
+          </a-button>
         </a-popconfirm>
       </a-col>
       <a-col>
-        <a-button color="normal">导出</a-button>
+        <a-button color="normal">{{ t('common.export') }}</a-button>
       </a-col>
     </a-row>
 
@@ -55,12 +59,12 @@
             class="mr-3"
             @click="handleUpdate(record)"
           >
-            修改
+            {{ t('common.update') }}
           </a-button>
           <a-popconfirm
-            title="确定要删除该数据吗？"
-            ok-text="确定"
-            cancel-text="取消"
+            :title="t('common.confirmDelete')"
+            :ok-text="t('common.okText')"
+            :cancel-text="t('common.cancelText')"
             @confirm="confirm(record)"
             @cancel="cancel"
           >
@@ -69,7 +73,7 @@
               color="error"
               v-has-permi="['baseInfo:clockIn:delete']"
             >
-              删除
+              {{ t('common.delete') }}
             </a-button>
           </a-popconfirm>
         </span>
@@ -123,60 +127,63 @@ import FormSearch from '@/components/FormSearch/index.vue'
 import useDrawer from '@/hooks/useDrawer'
 import { IClockIn } from '@/api/admin/baseInfo/clockIn/type'
 import { IData } from '@/api/admin/system/dict/data/type'
+import { useI18n } from '@/hooks/useI18n'
+
+const { t } = useI18n()
 
 type Pagination = TableState['pagination']
 
 const columns = [
   {
-    title: '姓名',
+    title: t('routes.clockIn.nickName'),
     key: 'user',
     align: 'center',
     slots: { customRender: 'user' },
   },
   {
-    title: '打卡类型',
+    title: t('routes.clockIn.clockInType'),
     key: 'type',
     align: 'center',
     slots: { customRender: 'type' },
   },
   {
-    title: '上班打卡WiFi',
+    title: t('routes.clockIn.clockInWiFi'),
     dataIndex: 'wifiBefore',
     key: 'wifiBefore',
     align: 'center',
   },
   {
-    title: '上班打卡地址',
+    title: t('routes.clockIn.clockInAddr'),
     dataIndex: 'firstClockInAddr',
     key: 'firstClockInAddr',
     align: 'center',
   },
   {
-    title: '上班打卡时间',
+    title: t('routes.clockIn.clockInTime'),
     dataIndex: 'firstClockInTime',
     key: 'firstClockInTime',
     align: 'center',
   },
   {
-    title: '下班打卡WiFi',
+    title: t('routes.clockIn.clockOutWiFi'),
     dataIndex: 'wifiNext',
     key: 'wifiNext',
     align: 'center',
   },
   {
-    title: '下班打卡地址',
+    title: t('routes.clockIn.clockOutAddr'),
     dataIndex: 'lastClockInAddr',
     key: 'lastClockInAddr',
     align: 'center',
   },
   {
-    title: '下班打卡时间',
+    title: t('routes.clockIn.clockOutTime'),
     dataIndex: 'lastClockInTime',
     key: 'lastClockInTime',
     align: 'center',
   },
   {
-    title: '操作',
+    title: t('routes.clockIn.action'),
     key: 'action',
     align: 'center',
     slots: { customRender: 'action' },
@@ -216,17 +223,17 @@ export default defineComponent({
     const formFields = reactive([
       {
         type: 'input',
-        label: '姓名',
+        label: t('routes.clockIn.nickName'),
         name: 'nickName',
         value: '',
-        placeholder: '请输入姓名',
+        placeholder: t('routes.clockIn.nickNamePlaceholder'),
       },
       {
         type: 'select',
-        label: '类型',
+        label: t('routes.clockIn.clockInType'),
         name: 'type',
         value: undefined,
-        placeholder: '请选择类型',
+        placeholder: t('routes.clockIn.clockInTypePlaceholder'),
         normalizer: {
           value: 'dictValue',
           label: 'dictLabel',
@@ -282,13 +289,13 @@ export default defineComponent({
     // 新增按钮操作
     const handleAdd = () => {
       open.value = true
-      drawerTitle.value = '添加打卡'
+      drawerTitle.value = t('common.add')
     }
     // 更新按钮操作
     const handleUpdate = (row) => {
       getClockInById(row.id).then((res) => {
         open.value = true
-        drawerTitle.value = '修改打卡'
+        drawerTitle.value = t('common.update')
         nextTick(() => {
           Object.keys(formState).forEach((key) => {
             formState[key] = res.data[key]
@@ -314,13 +321,13 @@ export default defineComponent({
           }
         }
         getList(queryParams)
-        Message.success('删除成功')
+        Message.success(t('common.deleteSuccess'))
       })
     }
     // 取消删除
     const cancel = (e: MouseEvent) => {
       console.log(e)
-      Message.success('取消删除')
+      Message.success(t('common.cancelDelete'))
     }
     /**
      * 推窗操作
@@ -330,18 +337,18 @@ export default defineComponent({
       type: [
         {
           required: true,
-          message: '请选择类型',
+          message: t('routes.clockIn.clockInTypePlaceholder'),
         },
       ],
     })
     const formDataObj = reactive([
       {
         name: 'type',
-        label: '类型',
+        label: t('routes.clockIn.clockInType'),
         type: 'select',
         value: undefined,
         span: 24,
-        placeholder: '请选择类型',
+        placeholder: t('routes.clockIn.clockInTypePlaceholder'),
         options: clockInOptions,
         serialize: {
           value: 'dictValue',
@@ -350,27 +357,27 @@ export default defineComponent({
       },
       {
         name: 'wifiBefore',
-        label: '上班打卡WiFi',
+        label: t('routes.clockIn.clockInWiFi'),
         type: 'input',
         value: undefined,
         span: 24,
-        placeholder: '请输入打卡WiFi',
+        placeholder: t('routes.clockIn.clockInWiFiPlaceholder'),
       },
       {
         name: 'firstClockInAddr',
-        label: '上班打卡地址',
+        label: t('routes.clockIn.clockInAddr'),
         type: 'input',
         span: 24,
         value: undefined,
-        placeholder: '请输入上班打卡地址',
+        placeholder: t('routes.clockIn.clockInAddrPlaceholder'),
       },
       {
         name: 'firstClockInTime',
-        label: '上班打卡时间',
+        label: t('routes.clockIn.clockInTime'),
         type: 'time-picker',
         span: 24,
         value: undefined,
-        placeholder: '上班打卡时间',
+        placeholder: t('routes.clockIn.clockInTime'),
         props: {
           valueFormat: 'YYYY-MM-DD HH:mm',
           format: 'HH:mm',
@@ -378,27 +385,27 @@ export default defineComponent({
       },
       {
         name: 'wifiNext',
-        label: '下班打卡WiFi',
+        label: t('routes.clockIn.clockOutWiFi'),
         type: 'input',
         value: undefined,
         span: 24,
-        placeholder: '请输入打卡WiFi',
+        placeholder: t('routes.clockIn.clockOutWiFiPlaceholder'),
       },
       {
         name: 'lastClockInAddr',
-        label: '下班打卡地址',
+        label: t('routes.clockIn.clockOutAddr'),
         type: 'input',
         span: 24,
         value: undefined,
-        placeholder: '请输入下班打卡地址',
+        placeholder: t('routes.clockIn.clockOutAddrPlaceholder'),
       },
       {
         name: 'lastClockInTime',
-        label: '下班打卡时间',
+        label: t('routes.clockIn.clockOutTime'),
         type: 'time-picker',
         span: 24,
         value: undefined,
-        placeholder: '下班打卡时间',
+        placeholder: t('routes.clockIn.clockOutTime'),
         props: {
           valueFormat: 'YYYY-MM-DD HH:mm',
           format: 'HH:mm',
@@ -456,6 +463,7 @@ export default defineComponent({
     })
 
     return {
+      t,
       loading,
       queryParams,
       formFields,

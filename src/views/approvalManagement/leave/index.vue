@@ -10,21 +10,25 @@
 
     <a-row :gutter="10" class="mb-2">
       <a-col v-has-permi="['examineAndApprove:leave:add']">
-        <a-button color="success" @click="handleAdd"> 新增 </a-button>
+        <a-button color="success" @click="handleAdd">
+          {{ t('common.add') }}
+        </a-button>
       </a-col>
       <a-col v-has-permi="['examineAndApprove:leave:delete']">
         <a-popconfirm
-          title="确定要删除选中数据吗？"
-          ok-text="确定"
-          cancel-text="取消"
+          :title="t('common.confirmDeleteSelect')"
+          :ok-text="t('common.okText')"
+          :cancel-text="t('common.cancelText')"
           @confirm="confirm"
           @cancel="cancel"
         >
-          <a-button :disabled="!hasSelected" color="error"> 删除 </a-button>
+          <a-button :disabled="!hasSelected" color="error">
+            {{ t('common.delete') }}
+          </a-button>
         </a-popconfirm>
       </a-col>
       <a-col>
-        <a-button color="normal">导出</a-button>
+        <a-button color="normal">{{ t('common.export') }}</a-button>
       </a-col>
     </a-row>
 
@@ -54,7 +58,9 @@
       <template #action="{ record }">
         <span>
           <a-dropdown :trigger="['click']" @click="handleClickDropdown(record)">
-            <span class="mr-3 text-[#faad14] cursor-pointer"> 审批 </span>
+            <span class="mr-3 text-[#faad14] cursor-pointer">
+              {{ t('routes.leave.approve') }}
+            </span>
             <template #overlay>
               <a-menu @click="handleExamineAndApprove">
                 <a-menu-item
@@ -74,12 +80,12 @@
             @click="handleUpdate(record)"
             v-has-permi="['examineAndApprove:leave:update']"
           >
-            修改
+            {{ t('common.update') }}
           </a-button>
           <a-popconfirm
-            title="确定要删除该数据吗？"
-            ok-text="确定"
-            cancel-text="取消"
+            :title="t('common.confirmDelete')"
+            :ok-text="t('common.okText')"
+            :cancel-text="t('common.cancelText')"
             @confirm="confirm(record)"
             @cancel="cancel"
           >
@@ -88,7 +94,7 @@
               color="error"
               v-has-permi="['examineAndApprove:leave:delete']"
             >
-              删除
+              {{ t('common.delete') }}
             </a-button>
           </a-popconfirm>
         </span>
@@ -144,6 +150,9 @@ import useDrawer from '@/hooks/useDrawer'
 import { ILeave } from '@/api/admin/examineAndApprove/leave/type'
 import { IData } from '@/api/admin/system/dict/data/type'
 import { FormDataItem } from '@/components/BaseForm/type'
+import { useI18n } from '@/hooks/useI18n'
+
+const { t } = useI18n()
 
 type Pagination = TableState['pagination']
 
@@ -167,63 +176,63 @@ interface FormState {
 
 const columns = [
   {
-    title: '姓名',
+    title: t('routes.leave.nickName'),
     key: 'user',
     align: 'center',
     slots: { customRender: 'user' },
   },
   {
-    title: '请假类型',
+    title: t('routes.leave.leaveType'),
     dataIndex: 'type',
     key: 'type',
     align: 'center',
     slots: { customRender: 'type' },
   },
   {
-    title: '请假时长（小时）',
+    title: t('routes.leave.duration'),
     dataIndex: 'leaveDuration',
     key: 'leaveDuration',
     align: 'center',
   },
   {
-    title: '请假原因',
+    title: t('routes.leave.leaveReason'),
     dataIndex: 'leaveReason',
     key: 'leaveReason',
     align: 'center',
   },
   {
-    title: '开始时间',
+    title: t('routes.leave.startTime'),
     dataIndex: 'startTime',
     key: 'startTime',
     align: 'center',
   },
   {
-    title: '结束时间',
+    title: t('routes.leave.endTime'),
     dataIndex: 'endTime',
     key: 'endTime',
     align: 'center',
   },
   {
-    title: '创建时间',
+    title: t('routes.leave.createdAt'),
     dataIndex: 'createdAt',
     key: 'createdAt',
     align: 'center',
   },
   {
-    title: '审批状态',
+    title: t('routes.leave.status'),
     dataIndex: 'status',
     key: 'status',
     slots: { customRender: 'status' },
     align: 'center',
   },
   {
-    title: '审批备注',
+    title: t('routes.leave.remark'),
     dataIndex: 'remark',
     key: 'remark',
     align: 'center',
   },
   {
-    title: '操作',
+    title: t('routes.leave.action'),
     key: 'action',
     align: 'center',
     slots: { customRender: 'action' },
@@ -254,17 +263,17 @@ export default defineComponent({
     const formFields = reactive([
       {
         type: 'input',
-        label: '姓名',
+        label: t('routes.leave.nickName'),
         name: 'nickName',
         value: '',
-        placeholder: '请输入姓名',
+        placeholder: t('routes.leave.nickNamePlaceholder'),
       },
       {
         type: 'select',
-        label: '审批状态',
+        label: t('routes.leave.status'),
         name: 'status',
         value: undefined,
-        placeholder: '请选择审批状态',
+        placeholder: t('routes.leave.statusPlaceholder'),
         normalizer: {
           value: 'dictValue',
           label: 'dictLabel',
@@ -273,10 +282,10 @@ export default defineComponent({
       },
       {
         type: 'select',
-        label: '请假类型',
+        label: t('routes.leave.leaveType'),
         name: 'type',
         value: undefined,
-        placeholder: '请选择请假类型',
+        placeholder: t('routes.leave.leaveTypePlaceholder'),
         normalizer: {
           value: 'dictValue',
           label: 'dictLabel',
@@ -357,13 +366,13 @@ export default defineComponent({
     // 新增按钮操作
     const handleAdd = () => {
       open.value = true
-      drawerTitle.value = '添加'
+      drawerTitle.value = t('common.add')
     }
     // 更新按钮操作
     const handleUpdate = (row) => {
       getLeaveById(row.id).then((res) => {
         open.value = true
-        drawerTitle.value = '修改'
+        drawerTitle.value = t('common.update')
         nextTick(() => {
           Object.keys(formState).forEach((key) => {
             formState[key] = res.data[key]
@@ -399,13 +408,13 @@ export default defineComponent({
           }
         }
         getList(queryParams)
-        Message.success('删除成功')
+        Message.success(t('common.deleteSuccess'))
       })
     }
     // 取消删除
     const cancel = (e: MouseEvent) => {
       console.log(e)
-      Message.success('取消删除')
+      Message.success(t('common.cancelDelete'))
     }
     /**
      * 推窗操作
@@ -429,26 +438,26 @@ export default defineComponent({
       time: [
         {
           required: true,
-          message: '请选择出差时间',
+          message: t('routes.leave.startTimePlaceholder'),
         },
       ],
       type: [
         {
           required: true,
-          message: '请选择出差类型',
+          message: t('routes.leave.endTimePlaceholder'),
         },
       ],
     })
     const formDataObj = reactive<FormDataItem[]>([
       {
         name: 'time',
-        label: '选择时间',
+        label: t('routes.leave.selectTime'),
         type: 'range-picker',
         value: undefined,
         span: 24,
         props: {
           format: 'YYYY-MM-DD HH:mm',
-          placeholder: ['开始时间', '结束时间'],
+          placeholder: [t('routes.leave.startTime'), t('routes.leave.endTime')],
           valueFormat: 'YYYY-MM-DD HH:mm',
         },
         fn: {
@@ -458,11 +467,11 @@ export default defineComponent({
       },
       {
         name: 'type',
-        label: '请假类型',
+        label: t('routes.leave.leaveType'),
         type: 'select',
         value: undefined,
         span: 24,
-        placeholder: '请选择请假类型',
+        placeholder: t('routes.leave.leaveTypePlaceholder'),
         options: leaveTypeOptions,
         serialize: {
           value: 'dictValue',
@@ -471,11 +480,11 @@ export default defineComponent({
       },
       {
         name: 'leaveReason',
-        label: '请假原因',
+        label: t('routes.leave.leaveReason'),
         type: 'textarea',
         value: undefined,
         span: 24,
-        placeholder: '请输入请假原因',
+        placeholder: t('routes.leave.leaveReasonPlaceholder'),
       },
     ])
     // 表单提交
@@ -529,6 +538,7 @@ export default defineComponent({
     })
 
     return {
+      t,
       loading,
       queryParams,
       formFields,

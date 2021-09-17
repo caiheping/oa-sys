@@ -10,21 +10,25 @@
 
     <a-row :gutter="10" class="mb-2">
       <a-col>
-        <a-button color="success" @click="handleAdd"> 新增 </a-button>
+        <a-button color="success" @click="handleAdd">
+          {{ t('common.add') }}
+        </a-button>
       </a-col>
       <a-col v-has-permi="['finance:salary:add']">
         <a-popconfirm
-          title="确定要删除选中数据吗？"
-          ok-text="确定"
-          cancel-text="取消"
+          :title="t('common.confirmDeleteSelect')"
+          :ok-text="t('common.okText')"
+          :cancel-text="t('common.cancelText')"
           @confirm="confirm"
           @cancel="cancel"
         >
-          <a-button :disabled="!hasSelected" color="error"> 删除 </a-button>
+          <a-button :disabled="!hasSelected" color="error">
+            {{ t('common.delete') }}
+          </a-button>
         </a-popconfirm>
       </a-col>
       <a-col>
-        <a-button color="normal">导出</a-button>
+        <a-button color="normal">{{ t('common.export') }}</a-button>
       </a-col>
     </a-row>
 
@@ -58,12 +62,12 @@
             class="mr-3"
             @click="handleUpdate(record)"
           >
-            修改
+            {{ t('common.update') }}
           </a-button>
           <a-popconfirm
-            title="确定要删除该数据吗？"
-            ok-text="确定"
-            cancel-text="取消"
+            :title="t('common.confirmDelete')"
+            :ok-text="t('common.okText')"
+            :cancel-text="t('common.cancelText')"
             @confirm="confirm(record)"
             @cancel="cancel"
           >
@@ -72,7 +76,7 @@
               color="error"
               v-has-permi="['finance:salary:delete']"
             >
-              删除
+              {{ t('common.delete') }}
             </a-button>
           </a-popconfirm>
         </span>
@@ -125,84 +129,87 @@ import moment from 'moment'
 import FormSearch from '@/components/FormSearch/index.vue'
 import useDrawer from '@/hooks/useDrawer'
 import { ISalary } from '@/api/admin/finance/salary/type'
+import { useI18n } from '@/hooks/useI18n'
+
+const { t } = useI18n()
 
 type Pagination = TableState['pagination']
 
 const columns = [
   {
-    title: '年月',
+    title: t('routes.salary.yearAndMounth'),
     key: 'yearAndMounth',
     align: 'center',
     slots: { customRender: 'yearAndMounth' },
   },
   {
-    title: '姓名',
+    title: t('routes.salary.nickName'),
     key: 'user',
     align: 'center',
     slots: { customRender: 'user' },
   },
   {
-    title: '目前薪资',
+    title: t('routes.salary.currentSalary'),
     key: 'currentSalary',
     align: 'center',
     slots: { customRender: 'currentSalary' },
   },
   {
-    title: '当月应出勤时长',
+    title: t('routes.salary.expectedAttendanceHours'),
     dataIndex: 'expectedAttendanceHours',
     key: 'expectedAttendanceHours',
     align: 'center',
   },
   {
-    title: '出勤时长',
+    title: t('routes.salary.attendanceHours'),
     dataIndex: 'attendanceHours',
     key: 'attendanceHours',
     align: 'center',
   },
   {
-    title: '带薪假期（小时）',
+    title: t('routes.salary.paidLeave'),
     dataIndex: 'paidLeave',
     key: 'paidLeave',
     align: 'center',
   },
   {
-    title: '无薪假期（小时）',
+    title: t('routes.salary.unpaidLeave'),
     dataIndex: 'unpaidLeave',
     key: 'unpaidLeave',
     align: 'center',
   },
   {
-    title: '迟到早退（次数）',
+    title: t('routes.salary.beLateAndLeaveEarly'),
     dataIndex: 'beLateAndLeaveEarly',
     key: 'beLateAndLeaveEarly',
     align: 'center',
   },
   {
-    title: '补贴',
+    title: t('routes.salary.subsidy'),
     dataIndex: 'subsidy',
     key: 'subsidy',
     align: 'center',
   },
   {
-    title: '社保/公积金',
+    title: t('routes.salary.socialSecurityAndProvidentFund'),
     dataIndex: 'socialSecurityAndProvidentFund',
     key: 'socialSecurityAndProvidentFund',
     align: 'center',
   },
   {
-    title: '其他',
+    title: t('routes.salary.other'),
     dataIndex: 'other',
     key: 'other',
     align: 'center',
   },
   {
-    title: '总计（税前工资）',
+    title: t('routes.salary.total'),
     dataIndex: 'total',
     key: 'total',
     align: 'center',
   },
   {
-    title: '操作',
+    title: t('routes.salary.action'),
     key: 'action',
     align: 'center',
     slots: { customRender: 'action' },
@@ -243,17 +250,17 @@ export default defineComponent({
     const formFields = reactive([
       {
         type: 'input',
-        label: '姓名',
+        label: t('routes.salary.nickName'),
         name: 'nickName',
         value: '',
-        placeholder: '请输入姓名',
+        placeholder: t('routes.salary.nickNamePlaceholder'),
       },
       {
         type: 'month-picker',
-        label: '年月',
+        label: t('routes.salary.yearAndMounth'),
         name: 'yearAndMounth',
         value: '',
-        placeholder: '请选择年月',
+        placeholder: t('routes.salary.yearAndMounthPlaceholder'),
       },
     ])
     const handleQuery = (query: {
@@ -313,13 +320,13 @@ export default defineComponent({
     // 新增按钮操作
     const handleAdd = () => {
       open.value = true
-      drawerTitle.value = '添加打卡'
+      drawerTitle.value = t('common.add')
     }
     // 更新按钮操作
     const handleUpdate = (row) => {
       getSalaryById(row.id).then((res) => {
         open.value = true
-        drawerTitle.value = '修改打卡'
+        drawerTitle.value = t('common.update')
         nextTick(() => {
           Object.keys(formState).forEach((key) => {
             formState[key] = res.data[key]
@@ -345,13 +352,13 @@ export default defineComponent({
           }
         }
         getList(queryParams)
-        Message.success('删除成功')
+        Message.success(t('common.deleteSuccess'))
       })
     }
     // 取消删除
     const cancel = (e: MouseEvent) => {
       console.log(e)
-      Message.success('取消删除')
+      Message.success(t('common.cancelDelete'))
     }
     /**
      * 推窗操作
@@ -361,88 +368,99 @@ export default defineComponent({
       yearAndMounth: [
         {
           required: true,
-          message: '请选择年月',
+          message: t('routes.salary.yearAndMounthPlaceholder'),
         },
-      ]
+      ],
     })
     const formDataObj = reactive([
       {
         name: 'yearAndMounth',
-        label: '年月',
+        label: t('routes.salary.yearAndMounth'),
         type: 'month-picker',
         value: undefined,
         span: 24,
-        placeholder: '请选择年月',
+        labelCol: 8,
+        placeholder: t('routes.salary.yearAndMounthPlaceholder'),
       },
       {
         name: 'expectedAttendanceHours',
-        label: '应出勤时长',
+        label: t('routes.salary.expectedAttendanceHours'),
         type: 'input-number',
         span: 24,
+        labelCol: 8,
         value: undefined,
-        placeholder: '请输入应出勤时长',
+        placeholder: t('routes.salary.expectedAttendanceHoursPlaceholder'),
       },
       {
         name: 'attendanceHours',
-        label: '出勤时长',
+        label: t('routes.salary.attendanceHours'),
         type: 'input-number',
         span: 24,
+        labelCol: 8,
         value: undefined,
-        placeholder: '请输入出勤时长',
+        placeholder: t('routes.salary.attendanceHoursPlaceholder'),
       },
       {
         name: 'paidLeave',
-        label: '带薪假期',
+        label: t('routes.salary.paidLeave'),
         type: 'input-number',
         span: 24,
+        labelCol: 8,
         value: undefined,
-        placeholder: '请输入带薪假期',
+        placeholder: t('routes.salary.paidLeavePlaceholder'),
       },
       {
         name: 'unpaidLeave',
-        label: '无薪假期',
+        label: t('routes.salary.unpaidLeave'),
         type: 'input-number',
         span: 24,
+        labelCol: 8,
         value: undefined,
-        placeholder: '请输入无薪假期',
+        placeholder: t('routes.salary.unpaidLeavePlaceholder'),
       },
       {
         name: 'beLateAndLeaveEarly',
-        label: '迟到早退',
+        label: t('routes.salary.beLateAndLeaveEarly'),
         type: 'input-number',
         span: 24,
+        labelCol: 8,
         value: undefined,
-        placeholder: '请输入迟到早退次数',
+        placeholder: t('routes.salary.beLateAndLeaveEarlyPlaceholder'),
       },
       {
         name: 'subsidy',
-        label: '补贴',
+        label: t('routes.salary.subsidy'),
         type: 'input-number',
         span: 24,
+        labelCol: 8,
         value: undefined,
-        placeholder: '请输入补贴',
+        placeholder: t('routes.salary.subsidyPlaceholder'),
         props: {
           precision: 2,
         },
       },
       {
         name: 'socialSecurityAndProvidentFund',
-        label: '公积金/社保',
+        label: t('routes.salary.socialSecurityAndProvidentFund'),
         type: 'input-number',
         span: 24,
+        labelCol: 8,
         value: undefined,
-        placeholder: '请输入公积金/社保',
+        placeholder: t(
+          'routes.salary.socialSecurityAndProvidentFundPlaceholder'
+        ),
         props: {
           precision: 2,
         },
       },
       {
         name: 'other',
-        label: '其他',
+        label: t('routes.salary.other'),
         type: 'input-number',
         span: 24,
+        labelCol: 8,
         value: undefined,
-        placeholder: '请输入其他',
+        placeholder: t('routes.salary.otherPlaceholder'),
         props: {
           precision: 2,
         },
@@ -496,6 +514,7 @@ export default defineComponent({
     })
 
     return {
+      t,
       loading,
       queryParams,
       formFields,

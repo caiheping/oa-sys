@@ -10,20 +10,26 @@
 
     <a-row :gutter="10" class="mb-2">
       <a-col>
-        <a-button color="normal" @click="handleExportFile">导出</a-button>
+        <a-button color="normal" @click="handleExportFile">{{
+          t('common.export')
+        }}</a-button>
       </a-col>
       <a-col v-has-permi="['system:logs:deleteAllLogs']">
-        <a-button color="warning" @click="clearAll">清空</a-button>
+        <a-button color="warning" @click="clearAll">{{
+          t('common.clearAll')
+        }}</a-button>
       </a-col>
       <a-col v-has-permi="['system:logs:delete']">
         <a-popconfirm
-          title="确定要删除选中数据吗？"
-          ok-text="确定"
-          cancel-text="取消"
+          :title="t('common.confirmDelete')"
+          :ok-text="t('common.okText')"
+          :cancel-text="t('common.cancelText')"
           @confirm="confirm"
           @cancel="cancel"
         >
-          <a-button :disabled="!hasSelected" color="error"> 删除 </a-button>
+          <a-button :disabled="!hasSelected" color="error">
+            {{ t('common.delete') }}
+          </a-button>
         </a-popconfirm>
       </a-col>
     </a-row>
@@ -48,12 +54,12 @@
             class="mr-3"
             @click="showDetail(record)"
           >
-            详细
+            {{ t('common.detail') }}
           </a-button>
           <a-popconfirm
-            title="确定要删除该数据吗？"
-            ok-text="确定"
-            cancel-text="取消"
+            :title="t('common.confirmDelete')"
+            :ok-text="t('common.okText')"
+            :cancel-text="t('common.cancelText')"
             @confirm="confirm(record)"
             @cancel="cancel"
           >
@@ -62,7 +68,7 @@
               color="error"
               v-has-permi="['system:logs:delete']"
             >
-              删除
+              {{ t('common.delete') }}
             </a-button>
           </a-popconfirm>
         </span>
@@ -79,13 +85,21 @@
       @close="handleClose"
     >
       <div v-if="detailObj">
-        <p class="mb-2">操作人员: {{ detailObj.createdBy }}</p>
-        <p class="mb-2">接口地址: {{ detailObj.url }}</p>
-        <p class="mb-2">ip地址: {{ detailObj.ip }}</p>
-        <p class="mb-2">请求方式: {{ detailObj.method }}</p>
-        <p class="mb-2">http状态码: {{ detailObj.status }}</p>
-        <p class="mb-2">请求参数: {{ detailObj.data }}</p>
-        <p class="mb-2">创建时间: {{ detailObj.createdAt }}</p>
+        <p class="mb-2">
+          {{ t('routes.logs.createdBy') }}: {{ detailObj.createdBy }}
+        </p>
+        <p class="mb-2">{{ t('routes.logs.url') }}: {{ detailObj.url }}</p>
+        <p class="mb-2">{{ t('routes.logs.ip') }}: {{ detailObj.ip }}</p>
+        <p class="mb-2">
+          {{ t('routes.logs.method') }}: {{ detailObj.method }}
+        </p>
+        <p class="mb-2">
+          {{ t('routes.logs.status') }}: {{ detailObj.status }}
+        </p>
+        <p class="mb-2">{{ t('routes.logs.data') }}: {{ detailObj.data }}</p>
+        <p class="mb-2">
+          {{ t('routes.logs.createdAt') }}: {{ detailObj.createdAt }}
+        </p>
       </div>
     </a-drawer>
   </div>
@@ -110,48 +124,61 @@ import useDrawer from '@/hooks/useDrawer'
 import { ILog } from '@/api/admin/system/logs/type'
 import { IData } from '@/api/admin/system/dict/data/type'
 import { downLoad } from '@/utils/request'
+import { useI18n } from '@/hooks/useI18n'
+
+const { t } = useI18n()
 
 type Pagination = TableState['pagination']
 
+interface DetailObj {
+  createdBy: string
+  url: string
+  ip: string
+  method: string
+  status: string
+  data: string
+  createdAt: string
+}
+
 const columns = [
   {
-    title: '操作人员',
+    title: t('routes.logs.createdBy'),
     dataIndex: 'createdBy',
     key: 'createdBy',
     align: 'center',
   },
   {
-    title: '接口地址',
+    title: t('routes.logs.url'),
     dataIndex: 'url',
     key: 'url',
     align: 'center',
   },
   {
-    title: '请求方式',
+    title: t('routes.logs.method'),
     dataIndex: 'method',
     key: 'method',
     align: 'center',
   },
   {
-    title: 'ip地址',
+    title: t('routes.logs.ip'),
     dataIndex: 'ip',
     key: 'ip',
     align: 'center',
   },
   {
-    title: 'http状态码',
+    title: t('routes.logs.status'),
     dataIndex: 'status',
     key: 'status',
     align: 'center',
   },
   {
-    title: '创建时间',
+    title: t('routes.logs.createdAt'),
     dataIndex: 'createdAt',
     key: 'createdAt',
     align: 'center',
   },
   {
-    title: '操作',
+    title: t('routes.logs.action'),
     key: 'action',
     align: 'center',
     slots: { customRender: 'action' },
@@ -179,17 +206,17 @@ export default defineComponent({
     const formFields = reactive([
       {
         type: 'input',
-        label: '操作人员',
+        label: t('routes.logs.createdBy'),
         name: 'createdBy',
         value: '',
-        placeholder: '请输入操作人员',
+        placeholder: t('routes.logs.createdByPlaceholder'),
       },
       {
         type: 'select',
-        label: '请求方式',
+        label: t('routes.logs.method'),
         name: 'method',
         value: undefined,
-        placeholder: '请选择请求方式',
+        placeholder: t('routes.logs.methodPlaceholder'),
         normalizer: {
           value: 'dictValue',
           label: 'dictLabel',
@@ -244,7 +271,7 @@ export default defineComponent({
     }
 
     const handleExportFile = () => {
-      downLoad('/admin/system/logs/export', {}, '系统日志.xlsx')
+      downLoad('/admin/system/logs/export', {}, `${t('routes.logs.logs')}.xlsx`)
     }
 
     // 确认删除
@@ -264,30 +291,30 @@ export default defineComponent({
           }
         }
         getList(queryParams)
-        Message.success('删除成功')
+        Message.success(t('common.deleteSuccess'))
       })
     }
     // 取消删除
     const cancel = (e: MouseEvent) => {
       console.log(e)
-      Message.success('取消删除')
+      Message.success(t('common.cancelDelete'))
     }
     // 清空数据
     const clearAll = () => {
       delAllLogs().then(() => {
         getList(queryParams)
-        Message.success('清除成功')
+        Message.success(t('routes.logs.clearAllSuccess'))
       })
     }
     /**
      * 推窗操作
      */
     const { open, drawerTitle } = useDrawer()
-    const detailObj = ref(null)
+    const detailObj = ref<DetailObj>()
     // 显示详情
     const showDetail = (record) => {
       open.value = true
-      drawerTitle.value = '详细信息'
+      drawerTitle.value = t('common.detail')
       detailObj.value = record
       console.log(record)
     }
@@ -306,6 +333,7 @@ export default defineComponent({
     })
 
     return {
+      t,
       loading,
       queryParams,
       formFields,

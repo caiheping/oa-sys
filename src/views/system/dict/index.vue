@@ -9,17 +9,21 @@
     </div>
     <a-row :gutter="10" class="mb-2">
       <a-col v-has-permi="['system:dictType:add']">
-        <a-button color="success" @click="handleAdd">新增</a-button>
+        <a-button color="success" @click="handleAdd">{{
+          t('common.add')
+        }}</a-button>
       </a-col>
       <a-col v-has-permi="['system:dictType:delete']">
         <a-popconfirm
-          title="确定要删除选中数据吗？"
-          ok-text="确定"
-          cancel-text="取消"
+          :title="t('common.confirmDelete')"
+          :ok-text="t('common.okText')"
+          :cancel-text="t('common.cancelText')"
           @confirm="confirm"
           @cancel="cancel"
         >
-          <a-button :disabled="!hasSelected" color="error"> 删除 </a-button>
+          <a-button :disabled="!hasSelected" color="error">
+            {{ t('common.delete') }}
+          </a-button>
         </a-popconfirm>
       </a-col>
     </a-row>
@@ -53,12 +57,12 @@
             @click="handleUpdate(record)"
             v-has-permi="['system:dictType:update']"
           >
-            修改
+            {{ t('common.update') }}
           </a-button>
           <a-popconfirm
-            title="确定要删除该数据吗？"
-            ok-text="确定"
-            cancel-text="取消"
+            :title="t('common.confirmDelete')"
+            :ok-text="t('common.okText')"
+            :cancel-text="t('common.cancelText')"
             @confirm="confirm(record)"
             @cancel="cancel"
           >
@@ -67,7 +71,7 @@
               color="error"
               v-has-permi="['system:dictType:delete']"
             >
-              删除
+              {{ t('common.delete') }}
             </a-button>
           </a-popconfirm>
         </span>
@@ -93,23 +97,23 @@
       >
         <a-row>
           <a-col :span="12">
-            <a-form-item label="字典名称" name="dictName">
+            <a-form-item :label="t('routes.dict.dictName')" name="dictName">
               <a-input
                 v-model:value="formState.dictName"
-                placeholder="请输入字典名称"
+                :placeholder="t('routes.dict.dictNamePlaceholder')"
               />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="字典类型" name="dictType">
+            <a-form-item :label="t('routes.dict.dictType')" name="dictType">
               <a-input
                 v-model:value="formState.dictType"
-                placeholder="请输入字典类型"
+                :placeholder="t('routes.dict.dictTypePlaceholder')"
               />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="状态" name="status">
+            <a-form-item :label="t('routes.dict.status')" name="status">
               <a-radio-group
                 v-model:value="formState.status"
                 :options="disableOptions"
@@ -117,20 +121,22 @@
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="备注" name="remark">
+            <a-form-item :label="t('routes.dict.remark')" name="remark">
               <a-textarea
                 :rows="3"
                 v-model:value="formState.remark"
-                placeholder="请输入备注"
+                :placeholder="t('routes.dict.remarkPlaceholder')"
               />
             </a-form-item>
           </a-col>
           <a-col :span="24">
             <a-form-item>
               <a-button type="primary" class="mr-3" @click="handleSubmit">
-                确认
+                {{ t('common.okText') }}
               </a-button>
-              <a-button @click="handleClose">取消</a-button>
+              <a-button @click="handleClose">
+                {{ t('common.cancelText') }}
+              </a-button>
             </a-form-item>
           </a-col>
         </a-row>
@@ -165,6 +171,9 @@ import { TableState } from 'ant-design-vue/es/table/interface'
 import FormSearch from '@/components/FormSearch/index.vue'
 import { IType } from '@/api/admin/system/dict/type/type'
 import { IData } from '@/api/admin/system/dict/data/type'
+import { useI18n } from '@/hooks/useI18n'
+
+const { t } = useI18n()
 
 interface FormState {
   id: undefined | number
@@ -177,39 +186,39 @@ type Pagination = TableState['pagination']
 
 const columns = [
   {
-    title: '字典名称',
+    title: t('routes.dict.dictName'),
     dataIndex: 'dictName',
     key: 'dictName',
     align: 'center',
   },
   {
-    title: '字典类型',
+    title: t('routes.dict.dictType'),
     dataIndex: 'dictType',
     key: 'dictType',
     align: 'center',
     slots: { customRender: 'dictType' },
   },
   {
-    title: '状态',
+    title: t('routes.dict.status'),
     dataIndex: 'status',
     key: 'status',
     align: 'center',
     slots: { customRender: 'status' },
   },
   {
-    title: '备注',
+    title: t('routes.dict.remark'),
     dataIndex: 'remark',
     key: 'remark',
     align: 'center',
   },
   {
-    title: '创建时间',
+    title: t('routes.dict.createdAt'),
     dataIndex: 'createdAt',
     key: 'createdAt',
     align: 'center',
   },
   {
-    title: '操作',
+    title: t('routes.dict.action'),
     key: 'action',
     align: 'center',
     slots: { customRender: 'action' },
@@ -226,34 +235,48 @@ export default defineComponent({
     const statusOptions = ref<IData[]>([])
     const rules = {
       dictName: [
-        { required: true, message: '字典名称不能为空', trigger: 'blur' },
+        {
+          required: true,
+          message: t('routes.dict.dictNameCannotBeRmpty'),
+          trigger: 'blur',
+        },
       ],
       dictType: [
-        { required: true, message: '字典类型不能为空', trigger: 'blur' },
+        {
+          required: true,
+          message: t('routes.dict.dictTypeCannotBeRmpty'),
+          trigger: 'blur',
+        },
       ],
-      status: [{ required: true, message: '状态不能为空', trigger: 'change' }],
+      status: [
+        {
+          required: true,
+          message: t('routes.dict.statusCannotBeRmpty'),
+          trigger: 'change',
+        },
+      ],
     }
     const formFields = reactive([
       {
         type: 'input',
-        label: '字典名称',
+        label: t('routes.dict.dictName'),
         name: 'dictName',
         value: '',
         placeholder: '请输入字典名称',
       },
       {
         type: 'input',
-        label: '字典类型',
+        label: t('routes.dict.dictType'),
         name: 'dictType',
         value: '',
         placeholder: '请输入字典类型',
       },
       {
         type: 'select',
-        label: '状态',
+        label: t('routes.dict.status'),
         name: 'status',
         value: undefined,
-        placeholder: '请选择角色状态',
+        placeholder: t('routes.dict.statusPlaceholder'),
         normalizer: {
           value: 'dictValue',
           label: 'dictLabel',
@@ -381,25 +404,25 @@ export default defineComponent({
           }
         }
         getList(queryParams)
-        Message.success('删除成功')
+        Message.success(t('common.deleteSuccess'))
       })
     }
     // 取消删除
     const cancel = (e: MouseEvent) => {
       console.log(e)
-      Message.success('取消删除')
+      Message.success(t('common.cancelDelete'))
     }
 
     // 新增按钮操作
     const handleAdd = () => {
       open.value = true
-      drawerTitle.value = '添加字典'
+      drawerTitle.value = t('common.add')
     }
     // 更新按钮操作
     const handleUpdate = (row) => {
       getType(row.id).then((res) => {
         open.value = true
-        drawerTitle.value = '修改字典'
+        drawerTitle.value = t('common.update')
         nextTick(() => {
           Object.keys(formState).forEach((key) => {
             formState[key] = res.data[key]
@@ -420,6 +443,7 @@ export default defineComponent({
     })
 
     return {
+      t,
       loading,
       queryParams,
       formFields,

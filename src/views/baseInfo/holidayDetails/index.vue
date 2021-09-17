@@ -20,7 +20,7 @@
         </div>
         <a-row :gutter="10" class="mb-2">
           <a-col>
-            <a-button color="normal">导出</a-button>
+            <a-button color="normal">{{ t('common.export') }}</a-button>
           </a-col>
         </a-row>
 
@@ -52,7 +52,7 @@
                 @click="handleUpdate(record)"
                 v-has-permi="['system:user:update']"
               >
-                修改
+                {{ t('common.update') }}
               </a-button>
             </span>
           </template>
@@ -86,7 +86,6 @@ import {
   reactive,
   ref,
   onMounted,
-  toRefs,
   nextTick,
   computed,
 } from 'vue'
@@ -94,15 +93,7 @@ import { TreeDataItem } from 'ant-design-vue/es/tree/Tree'
 import { getDict, selectDictLabel } from '@/utils/dictFormat'
 import { message as Message } from 'ant-design-vue'
 import { getDept } from '@/api/admin/system/dept'
-import {
-  listUser,
-  getUser,
-  addUser,
-  updateUser,
-  // exportUser,
-  resetUserPwd,
-  // importTemplate,
-} from '@/api/admin/system/user'
+import { listUser, getUser, addUser, updateUser } from '@/api/admin/system/user'
 import { getRole } from '@/api/admin/system/role'
 import { handleTree } from '@/utils/tools'
 import useDrawer from '@/hooks/useDrawer'
@@ -118,6 +109,9 @@ import { IUser } from '@/api/admin/system/user/type'
 import { IRole } from '@/api/admin/system/role/type'
 import { IData } from '@/api/admin/system/dict/data/type'
 import { IDept } from '@/api/admin/system/dept/type'
+import { useI18n } from '@/hooks/useI18n'
+
+const { t } = useI18n()
 
 interface FormState {
   id: undefined | number
@@ -130,13 +124,13 @@ type Pagination = TableState['pagination']
 
 const columns = [
   {
-    title: '昵称',
+    title: t('routes.holidayDetails.nickName'),
     dataIndex: 'nickName',
     key: 'nickName',
     align: 'center',
   },
   {
-    title: '部门',
+    title: t('routes.holidayDetails.department'),
     key: 'department',
     align: 'center',
     slots: {
@@ -144,7 +138,7 @@ const columns = [
     },
   },
   {
-    title: '岗位',
+    title: t('routes.holidayDetails.position'),
     key: 'position',
     align: 'center',
     slots: {
@@ -152,19 +146,19 @@ const columns = [
     },
   },
   {
-    title: '年假（天）',
+    title: t('routes.holidayDetails.annualLeave'),
     key: 'annualLeave',
     dataIndex: 'annualLeave',
     align: 'center',
   },
   {
-    title: '调休假（天）',
+    title: t('routes.holidayDetails.compensatoryLeave'),
     dataIndex: 'compensatoryLeave',
     key: 'compensatoryLeave',
     align: 'center',
   },
   {
-    title: '操作',
+    title: t('routes.holidayDetails.action'),
     key: 'action',
     align: 'center',
     slots: { customRender: 'action' },
@@ -214,10 +208,10 @@ export default defineComponent({
     const formFields = reactive([
       {
         type: 'input',
-        label: '昵称',
+        label: t('routes.holidayDetails.nickName'),
         name: 'nickName',
         value: undefined,
-        placeholder: '请输入昵称',
+        placeholder: t('routes.holidayDetails.nickNamePlaceholder'),
       },
     ])
 
@@ -257,7 +251,7 @@ export default defineComponent({
       getUser(row.id).then((res) => {
         open.value = true
         isUpdate.value = true
-        drawerTitle.value = '修改'
+        drawerTitle.value = t('common.update')
         nextTick(() => {
           Object.keys(formState).forEach((key) => {
             formState[key] = res.data[key]
@@ -305,19 +299,21 @@ export default defineComponent({
     const formDataObj = reactive([
       {
         name: 'annualLeave',
-        label: '年假',
+        label: t('routes.holidayDetails.annualLeave'),
         type: 'input-number',
         value: undefined,
         span: 24,
-        placeholder: '请输入年假',
+        labelCol: 8,
+        placeholder: t('routes.holidayDetails.annualLeavePlaceholder'),
       },
       {
         name: 'compensatoryLeave',
-        label: '调休假',
+        label: t('routes.holidayDetails.compensatoryLeave'),
         type: 'input-number',
         span: 24,
+        labelCol: 8,
         value: undefined,
-        placeholder: '请输入调休假',
+        placeholder: t('routes.holidayDetails.compensatoryLeavePlaceholder'),
       },
     ])
     const formState: FormState = reactive({
@@ -392,29 +388,6 @@ export default defineComponent({
      * 重置密码操作
      */
     const visible = ref<boolean>(false)
-    const resetformState = reactive({
-      id: 0,
-      newPassword: '',
-    })
-    // 重置密码
-    const handleResetPwd = () => {
-      if (!resetformState.newPassword) {
-        Message.error('新密码不能为空')
-        return
-      }
-      resetUserPwd(resetformState.id, {
-        newPassword: resetformState.newPassword,
-      }).then((res) => {
-        Message.success(res.message)
-        resetformState.newPassword = ''
-        visible.value = false
-      })
-    }
-    // 取消重置密码
-    const handleResetClose = () => {
-      resetformState.newPassword = ''
-      visible.value = false
-    }
 
     // 获取部门数据
     const getDeptList = () => {
@@ -459,6 +432,7 @@ export default defineComponent({
     })
 
     return {
+      t,
       loading,
       replaceFields,
       deptSearchRef,
@@ -502,9 +476,6 @@ export default defineComponent({
       sexOptions,
 
       visible,
-      ...toRefs(resetformState),
-      handleResetPwd,
-      handleResetClose,
     }
   },
 })

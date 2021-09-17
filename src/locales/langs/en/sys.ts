@@ -1,5 +1,6 @@
 export default {
   api: {
+    operationSuccess: "Operation success",
     operationFailed: "Operation failed",
     errorTip: "Error Tip",
     errorMessage: "The operation failed, the system is abnormal!",
@@ -23,6 +24,8 @@ export default {
       "The service is unavailable, the server is temporarily overloaded or maintained!",
     errMsg504: "Network timeout!",
     errMsg505: "The http version does not support the request!",
+    errMsg400: "Parameter error",
+    errTokenExpire: "The login status has expired. You can stay on this page or log in again"
   },
   app: {
     logoutTip: "Reminder",
@@ -81,7 +84,7 @@ export default {
 
     loginButton: "Sign in",
     registerButton: "Sign up",
-    rememberMe: "Remember me",
+    rememberMe: "Remember me?",
     forgetPassword: "Forget Password?",
     otherSignIn: "Sign in with",
 
@@ -92,7 +95,7 @@ export default {
     // placeholder
     accountPlaceholder: "Please input username",
     passwordPlaceholder: "Please input password",
-    smsPlaceholder: "Please input sms code",
+    smsPlaceholder: "Please input code",
     mobilePlaceholder: "Please input mobile",
     policyPlaceholder: "Register after checking",
     diffPwd: "The two passwords are inconsistent",

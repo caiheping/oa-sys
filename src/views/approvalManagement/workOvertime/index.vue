@@ -10,21 +10,25 @@
 
     <a-row :gutter="10" class="mb-2">
       <a-col v-has-permi="['examineAndApprove:workOverTime:add']">
-        <a-button color="success" @click="handleAdd"> 新增 </a-button>
+        <a-button color="success" @click="handleAdd">
+          {{ t('common.add') }}
+        </a-button>
       </a-col>
       <a-col v-has-permi="['examineAndApprove:workOverTime:delete']">
         <a-popconfirm
-          title="确定要删除选中数据吗？"
-          ok-text="确定"
-          cancel-text="取消"
+          :title="t('common.confirmDeleteSelect')"
+          :ok-text="t('common.okText')"
+          :cancel-text="t('common.cancelText')"
           @confirm="confirm"
           @cancel="cancel"
         >
-          <a-button :disabled="!hasSelected" color="error"> 删除 </a-button>
+          <a-button :disabled="!hasSelected" color="error">
+            {{ t('common.delete') }}
+          </a-button>
         </a-popconfirm>
       </a-col>
       <a-col>
-        <a-button color="normal">导出</a-button>
+        <a-button color="normal">{{ t('common.export') }}</a-button>
       </a-col>
     </a-row>
 
@@ -51,7 +55,9 @@
       <template #action="{ record }">
         <span>
           <a-dropdown :trigger="['click']" @click="handleClickDropdown(record)">
-            <span class="mr-3 text-[#faad14] cursor-pointer"> 审批 </span>
+            <span class="mr-3 text-[#faad14] cursor-pointer">
+              {{ t('routes.workOverTime.approve') }}
+            </span>
             <template #overlay>
               <a-menu @click="handleExamineAndApprove">
                 <a-menu-item
@@ -71,12 +77,12 @@
             class="mr-3"
             @click="handleUpdate(record)"
           >
-            修改
+            {{ t('common.update') }}
           </a-button>
           <a-popconfirm
-            title="确定要删除该数据吗？"
-            ok-text="确定"
-            cancel-text="取消"
+            :title="t('common.confirmDelete')"
+            :ok-text="t('common.okText')"
+            :cancel-text="t('common.cancelText')"
             @confirm="confirm(record)"
             @cancel="cancel"
           >
@@ -85,7 +91,7 @@
               color="error"
               v-has-permi="['examineAndApprove:workOverTime:delete']"
             >
-              删除
+              {{ t('common.delete') }}
             </a-button>
           </a-popconfirm>
         </span>
@@ -141,6 +147,9 @@ import useDrawer from '@/hooks/useDrawer'
 import { IWorkOvertime } from '@/api/admin/examineAndApprove/workOverTime/type'
 import { IData } from '@/api/admin/system/dict/data/type'
 import { FormDataItem } from '@/components/BaseForm/type'
+import { useI18n } from '@/hooks/useI18n'
+
+const { t } = useI18n()
 
 type Pagination = TableState['pagination']
 
@@ -163,57 +172,57 @@ interface FormState {
 
 const columns = [
   {
-    title: '姓名',
+    title: t('routes.workOverTime.nickName'),
     key: 'user',
     align: 'center',
     slots: { customRender: 'user' },
   },
   {
-    title: '加班时长',
+    title: t('routes.workOverTime.workOverTimeDuration'),
     dataIndex: 'workOverTimeDuration',
     key: 'workOverTimeDuration',
     align: 'center',
     slots: { customRender: 'workOverTimeDuration' },
   },
   {
-    title: '加班原因',
+    title: t('routes.workOverTime.workOverTimeReason'),
     dataIndex: 'workOverTimeReason',
     key: 'workOverTimeReason',
     align: 'center',
   },
   {
-    title: '开始时间',
+    title: t('routes.workOverTime.startTime'),
     dataIndex: 'startTime',
     key: 'startTime',
     align: 'center',
   },
   {
-    title: '结束时间',
+    title: t('routes.workOverTime.endTime'),
     dataIndex: 'endTime',
     key: 'endTime',
     align: 'center',
   },
   {
-    title: '创建时间',
+    title: t('routes.workOverTime.createdAt'),
     dataIndex: 'createdAt',
     key: 'createdAt',
     align: 'center',
   },
   {
-    title: '审批状态',
+    title: t('routes.workOverTime.status'),
     dataIndex: 'status',
     key: 'status',
     slots: { customRender: 'status' },
     align: 'center',
   },
   {
-    title: '审批备注',
+    title: t('routes.workOverTime.remark'),
     dataIndex: 'remark',
     key: 'remark',
     align: 'center',
   },
   {
-    title: '操作',
+    title: t('routes.workOverTime.action'),
     key: 'action',
     align: 'center',
     slots: { customRender: 'action' },
@@ -243,17 +252,17 @@ export default defineComponent({
     const formFields = reactive([
       {
         type: 'input',
-        label: '姓名',
+        label: t('routes.workOverTime.nickName'),
         name: 'nickName',
         value: '',
-        placeholder: '请输入姓名',
+        placeholder: t('routes.workOverTime.nickNamePlaceholder'),
       },
       {
         type: 'select',
-        label: '审批状态',
+        label: t('routes.workOverTime.status'),
         name: 'status',
         value: undefined,
-        placeholder: '请选择审批状态',
+        placeholder: t('routes.workOverTime.statusPlaceholder'),
         normalizer: {
           value: 'dictValue',
           label: 'dictLabel',
@@ -331,13 +340,13 @@ export default defineComponent({
     // 新增按钮操作
     const handleAdd = () => {
       open.value = true
-      drawerTitle.value = '添加'
+      drawerTitle.value = t('common.add')
     }
     // 更新按钮操作
     const handleUpdate = (row) => {
       getWorkOvertimeById(row.id).then((res) => {
         open.value = true
-        drawerTitle.value = '修改'
+        drawerTitle.value = t('common.update')
         nextTick(() => {
           Object.keys(formState).forEach((key) => {
             formState[key] = res.data[key]
@@ -373,13 +382,13 @@ export default defineComponent({
           }
         }
         getList(queryParams)
-        Message.success('删除成功')
+        Message.success(t('common.deleteSuccess'))
       })
     }
     // 取消删除
     const cancel = (e: MouseEvent) => {
       console.log(e)
-      Message.success('取消删除')
+      Message.success(t('common.cancelDelete'))
     }
     /**
      * 推窗操作
@@ -397,7 +406,7 @@ export default defineComponent({
       time: [
         {
           required: true,
-          message: '请选择加班时间',
+          message: t('routes.workOverTime.startTimePlaceholder'),
         },
       ],
     })
@@ -408,13 +417,16 @@ export default defineComponent({
     const formDataObj = reactive<FormDataItem[]>([
       {
         name: 'time',
-        label: '选择时间',
+        label: t('routes.workOverTime.selectTime'),
         type: 'range-picker',
         value: undefined,
         span: 24,
         props: {
           format: 'YYYY-MM-DD HH:mm',
-          placeholder: ['开始时间', '结束时间'],
+          placeholder: [
+            t('routes.workOverTime.startTime'),
+            t('routes.workOverTime.endTime'),
+          ],
           valueFormat: 'YYYY-MM-DD HH:mm',
         },
         fn: {
@@ -424,11 +436,11 @@ export default defineComponent({
       },
       {
         name: 'workOverTimeReason',
-        label: '加班原因',
+        label: t('routes.workOverTime.workOverTimeReason'),
         type: 'textarea',
         value: undefined,
         span: 24,
-        placeholder: '请输入加班原因',
+        placeholder: t('routes.workOverTime.workOverTimeReasonPlaceholder'),
       },
     ])
     // 表单提交
@@ -475,6 +487,7 @@ export default defineComponent({
     })
 
     return {
+      t,
       loading,
       queryParams,
       formFields,

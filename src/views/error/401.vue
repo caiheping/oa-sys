@@ -1,14 +1,16 @@
 <template>
   <div class="errPage-container">
-    <a-button class="pan-back-btn" @click="back"> 返回 </a-button>
+    <a-button class="pan-back-btn" @click="back">
+      {{ t('error.401.back') }}
+    </a-button>
     <a-row>
       <a-col :span="12">
-        <h1 class="text-jumbo text-ginormous">401错误!</h1>
-        <h2>您没有访问权限！</h2>
-        <h6>对不起，您没有访问权限，请不要进行非法操作！您可以返回主页面</h6>
+        <h1 class="text-jumbo text-ginormous">401{{ t('error.401.error') }}</h1>
+        <h2>{{ t('error.401.noAccess') }}</h2>
+        <h6>{{ t('error.401.errorMsg') }}</h6>
         <ul class="list-unstyled">
           <li class="link-type">
-            <router-link to="/"> 回首页 </router-link>
+            <router-link to="/"> {{ t('error.401.goHome') }} </router-link>
           </li>
         </ul>
       </a-col>
@@ -26,12 +28,20 @@
 
 <script>
 import { defineComponent } from 'vue'
+import { useI18n } from '@/hooks/useI18n'
 import errGif from '@/assets/images/401.gif'
+import router from '@/router'
 
 export default defineComponent({
   setup() {
+    const { t } = useI18n()
+    const back = () => {
+      router.back()
+    }
     return {
       errGif: errGif + '?' + +new Date(),
+      back,
+      t,
     }
   },
 })

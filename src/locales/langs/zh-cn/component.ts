@@ -26,8 +26,12 @@ export default {
 
     apiSelectNotFound: "请等待数据加载完成...",
   },
+  deptSearch: {
+    placeholder: "请输入部门名称"
+  },
   icon: {
     placeholder: "点击选择图标",
+    nothing: "无",
     search: "搜索图标",
     copy: "复制图标成功!",
   },

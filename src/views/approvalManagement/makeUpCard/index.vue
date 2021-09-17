@@ -10,21 +10,25 @@
 
     <a-row :gutter="10" class="mb-2">
       <a-col v-has-permi="['examineAndApprove:makeUpCard:add']">
-        <a-button color="success" @click="handleAdd"> 新增 </a-button>
+        <a-button color="success" @click="handleAdd">
+          {{ t('common.add') }}
+        </a-button>
       </a-col>
       <a-col v-has-permi="['examineAndApprove:makeUpCard:delete']">
         <a-popconfirm
-          title="确定要删除选中数据吗？"
-          ok-text="确定"
-          cancel-text="取消"
+          :title="t('common.confirmDeleteSelect')"
+          :ok-text="t('common.okText')"
+          :cancel-text="t('common.cancelText')"
           @confirm="confirm"
           @cancel="cancel"
         >
-          <a-button :disabled="!hasSelected" color="error"> 删除 </a-button>
+          <a-button :disabled="!hasSelected" color="error">
+            {{ t('common.delete') }}
+          </a-button>
         </a-popconfirm>
       </a-col>
       <a-col>
-        <a-button color="normal">导出</a-button>
+        <a-button color="normal">{{ t('common.export') }}</a-button>
       </a-col>
     </a-row>
 
@@ -57,7 +61,9 @@
       <template #action="{ record }">
         <span>
           <a-dropdown :trigger="['click']" @click="handleClickDropdown(record)">
-            <span class="mr-3 text-[#faad14] cursor-pointer"> 审批 </span>
+            <span class="mr-3 text-[#faad14] cursor-pointer">
+              {{ t('routes.makeUpCard.approve') }}
+            </span>
             <template #overlay>
               <a-menu @click="handleExamineAndApprove">
                 <a-menu-item
@@ -77,12 +83,12 @@
             @click="handleUpdate(record)"
             v-has-permi="['examineAndApprove:makeUpCard:update']"
           >
-            修改
+            {{ t('common.update') }}
           </a-button>
           <a-popconfirm
-            title="确定要删除该数据吗？"
-            ok-text="确定"
-            cancel-text="取消"
+            :title="t('common.confirmDelete')"
+            :ok-text="t('common.okText')"
+            :cancel-text="t('common.cancelText')"
             @confirm="confirm(record)"
             @cancel="cancel"
           >
@@ -91,7 +97,7 @@
               color="error"
               v-has-permi="['examineAndApprove:makeUpCard:delete']"
             >
-              删除
+              {{ t('common.delete') }}
             </a-button>
           </a-popconfirm>
         </span>
@@ -147,6 +153,9 @@ import { IMakeUpCard } from '@/api/admin/examineAndApprove/makeUpCard/type'
 import { IData } from '@/api/admin/system/dict/data/type'
 import BaseForm from '@/components/BaseForm/index.vue'
 import { FormDataItem } from '@/components/BaseForm/type'
+import { useI18n } from '@/hooks/useI18n'
+
+const { t } = useI18n()
 
 type Pagination = TableState['pagination']
 
@@ -169,51 +178,51 @@ interface FormState {
 
 const columns = [
   {
-    title: '姓名',
+    title: t('routes.makeUpCard.nickName'),
     key: 'user',
     align: 'center',
     slots: { customRender: 'user' },
   },
   {
-    title: '待补卡日期',
+    title: t('routes.makeUpCard.dateToBeSupplemented'),
     key: 'clock_in',
     align: 'center',
     slots: { customRender: 'clock_in' },
   },
   {
-    title: '补卡类型',
+    title: t('routes.makeUpCard.makeUpCardType'),
     dataIndex: 'type',
     key: 'type',
     align: 'center',
     slots: { customRender: 'type' },
   },
   {
-    title: '补卡原因',
+    title: t('routes.makeUpCard.makeUpCardReason'),
     dataIndex: 'makeUpCardReason',
     key: 'makeUpCardReason',
     align: 'center',
   },
   {
-    title: '创建时间',
+    title: t('routes.makeUpCard.createdAt'),
     dataIndex: 'createdAt',
     key: 'createdAt',
     align: 'center',
   },
   {
-    title: '审批状态',
+    title: t('routes.makeUpCard.status'),
     dataIndex: 'status',
     key: 'status',
     slots: { customRender: 'status' },
     align: 'center',
   },
   {
-    title: '审批备注',
+    title: t('routes.makeUpCard.remark'),
     dataIndex: 'remark',
     key: 'remark',
     align: 'center',
   },
   {
-    title: '操作',
+    title: t('routes.makeUpCard.action'),
     key: 'action',
     align: 'center',
     slots: { customRender: 'action' },
@@ -244,17 +253,17 @@ export default defineComponent({
     const formFields = reactive([
       {
         type: 'input',
-        label: '姓名',
+        label: t('routes.makeUpCard.nickName'),
         name: 'nickName',
         value: '',
-        placeholder: '请输入姓名',
+        placeholder: t('routes.makeUpCard.nickNamePlaceholder'),
       },
       {
         type: 'select',
-        label: '审批状态',
+        label: t('routes.makeUpCard.status'),
         name: 'status',
         value: undefined,
-        placeholder: '请选择审批状态',
+        placeholder: t('routes.makeUpCard.statusPlaceholder'),
         normalizer: {
           value: 'dictValue',
           label: 'dictLabel',
@@ -337,13 +346,13 @@ export default defineComponent({
       open.value = true
       formState.userId = undefined
       formState.deptId = undefined
-      drawerTitle.value = '添加'
+      drawerTitle.value = t('common.add')
     }
     // 更新按钮操作
     const handleUpdate = (row) => {
       getMakeUpCardById(row.id).then((res) => {
         open.value = true
-        drawerTitle.value = '修改'
+        drawerTitle.value = t('common.update')
         formState.userId = row.user.id
         formState.deptId = row.user.deptId
         nextTick(() => {
@@ -370,13 +379,13 @@ export default defineComponent({
           }
         }
         getList(queryParams)
-        Message.success('删除成功')
+        Message.success(t('common.deleteSuccess'))
       })
     }
     // 取消删除
     const cancel = (e: MouseEvent) => {
       console.log(e)
-      Message.success('取消删除')
+      Message.success(t('common.cancelDelete'))
     }
     /**
      * 推窗操作
@@ -394,32 +403,34 @@ export default defineComponent({
       createdAt: [
         {
           required: true,
-          message: '补卡日期',
+          message: t('routes.makeUpCard.createdAtPlaceholder'),
         },
       ],
       type: [
         {
           required: true,
-          message: '请选择补卡类型',
+          message: t('routes.makeUpCard.makeUpCardTypePlaceholder'),
         },
       ],
     })
     const formDataObj = reactive<FormDataItem[]>([
       {
         name: 'createdAt',
-        label: '补卡日期',
+        label: t('routes.makeUpCard.cardRenewalDate'),
         type: 'date-picker',
         value: undefined,
-        placeholder: '请选择补卡日期',
+        placeholder: t('routes.makeUpCard.cardRenewalDatePlaceholder'),
         span: 24,
+        labelCol: 8,
       },
       {
         name: 'type',
-        label: '补卡类型',
+        label: t('routes.makeUpCard.makeUpCardType'),
         type: 'select',
         value: undefined,
         span: 24,
-        placeholder: '请选择补卡类型',
+        labelCol: 8,
+        placeholder: t('routes.makeUpCard.makeUpCardTypePlaceholder'),
         options: makeUpCardTypeOptions,
         serialize: {
           value: 'dictValue',
@@ -428,11 +439,12 @@ export default defineComponent({
       },
       {
         name: 'makeUpCardReason',
-        label: '补卡原因',
+        label: t('routes.makeUpCard.makeUpCardReason'),
         type: 'textarea',
         value: undefined,
         span: 24,
-        placeholder: '请输入补卡原因',
+        labelCol: 8,
+        placeholder: t('routes.makeUpCard.makeUpCardReasonPlaceholder'),
       },
     ])
     // 表单提交
@@ -486,6 +498,7 @@ export default defineComponent({
     })
 
     return {
+      t,
       loading,
       queryParams,
       formFields,

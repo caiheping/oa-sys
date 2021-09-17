@@ -3,6 +3,7 @@ export default {
   header: {
     // user dropdown
     dropdownItemDoc: "Document",
+    personalCenter: "PersonalCenter",
     dropdownItemLoginOut: "Login Out",
 
     tooltipErrorLog: "Error log",
@@ -18,6 +19,7 @@ export default {
     lockScreenBtn: "Locking",
 
     home: "Home",
+    setting: "setting",
   },
   multipleTab: {
     reload: "Refresh current",
@@ -28,6 +30,8 @@ export default {
     closeAll: "Close All",
   },
   setting: {
+    systemConfiguration: "systemConfiguration",
+    showLogo: "showLogo",
     // content mode
     contentModeFull: "Full",
     contentModeFixed: "Fixed width",
@@ -58,6 +62,11 @@ export default {
     clearBtn: "Clear cache and to the login page",
 
     drawerTitle: "Configuration",
+    showTitle: "showTitle",
+    showSearch: "showSearch",
+    showFull: "showFull",
+    showLanguage: "showLanguage",
+    showTabs: "showTabs",
 
     darkMode: "Dark mode",
     navMode: "Navigation mode",
@@ -88,6 +97,7 @@ export default {
     tabsRedoBtn: "Tabs redo button",
     tabsFoldBtn: "Tabs flod button",
     sidebar: "Sidebar",
+    sidebarType: "sidebarType",
     header: "Header",
     footer: "Footer",
     fullContent: "Full content",

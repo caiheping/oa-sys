@@ -2,7 +2,9 @@
   <div class="p-4">
     <a-row :gutter="10" class="mb-2">
       <a-col v-has-permi="['system:menu:add']">
-        <a-button color="success" @click="handleAdd"> 新增 </a-button>
+        <a-button color="success" @click="handleAdd">
+          {{ t('common.add') }}
+        </a-button>
       </a-col>
     </a-row>
     <a-table
@@ -20,12 +22,16 @@
       </template>
       <template #status="{ record }">
         <div class="flex justify-center">
-          <span>{{ record.status === '1' ? '正常' : '停用' }}</span>
+          <span>{{
+            record.status === '1' ? t('common.normal') : t('common.deactivate')
+          }}</span>
         </div>
       </template>
       <template #visible="{ record }">
         <div class="flex justify-center">
-          <span>{{ record.visible === '1' ? '显示' : '隐藏' }}</span>
+          <span>{{
+            record.visible === '1' ? t('common.show') : t('common.hidden')
+          }}</span>
         </div>
       </template>
       <template #action="{ record }">
@@ -37,7 +43,7 @@
             @click="handleAdd(record)"
             v-has-permi="['system:menu:add']"
           >
-            新增
+            {{ t('common.add') }}
           </a-button>
           <a-button
             type="link"
@@ -46,12 +52,12 @@
             @click="handleUpdate(record)"
             v-has-permi="['system:menu:update']"
           >
-            修改
+            {{ t('common.update') }}
           </a-button>
           <a-popconfirm
-            title="确定要删除该数据吗？"
-            ok-text="确定"
-            cancel-text="取消"
+            :title="t('common.confirmDelete')"
+            :ok-text="t('common.okText')"
+            :cancel-text="t('common.cancelText')"
             @confirm="confirm(record)"
             @cancel="cancel"
           >
@@ -60,7 +66,7 @@
               color="error"
               v-has-permi="['system:menu:delete']"
             >
-              删除
+              {{ t('common.delete') }}
             </a-button>
           </a-popconfirm>
         </span>
@@ -86,61 +92,61 @@
       >
         <a-row>
           <a-col :span="12">
-            <a-form-item label="上级菜单" name="parentId">
+            <a-form-item :label="t('routes.menu.parentId')" name="parentId">
               <treeselect
                 ref="treeRef"
                 class="!mt-[3px]"
                 v-model="formState.parentId"
                 :normalizer="normalizer"
-                placeholder="请选择上级菜单"
+                :placeholder="t('routes.menu.parentIdPlaceholder')"
                 :options="treeOptions"
                 @select="handleTreeSelect"
               />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="菜单类型" name="menuType">
+            <a-form-item :label="t('routes.menu.menuType')" name="menuType">
               <a-radio-group
                 v-model:value="formState.menuType"
                 :options="[
-                  { label: '目录', value: 'M' },
-                  { label: '菜单', value: 'C' },
-                  { label: '按钮', value: 'F' },
+                  { label: t('routes.menu.M'), value: 'M' },
+                  { label: t('routes.menu.C'), value: 'C' },
+                  { label: t('routes.menu.F'), value: 'F' },
                 ]"
               />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="菜单名称" name="title">
+            <a-form-item :label="t('routes.menu.title')" name="title">
               <a-input
                 v-model:value="formState.title"
-                placeholder="请输入菜单名称"
+                :placeholder="t('routes.menu.titlePlaceholder')"
               />
             </a-form-item>
           </a-col>
           <a-col :span="12" v-if="formState.menuType !== 'F'">
-            <a-form-item label="菜单图标" name="icon">
+            <a-form-item :label="t('routes.menu.icon')" name="icon">
               <IconSelect
                 v-model:value="formState.icon"
-                placeholder="选择菜单图标"
+                :placeholder="t('routes.menu.iconPlaceholder')"
                 @change="handleIconChange"
               />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="显示排序" name="orderNum">
+            <a-form-item :label="t('routes.menu.orderNum')" name="orderNum">
               <a-input-number
                 class="!w-[100%]"
                 v-model:value="formState.orderNum"
-                placeholder="请输入显示排序"
+                :placeholder="t('routes.menu.orderNumPlaceholder')"
               />
             </a-form-item>
           </a-col>
           <a-col :span="12" v-if="formState.menuType !== 'F'">
-            <a-form-item label="路由地址" name="path">
+            <a-form-item :label="t('routes.menu.path')" name="path">
               <a-input
                 v-model:value="formState.path"
-                placeholder="请输入路由地址"
+                :placeholder="t('routes.menu.pathNumPlaceholder')"
               />
             </a-form-item>
           </a-col>
@@ -148,13 +154,9 @@
             :span="12"
             v-if="formState.menuType === 'C' || formState.menuType === 'M'"
           >
-            <a-form-item label="组件名" name="component">
-              <!-- <a-input
-                v-model:value="formState.component"
-                placeholder="请输入组件名"
-              /> -->
+            <a-form-item :label="t('routes.menu.component')" name="component">
               <a-select
-                placeholder="请输入组件名"
+                :placeholder="t('routes.menu.componentPlaceholder')"
                 v-model:value="formState.component"
               >
                 <a-select-option
@@ -168,15 +170,15 @@
             </a-form-item>
           </a-col>
           <a-col :span="12" v-if="formState.menuType === 'F'">
-            <a-form-item label="权限标识" name="perms">
+            <a-form-item :label="t('routes.menu.perms')" name="perms">
               <a-input
                 v-model:value="formState.perms"
-                placeholder="请输入权限标识"
+                :placeholder="t('routes.menu.permsPlaceholder')"
               />
             </a-form-item>
           </a-col>
           <a-col :span="12" v-if="formState.menuType !== 'F'">
-            <a-form-item label="显示状态" name="visible">
+            <a-form-item :label="t('routes.menu.visible')" name="visible">
               <a-radio-group
                 v-model:value="formState.visible"
                 :options="showOrHideOptions"
@@ -184,7 +186,7 @@
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="菜单状态" name="status">
+            <a-form-item :label="t('routes.menu.status')" name="status">
               <a-radio-group
                 v-model:value="formState.status"
                 :options="disableOptions"
@@ -192,23 +194,23 @@
             </a-form-item>
           </a-col>
           <a-col :span="12" v-if="formState.menuType !== 'F'">
-            <a-form-item label="是否缓存" name="keepAlive">
+            <a-form-item :label="t('routes.menu.keepAlive')" name="keepAlive">
               <a-radio-group
                 v-model:value="formState.keepAlive"
                 :options="[
-                  { label: '缓存', value: 1 },
-                  { label: '不缓存', value: 0 },
+                  { label: t('routes.menu.cache'), value: 1 },
+                  { label: t('routes.menu.noCache'), value: 0 },
                 ]"
               />
             </a-form-item>
           </a-col>
           <a-col :span="12" v-if="formState.menuType !== 'F'">
-            <a-form-item label="是否外链" name="isFrame">
+            <a-form-item :label="t('routes.menu.isFrame')" name="isFrame">
               <a-radio-group
                 v-model:value="formState.isFrame"
                 :options="[
-                  { label: '是', value: '1' },
-                  { label: '否', value: '0' },
+                  { label: t('routes.menu.yes'), value: '1' },
+                  { label: t('routes.menu.no'), value: '0' },
                 ]"
               />
             </a-form-item>
@@ -216,9 +218,11 @@
           <a-col :span="24">
             <a-form-item>
               <a-button type="primary" class="mr-3" @click="handleSubmit">
-                确认
+                {{ t('common.okText') }}
               </a-button>
-              <a-button @click="handleClose">取消</a-button>
+              <a-button @click="handleClose">{{
+                t('common.cancelText')
+              }}</a-button>
             </a-form-item>
           </a-col>
         </a-row>
@@ -256,61 +260,64 @@ import 'vue3-treeselect/dist/vue3-treeselect.css'
 import { IMenu } from '@/api/admin/system/menu/type'
 import { IData } from '@/api/admin/system/dict/data/type'
 import { getDict } from '@/utils/dictFormat'
+import { useI18n } from '@/hooks/useI18n'
+
+const { t } = useI18n()
 
 // 表头配置
 const columns = [
   {
-    title: '菜单名称',
+    title: t('routes.menu.title'),
     dataIndex: 'title',
     key: 'title',
   },
   {
-    title: '图标',
+    title: t('routes.menu.icon'),
     dataIndex: 'icon',
     key: 'icon',
     align: 'center',
     slots: { customRender: 'icon' },
   },
   {
-    title: '排序',
+    title: t('routes.menu.orderNum'),
     dataIndex: 'orderNum',
     key: 'orderNum',
     align: 'center',
   },
   {
-    title: '权限标识',
+    title: t('routes.menu.perms'),
     dataIndex: 'perms',
     key: 'perms',
     align: 'center',
   },
   {
-    title: '组件名',
+    title: t('routes.menu.component'),
     dataIndex: 'component',
     key: 'component',
     align: 'center',
   },
   {
-    title: '状态',
+    title: t('routes.menu.status'),
     dataIndex: 'status',
     key: 'status',
     align: 'center',
     slots: { customRender: 'status' },
   },
   {
-    title: '是否显示',
+    title: t('routes.menu.visible'),
     dataIndex: 'visible',
     key: 'visible',
     align: 'center',
     slots: { customRender: 'visible' },
   },
   {
-    title: '创建时间',
+    title: t('routes.menu.createdAt'),
     dataIndex: 'createdAt',
     key: 'createdAt',
     align: 'center',
   },
   {
-    title: '操作',
+    title: t('routes.menu.action'),
     key: 'action',
     align: 'center',
     slots: { customRender: 'action' },
@@ -342,7 +349,7 @@ export default defineComponent({
     const treeOptions = ref<any[]>([
       {
         id: 0,
-        title: '主目录',
+        title: t('routes.menu.homeDirectory'),
         children: [],
       },
     ])
@@ -372,10 +379,8 @@ export default defineComponent({
 
     const checkType = (rule, value: string) => {
       if (formState.menuType === 'M') {
-        console.log(typeof value === 'string' && value.charAt(0) !== '/')
         if (typeof value === 'string' && value.charAt(0) !== '/') {
-          console.log(999)
-          return Promise.reject('菜单类型为目录，必须以 / 开头')
+          return Promise.reject(t('routes.menu.menuTypeRule'))
         }
       }
       return Promise.resolve()
@@ -385,23 +390,29 @@ export default defineComponent({
         {
           required: true,
           validator: formRules.number,
-          message: '上级菜单不能为空',
+          message: t('routes.menu.parentIdCannotBeEmpty'),
           trigger: 'change',
         },
       ],
-      title: [{ required: true, message: '菜单名称不能为空', trigger: 'blur' }],
+      title: [
+        {
+          required: true,
+          message: t('routes.menu.titleCannotBeEmpty'),
+          trigger: 'blur',
+        },
+      ],
       orderNum: [
         {
           required: true,
           validator: formRules.number,
-          message: '显示排序不能为空',
+          message: t('routes.menu.orderNumCannotBeEmpty'),
           trigger: 'blur',
         },
       ],
       path: [
         {
           required: true,
-          message: '路由地址不能为空',
+          message: t('routes.menu.pathCannotBeEmpty'),
           trigger: 'blur',
         },
         {
@@ -409,8 +420,20 @@ export default defineComponent({
           trigger: 'blur',
         },
       ],
-      component: [{ required: true, message: '组件不能为空', trigger: 'blur' }],
-      perms: [{ required: true, message: '权限标识不能为空', trigger: 'blur' }],
+      component: [
+        {
+          required: true,
+          message: t('routes.menu.componentCannotBeEmpty'),
+          trigger: 'blur',
+        },
+      ],
+      perms: [
+        {
+          required: true,
+          message: t('routes.menu.permsCannotBeEmpty'),
+          trigger: 'blur',
+        },
+      ],
     }
     // 取消推窗
     const { open, drawerTitle } = useDrawer()
@@ -450,13 +473,13 @@ export default defineComponent({
     const confirm = (row) => {
       delMenu(row.id).then(() => {
         getList()
-        Message.success('删除成功')
+        Message.success(t('common.deleteSuccess'))
       })
     }
     // 取消删除
     const cancel = (e: MouseEvent) => {
       console.log(e)
-      Message.success('取消删除')
+      Message.success(t('common.cancelDelete'))
     }
 
     // 新增按钮操作
@@ -468,7 +491,7 @@ export default defineComponent({
         treeOptions.value[0].children = handleTree(res.data.rows, 'id').tree
 
         open.value = true
-        drawerTitle.value = '添加菜单'
+        drawerTitle.value = t('common.add')
         if (row != null && row.id) {
           nextTick(() => {
             formState.parentId = row.id
@@ -491,7 +514,7 @@ export default defineComponent({
 
         getMenuById(row.id).then((res) => {
           open.value = true
-          drawerTitle.value = '修改菜单'
+          drawerTitle.value = t('common.update')
           nextTick(() => {
             Object.keys(formState).forEach((key) => {
               formState[key] = res.data[key]
@@ -529,6 +552,7 @@ export default defineComponent({
     })
 
     return {
+      t,
       loading,
       menuList,
       confirm,

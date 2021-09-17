@@ -1,7 +1,11 @@
 <template>
   <div class="p-4">
     <a-button type="primary" @click="handleCreate">
-      生成当月工资数据({{ selectDates }}天)
+      {{ t('routes.workingDaySetting.generateCurrentMonthData') }}
+      (
+      {{ selectDates }}
+      {{ t('routes.workingDaySetting.day') }}
+      )
     </a-button>
     <a-calendar
       v-model:value="dateTime"
@@ -17,15 +21,15 @@
 
     <a-modal
       v-model:visible="visible"
-      title="设置为工作日"
-      ok-text="确认"
-      cancel-text="取消"
+      :title="t('routes.workingDaySetting.setDay')"
+      :ok-text="t('common.okText')"
+      :cancel-text="t('common.cancelText')"
       @cancel="handleCancel"
       @ok="handleSubmit"
     >
       <a-textarea
         v-model:value="remark"
-        placeholder="请输入备注信息"
+        :placeholder="t('routes.workingDaySetting.remark')"
         allow-clear
       />
     </a-modal>
@@ -43,6 +47,9 @@ import {
 import { createEmployeeSalary } from '@/api/admin/finance/salary'
 import { IWorkingDaySettings } from '@/api/admin/baseInfo/workingDaySettings/type'
 import router from '@/router'
+import { useI18n } from '@/hooks/useI18n'
+
+const { t } = useI18n()
 
 export default defineComponent({
   setup() {
@@ -66,7 +73,7 @@ export default defineComponent({
       })
     }
 
-    const getListData = (value: Moment) => {
+    const getListData = (value: Moment): any => {
       if (
         dateLists.value.filter(
           (item) => item.day === value.format('YYYY-MM-DD')
@@ -91,9 +98,9 @@ export default defineComponent({
           showModal()
         } else {
           Modal.confirm({
-            title: '确定取消该工作日吗？',
-            okText: '确认',
-            cancelText: '取消',
+            title: t('routes.workingDaySetting.calcelText'),
+            okText: t('common.okText'),
+            cancelText: t('common.cancelText'),
             onOk: () => {
               const id = dateLists.value.filter(
                 (item) => item.day === value.format('YYYY-MM-DD')
@@ -150,6 +157,7 @@ export default defineComponent({
     })
 
     return {
+      t,
       dateTime,
       visible,
       remark,

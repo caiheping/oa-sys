@@ -11,6 +11,9 @@
 import { defineComponent, ref } from 'vue'
 import UserInfo from './UserInfo.vue'
 import UpdatePwd from './UpdatePwd.vue'
+import { useI18n } from '@/hooks/useI18n'
+
+const { t } = useI18n()
 
 export default defineComponent({
   components: {
@@ -22,12 +25,12 @@ export default defineComponent({
     const tabs = [
       {
         key: 1,
-        title: '个人信息',
+        title: t('routes.user.UserInfo'),
         component: 'UserInfo',
       },
       {
         key: 2,
-        title: '修改密码',
+        title: t('routes.user.UpdatePwd'),
         component: 'UpdatePwd',
       },
     ]

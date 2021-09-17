@@ -2,7 +2,7 @@
   <a-input
     :allowClear="true"
     v-model:value="searchValue"
-    placeholder="请输入部门名称"
+    :placeholder="t('component.deptSearch.placeholder')"
   >
     <template #prefix>
       <svg-icon name="search" class="text-[#d9d9d9]" />
@@ -33,6 +33,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, watch, computed } from 'vue'
+import { useI18n } from '@/hooks/useI18n'
 import { TreeDataItem } from 'ant-design-vue/es/tree/Tree'
 
 export default defineComponent({
@@ -60,6 +61,7 @@ export default defineComponent({
   },
   emits: ['select'],
   setup(props, { emit }) {
+    const { t } = useI18n()
     const searchValue = ref<string>('')
     const selectedKeys = ref<number[]>([])
     const expandedKeys = ref<number[]>([])
@@ -93,6 +95,7 @@ export default defineComponent({
       console.log('selectedKeys', val)
     })
     return {
+      t,
       searchValue,
       expandedKeys,
       autoExpandParent,

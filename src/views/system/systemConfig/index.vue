@@ -9,17 +9,21 @@
     </div>
     <a-row :gutter="10" class="mb-2">
       <a-col v-has-permi="['system:systemConfig:add']">
-        <a-button color="success" @click="handleAdd">新增</a-button>
+        <a-button color="success" @click="handleAdd">{{
+          t('common.add')
+        }}</a-button>
       </a-col>
       <a-col v-has-permi="['system:systemConfig:delete']">
         <a-popconfirm
-          title="确定要删除选中数据吗？"
-          ok-text="确定"
-          cancel-text="取消"
+          :title="t('common.confirmDelete')"
+          :ok-text="t('common.okText')"
+          :cancel-text="t('common.cancelText')"
           @confirm="confirm"
           @cancel="cancel"
         >
-          <a-button :disabled="!hasSelected" color="error"> 删除 </a-button>
+          <a-button :disabled="!hasSelected" color="error">
+            {{ t('common.update') }}
+          </a-button>
         </a-popconfirm>
       </a-col>
     </a-row>
@@ -45,12 +49,12 @@
             @click="handleUpdate(record)"
             v-has-permi="['system:systemConfig:update']"
           >
-            修改
+            {{ t('common.update') }}
           </a-button>
           <a-popconfirm
-            title="确定要删除该数据吗？"
-            ok-text="确定"
-            cancel-text="取消"
+            :title="t('common.confirmDelete')"
+            :ok-text="t('common.okText')"
+            :cancel-text="t('common.cancelText')"
             @confirm="confirm(record)"
             @cancel="cancel"
           >
@@ -59,7 +63,7 @@
               color="error"
               v-has-permi="['system:systemConfig:delete']"
             >
-              删除
+              {{ t('common.delete') }}
             </a-button>
           </a-popconfirm>
         </span>
@@ -85,44 +89,49 @@
       >
         <a-row>
           <a-col :span="24">
-            <a-form-item label="参数名称" name="name">
+            <a-form-item :label="t('routes.systemConfig.name')" name="name">
               <a-input
                 v-model:value="formState.name"
-                placeholder="请输入参数名称"
+                :placeholder="t('routes.systemConfig.namePlaceholder')"
               />
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item label="参数键名" name="keyName">
+            <a-form-item
+              :label="t('routes.systemConfig.keyName')"
+              name="keyName"
+            >
               <a-input
                 v-model:value="formState.keyName"
-                placeholder="请输入参数键名"
+                :placeholder="t('routes.systemConfig.keyNamePlaceholder')"
               />
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item label="参数键值" name="key">
+            <a-form-item :label="t('routes.systemConfig.key')" name="key">
               <a-input
                 v-model:value="formState.key"
-                placeholder="请输入参数键值"
+                :placeholder="t('routes.systemConfig.keyPlaceholder')"
               />
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item label="备注" name="remark">
+            <a-form-item :label="t('routes.systemConfig.remark')" name="remark">
               <a-textarea
                 :rows="3"
                 v-model:value="formState.remark"
-                placeholder="请输入备注"
+                :placeholder="t('routes.systemConfig.remarkPlaceholder')"
               />
             </a-form-item>
           </a-col>
           <a-col :span="24">
             <a-form-item>
               <a-button type="primary" class="mr-3" @click="handleSubmit">
-                确认
+                {{ t('common.okText') }}
               </a-button>
-              <a-button @click="handleClose">取消</a-button>
+              <a-button @click="handleClose">
+                {{ t('common.cancelText') }}
+              </a-button>
             </a-form-item>
           </a-col>
         </a-row>
@@ -156,6 +165,9 @@ import { TableState } from 'ant-design-vue/es/table/interface'
 
 import FormSearch from '@/components/FormSearch/index.vue'
 import { ISystemConfig } from '@/api/admin/system/systemConfig/type'
+import { useI18n } from '@/hooks/useI18n'
+
+const { t } = useI18n()
 
 interface FormState {
   id: undefined | number
@@ -163,48 +175,50 @@ interface FormState {
   keyName: undefined | number
   key: undefined | string
   status: undefined | string
+  remark?: undefined | string
+  [key: string]: any
 }
 type Pagination = TableState['pagination']
 
 const columns = [
   {
-    title: '参数名称',
+    title: t('routes.systemConfig.name'),
     dataIndex: 'name',
     key: 'name',
     align: 'center',
   },
   {
-    title: '参数键名',
+    title: t('routes.systemConfig.keyName'),
     dataIndex: 'keyName',
     key: 'keyName',
     align: 'center',
   },
   {
-    title: '参数键值',
+    title: t('routes.systemConfig.key'),
     dataIndex: 'key',
     key: 'key',
     align: 'center',
   },
   {
-    title: '备注',
+    title: t('routes.systemConfig.remark'),
     dataIndex: 'remark',
     key: 'remark',
     align: 'center',
   },
   {
-    title: '创建者',
+    title: t('routes.systemConfig.createdBy'),
     dataIndex: 'createdBy',
     key: 'createdBy',
     align: 'center',
   },
   {
-    title: '创建时间',
+    title: t('routes.systemConfig.createdAt'),
     dataIndex: 'createdAt',
     key: 'createdAt',
     align: 'center',
   },
   {
-    title: '操作',
+    title: t('routes.systemConfig.action'),
     key: 'action',
     align: 'center',
     slots: { customRender: 'action' },
@@ -218,19 +232,35 @@ export default defineComponent({
   setup() {
     const loading = computed(() => useAppStore().loading)
     const rules = {
-      name: [{ required: true, message: '参数名称不能为空', trigger: 'blur' }],
-      keyName: [
-        { required: true, message: '参数键名不能为空', trigger: 'blur' },
+      name: [
+        {
+          required: true,
+          message: t('routes.systemConfig.nameCannotBeEmpty'),
+          trigger: 'blur',
+        },
       ],
-      key: [{ required: true, message: '参数键值不能为空', trigger: 'change' }],
+      keyName: [
+        {
+          required: true,
+          message: t('routes.systemConfig.keyNameCannotBeEmpty'),
+          trigger: 'blur',
+        },
+      ],
+      key: [
+        {
+          required: true,
+          message: t('routes.systemConfig.keyCannotBeEmpty'),
+          trigger: 'change',
+        },
+      ],
     }
     const formFields = reactive([
       {
         type: 'input',
-        label: '参数名称',
+        label: t('routes.systemConfig.name'),
         name: 'name',
         value: '',
-        placeholder: '请输入参数名称',
+        placeholder: t('routes.systemConfig.namePlaceholder'),
       },
     ])
     // 查询表单操作
@@ -353,25 +383,25 @@ export default defineComponent({
           }
         }
         getList(queryParams)
-        Message.success('删除成功')
+        Message.success(t('common.deleteSuccess'))
       })
     }
     // 取消删除
     const cancel = (e: MouseEvent) => {
       console.log(e)
-      Message.success('取消删除')
+      Message.success(t('common.cancelDelete'))
     }
 
     // 新增按钮操作
     const handleAdd = () => {
       open.value = true
-      drawerTitle.value = '添加配置'
+      drawerTitle.value = t('common.add')
     }
     // 更新按钮操作
     const handleUpdate = (row) => {
       getSystemConfigById(row.id).then((res) => {
         open.value = true
-        drawerTitle.value = '修改配置'
+        drawerTitle.value = t('common.update')
         nextTick(() => {
           Object.keys(formState).forEach((key) => {
             formState[key] = res.data[key]
@@ -385,6 +415,7 @@ export default defineComponent({
     })
 
     return {
+      t,
       loading,
       queryParams,
       formFields,

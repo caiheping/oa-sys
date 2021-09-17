@@ -1,0 +1,16 @@
+export default {
+  name: "name",
+  namePlaceholder: "Please enter parameter name",
+  keyName: "keyName",
+  keyNamePlaceholder: "Please enter the parameter key name",
+  key: "key",
+  keyPlaceholder: "Please enter the parameter key value",
+  remark: "remark",
+  remarkPlaceholder: "Please enter comments",
+  createdBy: "createdBy",
+  createdAt: "createdAt",
+  action: "action",
+  nameCannotBeEmpty: "Parameter name cannot be empty",
+  keyNameCannotBeEmpty: "Parameter key name cannot be empty",
+  keyCannotBeEmpty: "Parameter key value cannot be empty",
+}

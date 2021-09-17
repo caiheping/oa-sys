@@ -1,0 +1,17 @@
+export default {
+  nickName: "姓名",
+  clockInType: "打卡类型",
+  clockInWiFi: "上班打卡WiFi",
+  clockInAddr: "上班打卡地址",
+  clockInTime: "上班打卡时间",
+  clockOutWiFi: "下班打卡WiFi",
+  clockOutAddr: "下班打卡地址",
+  clockOutTime: "下班打卡时间",
+  action: "操作",
+  nickNamePlaceholder: "请输入姓名",
+  clockInTypePlaceholder: "请选择类型",
+  clockInWiFiPlaceholder: "请输入上班打卡WiFi",
+  clockInAddrPlaceholder: "请输入上班打卡地址",
+  clockOutWiFiPlaceholder: "请输入下班打卡WiFi",
+  clockOutAddrPlaceholder: "请输入下班打卡地址",
+}

@@ -60,8 +60,10 @@
     </a-form-item>
     <a-form-item>
       <a-space>
-        <a-button type="primary" @click="handleQuery">搜索</a-button>
-        <a-button @click="handleReset">重置</a-button>
+        <a-button type="primary" @click="handleQuery">{{
+          t('common.searchText')
+        }}</a-button>
+        <a-button @click="handleReset">{{ t('common.resetText') }}</a-button>
       </a-space>
     </a-form-item>
   </a-form>
@@ -69,6 +71,8 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, watch } from 'vue'
+import { useI18n } from '@/hooks/useI18n'
+import { FormDataItem } from './type'
 
 export default defineComponent({
   props: {
@@ -79,6 +83,7 @@ export default defineComponent({
   },
   emits: ['search', 'reset'],
   setup(props, { emit, attrs }) {
+    const { t } = useI18n()
     console.log(props, emit, attrs)
     // 新增修改表单操作
     const formRef = ref()
@@ -98,7 +103,7 @@ export default defineComponent({
       },
       { deep: true }
     )
-    const formDataList = computed(() => props.formFields)
+    const formDataList = computed<FormDataItem[] | any>(() => props.formFields)
 
     const handleQuery = () => {
       emit('search', formState.value)
@@ -109,6 +114,7 @@ export default defineComponent({
     }
 
     return {
+      t,
       formDataList,
       formState,
       formRef,

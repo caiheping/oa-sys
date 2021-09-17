@@ -20,24 +20,32 @@
         </div>
         <a-row :gutter="10" class="mb-2">
           <a-col v-has-permi="['system:user:add']">
-            <a-button color="success" @click="handleAdd"> 新增 </a-button>
+            <a-button color="success" @click="handleAdd">
+              {{ t('common.add') }}
+            </a-button>
           </a-col>
           <a-col v-has-permi="['system:user:delete']">
             <a-popconfirm
-              title="确定要删除选中数据吗？"
-              ok-text="确定"
-              cancel-text="取消"
+              :title="t('common.confirmDelete')"
+              :ok-text="t('common.okText')"
+              :cancel-text="t('common.cancelText')"
               @confirm="confirm"
               @cancel="cancel"
             >
-              <a-button :disabled="!hasSelected" color="error"> 删除 </a-button>
+              <a-button :disabled="!hasSelected" color="error">
+                {{ t('common.delete') }}
+              </a-button>
             </a-popconfirm>
           </a-col>
           <a-col>
-            <a-button color="warning">导入</a-button>
+            <a-button color="warning">
+              {{ t('common.export') }}
+            </a-button>
           </a-col>
           <a-col>
-            <a-button color="normal">导出</a-button>
+            <a-button color="normal">
+              {{ t('common.import') }}
+            </a-button>
           </a-col>
         </a-row>
 
@@ -76,7 +84,7 @@
                 @click="handleUpdate(record)"
                 v-has-permi="['system:user:update']"
               >
-                修改
+                {{ t('common.update') }}
               </a-button>
               <a-button
                 type="link"
@@ -85,12 +93,12 @@
                 @click="showModal(record)"
                 v-has-permi="['system:user:resetPwd']"
               >
-                重置密码
+                {{ t('routes.user.resetPwd') }}
               </a-button>
               <a-popconfirm
-                title="确定要删除该数据吗？"
-                ok-text="确定"
-                cancel-text="取消"
+                :title="t('common.confirmDelete')"
+                :ok-text="t('common.okText')"
+                :cancel-text="t('common.cancelText')"
                 @confirm="confirm(record)"
                 @cancel="cancel"
               >
@@ -99,7 +107,7 @@
                   color="error"
                   v-has-permi="['system:user:delete']"
                 >
-                  删除
+                  {{ t('common.delete') }}
                 </a-button>
               </a-popconfirm>
             </span>
@@ -127,48 +135,48 @@
       >
         <a-row>
           <a-col :span="12" v-show="formState.deptId !== 0">
-            <a-form-item label="归属部门" name="deptId">
+            <a-form-item :label="t('routes.user.deptId')" name="deptId">
               <treeselect
                 ref="treeRef"
                 class="!mt-[3px]"
                 v-model:value="formState.deptId"
                 :normalizer="normalizer"
-                placeholder="请选择归属部门"
+                :placeholder="t('routes.user.deptIdPlaceholder')"
                 :options="deptOptions"
                 @select="handleTreeSelect"
               />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="昵称" name="nickName">
+            <a-form-item :label="t('routes.user.nickName')" name="nickName">
               <a-input
                 v-model:value="formState.nickName"
-                placeholder="请输入昵称"
+                :placeholder="t('routes.user.nickNamePlaceholder')"
               />
             </a-form-item>
           </a-col>
           <a-col :span="12" v-if="!isUpdate">
-            <a-form-item label="用户名" name="userName">
+            <a-form-item :label="t('routes.user.userName')" name="userName">
               <a-input
                 v-model:value="formState.userName"
-                placeholder="请输入用户名"
+                :placeholder="t('routes.user.userNamePlaceholder')"
               />
             </a-form-item>
           </a-col>
           <a-col :span="12" v-if="!isUpdate">
-            <a-form-item label="密码" name="password">
+            <a-form-item :label="t('routes.user.password')" name="password">
               <a-input-password
                 v-model:value="formState.password"
-                placeholder="请输入密码"
+                :placeholder="t('routes.user.passwordPlaceholder')"
               />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="角色" name="roleIds">
+            <a-form-item :label="t('routes.user.roleIds')" name="roleIds">
               <a-select
                 mode="multiple"
                 v-model:value="formState.roleIds"
-                placeholder="请选择角色"
+                :placeholder="t('routes.user.roleIdsPlaceholder')"
               >
                 <a-select-option v-for="item in roleOptions" :key="item.id">
                   {{ item.roleName }}
@@ -177,10 +185,10 @@
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="岗位" name="position">
+            <a-form-item :label="t('routes.user.position')" name="position">
               <a-select
                 v-model:value="formState.position"
-                placeholder="请选择岗位"
+                :placeholder="t('routes.user.positionPlaceholder')"
               >
                 <a-select-option
                   :value="item.dictValue"
@@ -193,7 +201,7 @@
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="性别" name="sex">
+            <a-form-item :label="t('routes.user.sex')" name="sex">
               <a-radio-group
                 v-model:value="formState.sex"
                 :options="sexOptions"
@@ -201,15 +209,15 @@
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="手机号码" name="mobile">
+            <a-form-item :label="t('routes.user.mobile')" name="mobile">
               <a-input
                 v-model:value="formState.mobile"
-                placeholder="请输入手机号码"
+                :placeholder="t('routes.user.mobilePlaceholder')"
               />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="状态" name="status">
+            <a-form-item :label="t('routes.user.status')" name="status">
               <a-radio-group
                 v-model:value="formState.status"
                 :options="disableOptions"
@@ -217,19 +225,19 @@
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="邮箱" name="email">
+            <a-form-item :label="t('routes.user.email')" name="email">
               <a-input
                 v-model:value="formState.email"
-                placeholder="请输入邮箱"
+                :placeholder="t('routes.user.emailPlaceholder')"
               />
             </a-form-item>
           </a-col>
           <a-col :span="12" v-if="formState.position !== '1'">
-            <a-form-item label="薪资" name="salary">
+            <a-form-item :label="t('routes.user.salary')" name="salary">
               <a-input-number
                 class="!w-[100%]"
                 v-model:value="formState.salary"
-                placeholder="请输入薪资"
+                :placeholder="t('routes.user.salaryPlaceholder')"
                 :precision="2"
                 :formatter="
                   (value) => `￥ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
@@ -239,29 +247,29 @@
             </a-form-item>
           </a-col>
           <a-col :span="12" v-if="formState.position !== '1'">
-            <a-form-item label="入职时间" name="entryTime">
+            <a-form-item :label="t('routes.user.entryTime')" name="entryTime">
               <a-date-picker
                 class="!w-[100%]"
                 v-model:value="formState.entryTime"
-                placeholder="请输入入职时间"
+                :placeholder="t('routes.user.entryTimePlaceholder')"
               />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="出生日期" name="birthday">
+            <a-form-item :label="t('routes.user.birthday')" name="birthday">
               <a-date-picker
                 class="!w-[100%]"
                 v-model:value="formState.birthday"
-                placeholder="请输入出生日期"
+                :placeholder="t('routes.user.birthdayPlaceholder')"
               />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="学历" name="education">
+            <a-form-item :label="t('routes.user.education')" name="education">
               <a-select
                 allowClear
                 v-model:value="formState.education"
-                placeholder="请选择学历"
+                :placeholder="t('routes.user.educationPlaceholder')"
               >
                 <a-select-option
                   :value="item.dictValue"
@@ -274,20 +282,22 @@
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="备注" name="remark">
+            <a-form-item :label="t('routes.user.remark')" name="remark">
               <a-textarea
                 :rows="3"
                 v-model:value="formState.remark"
-                placeholder="请输入备注"
+                :placeholder="t('routes.user.remarkPlaceholder')"
               />
             </a-form-item>
           </a-col>
           <a-col :span="24">
             <a-form-item>
               <a-button type="primary" class="mr-3" @click="handleSubmit">
-                确认
+                {{ t('common.okText') }}
               </a-button>
-              <a-button @click="handleClose">取消</a-button>
+              <a-button @click="handleClose">
+                {{ t('common.cancelText') }}
+              </a-button>
             </a-form-item>
           </a-col>
         </a-row>
@@ -297,15 +307,17 @@
     <!-- 重置密码 -->
     <a-modal
       v-model:visible="visible"
-      title="重置密码"
+      :title="t('routes.user.resetPwd')"
       @ok="handleResetPwd"
       @cancel="handleResetClose"
     >
       <div class="flex items-center">
-        <span class="whitespace-nowrap">新密码：</span>
+        <span class="whitespace-nowrap"
+          >{{ t('routes.user.newPassword') }}：</span
+        >
         <a-input-password
           v-model:value="newPassword"
-          placeholder="请输入密码"
+          :placeholder="t('routes.user.newPasswordPlaceholder')"
         />
       </div>
     </a-modal>
@@ -353,6 +365,9 @@ import { IUser } from '@/api/admin/system/user/type'
 import { IRole } from '@/api/admin/system/role/type'
 import { IData } from '@/api/admin/system/dict/data/type'
 import { IDept } from '@/api/admin/system/dept/type'
+import { useI18n } from '@/hooks/useI18n'
+
+const { t } = useI18n()
 
 interface FormState {
   id: undefined | number
@@ -377,19 +392,19 @@ type Pagination = TableState['pagination']
 
 const columns = [
   {
-    title: '用户名',
+    title: t('routes.user.userName'),
     dataIndex: 'userName',
     key: 'userName',
     align: 'center',
   },
   {
-    title: '昵称',
+    title: t('routes.user.nickName'),
     dataIndex: 'nickName',
     key: 'nickName',
     align: 'center',
   },
   {
-    title: '角色',
+    title: t('routes.user.roles'),
     key: 'roles',
     align: 'center',
     slots: {
@@ -397,7 +412,7 @@ const columns = [
     },
   },
   {
-    title: '部门',
+    title: t('routes.user.department'),
     key: 'department',
     align: 'center',
     slots: {
@@ -405,7 +420,7 @@ const columns = [
     },
   },
   {
-    title: '岗位',
+    title: t('routes.user.position'),
     key: 'position',
     align: 'center',
     slots: {
@@ -413,26 +428,26 @@ const columns = [
     },
   },
   {
-    title: '手机号',
+    title: t('routes.user.mobile'),
     key: 'mobile',
     dataIndex: 'mobile',
     align: 'center',
   },
   {
-    title: '状态',
+    title: t('routes.user.status'),
     dataIndex: 'status',
     key: 'status',
     align: 'center',
     slots: { customRender: 'status' },
   },
   {
-    title: '创建时间',
+    title: t('routes.user.createdAt'),
     dataIndex: 'createdAt',
     key: 'createdAt',
     align: 'center',
   },
   {
-    title: '操作',
+    title: t('routes.user.action'),
     key: 'action',
     align: 'center',
     slots: { customRender: 'action' },
@@ -482,17 +497,17 @@ export default defineComponent({
     const formFields = reactive([
       {
         type: 'input',
-        label: '用户名',
+        label: t('routes.user.userName'),
         name: 'userName',
         value: undefined,
-        placeholder: '请输入用户名',
+        placeholder: t('routes.user.userNamePlaceholder'),
       },
       {
         type: 'select',
-        label: '角色',
+        label: t('routes.user.roleIds'),
         name: 'roleId',
         value: undefined,
-        placeholder: '请选择角色',
+        placeholder: t('routes.user.roleIdsPlaceholder'),
         normalizer: {
           value: 'id',
           label: 'roleName',
@@ -546,7 +561,7 @@ export default defineComponent({
     const handleAdd = () => {
       open.value = true
       isUpdate.value = false
-      drawerTitle.value = '添加用户'
+      drawerTitle.value = t('common.add')
     }
 
     // 更新按钮操作
@@ -554,7 +569,7 @@ export default defineComponent({
       getUser(row.id).then((res) => {
         open.value = true
         isUpdate.value = true
-        drawerTitle.value = '修改用户'
+        drawerTitle.value = t('common.update')
         nextTick(() => {
           Object.keys(formState).forEach((key) => {
             formState[key] = res.data[key]
@@ -584,13 +599,13 @@ export default defineComponent({
           }
         }
         getList(queryParams)
-        Message.success('删除成功')
+        Message.success(t('common.deleteSuccess'))
       })
     }
     // 取消删除
     const cancel = (e: MouseEvent) => {
       console.log(e)
-      Message.success('取消删除')
+      Message.success(t('common.cancelDelete'))
     }
     // 部门树选项
     const deptOptions = ref<IDept[]>([])
@@ -648,15 +663,31 @@ export default defineComponent({
         {
           required: true,
           validator: formRules.number,
-          message: '归属部门不能为空',
+          message: t('routes.user.deptIdCannotBeEmpty'),
           trigger: 'change',
         },
       ],
-      nickName: [{ required: true, message: '昵称不能为空', trigger: 'blur' }],
-      userName: [
-        { required: true, message: '用户名不能为空', trigger: 'blur' },
+      nickName: [
+        {
+          required: true,
+          message: t('routes.user.nickNameCannotBeEmpty'),
+          trigger: 'blur',
+        },
       ],
-      password: [{ required: true, message: '密码不能为空', trigger: 'blur' }],
+      userName: [
+        {
+          required: true,
+          message: t('routes.user.userNameCannotBeEmpty'),
+          trigger: 'blur',
+        },
+      ],
+      password: [
+        {
+          required: true,
+          message: t('routes.user.passwordCannotBeEmpty'),
+          trigger: 'blur',
+        },
+      ],
       roleIds: [
         {
           required: true,
@@ -667,7 +698,7 @@ export default defineComponent({
       position: [
         {
           required: true,
-          message: '岗位不能为空',
+          message: t('routes.user.positionCannotBeEmpty'),
           trigger: 'change',
         },
       ],
@@ -675,7 +706,7 @@ export default defineComponent({
         {
           required: true,
           validator: formRules.number,
-          message: '薪资不能为空',
+          message: t('routes.user.salaryCannotBeEmpty'),
           trigger: 'blur',
         },
       ],
@@ -766,7 +797,7 @@ export default defineComponent({
     // 重置密码
     const handleResetPwd = () => {
       if (!resetformState.newPassword) {
-        Message.error('新密码不能为空')
+        Message.error(t('routes.user.newPasswordCannotBeEmpty'))
         return
       }
       resetUserPwd(resetformState.id, {
@@ -826,6 +857,7 @@ export default defineComponent({
     })
 
     return {
+      t,
       loading,
       replaceFields,
       deptSearchRef,
