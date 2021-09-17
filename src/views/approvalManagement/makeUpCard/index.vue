@@ -27,9 +27,9 @@
           </a-button>
         </a-popconfirm>
       </a-col>
-      <a-col>
+      <!-- <a-col>
         <a-button color="normal">{{ t('common.export') }}</a-button>
-      </a-col>
+      </a-col> -->
     </a-row>
 
     <a-table
@@ -60,22 +60,28 @@
       </template>
       <template #action="{ record }">
         <span>
-          <a-dropdown :trigger="['click']" @click="handleClickDropdown(record)">
-            <span class="mr-3 text-[#faad14] cursor-pointer">
-              {{ t('routes.makeUpCard.approve') }}
-            </span>
-            <template #overlay>
-              <a-menu @click="handleExamineAndApprove">
-                <a-menu-item
-                  :disabled="item.dictValue === '0'"
-                  v-for="item in examineAndApproveStatusOptions"
-                  :key="item.dictValue"
-                >
-                  {{ item.dictLabel }}
-                </a-menu-item>
-              </a-menu>
-            </template>
-          </a-dropdown>
+          <span v-has-permi="['examineAndApprove:makeUpCard:update']">
+            <a-dropdown
+              :trigger="['click']"
+              @click="handleClickDropdown(record)"
+            >
+              <span class="mr-3 text-[#faad14] cursor-pointer">
+                {{ t('routes.makeUpCard.approve') }}
+              </span>
+              <template #overlay>
+                <a-menu @click="handleExamineAndApprove">
+                  <a-menu-item
+                    :disabled="item.dictValue === '0'"
+                    v-for="item in examineAndApproveStatusOptions"
+                    :key="item.dictValue"
+                  >
+                    {{ item.dictLabel }}
+                  </a-menu-item>
+                </a-menu>
+              </template>
+            </a-dropdown>
+          </span>
+
           <a-button
             type="link"
             color="success"

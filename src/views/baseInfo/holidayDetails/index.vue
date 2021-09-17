@@ -18,11 +18,11 @@
             @reset="handleQuery"
           />
         </div>
-        <a-row :gutter="10" class="mb-2">
+        <!-- <a-row :gutter="10" class="mb-2">
           <a-col>
             <a-button color="normal">{{ t('common.export') }}</a-button>
           </a-col>
-        </a-row>
+        </a-row> -->
 
         <a-table
           :loading="loading"

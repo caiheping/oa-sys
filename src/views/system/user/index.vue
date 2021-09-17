@@ -37,16 +37,16 @@
               </a-button>
             </a-popconfirm>
           </a-col>
-          <a-col>
+          <!-- <a-col>
             <a-button color="warning">
               {{ t('common.export') }}
             </a-button>
-          </a-col>
-          <a-col>
+          </a-col> -->
+          <!-- <a-col>
             <a-button color="normal">
               {{ t('common.import') }}
             </a-button>
-          </a-col>
+          </a-col> -->
         </a-row>
 
         <a-table
@@ -313,7 +313,7 @@
     >
       <div class="flex items-center">
         <span class="whitespace-nowrap"
-          >{{ t('routes.user.newPassword') }}：</span
+        >{{ t('routes.user.newPassword') }}：</span
         >
         <a-input-password
           v-model:value="newPassword"
@@ -404,7 +404,7 @@ const columns = [
     align: 'center',
   },
   {
-    title: t('routes.user.roles'),
+    title: t('routes.user.roleIds'),
     key: 'roles',
     align: 'center',
     slots: {

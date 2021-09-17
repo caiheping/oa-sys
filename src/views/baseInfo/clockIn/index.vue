@@ -27,9 +27,9 @@
           </a-button>
         </a-popconfirm>
       </a-col>
-      <a-col>
+      <!-- <a-col>
         <a-button color="normal">{{ t('common.export') }}</a-button>
-      </a-col>
+      </a-col> -->
     </a-row>
 
     <a-table
