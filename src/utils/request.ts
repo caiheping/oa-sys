@@ -141,18 +141,14 @@ export function downLoad(url, params = {}, filename = 'filename.xlsx') {
   }).then((data: any) => {
     const content = data
     const blob = new Blob([content])
-    if ('download' in document.createElement('a')) {
-      const elink = document.createElement('a')
-      elink.download = filename
-      elink.style.display = 'none'
-      elink.href = URL.createObjectURL(blob)
-      document.body.appendChild(elink)
-      elink.click()
-      URL.revokeObjectURL(elink.href)
-      document.body.removeChild(elink)
-    } else {
-      navigator.msSaveBlob(blob, filename)
-    }
+    const elink = document.createElement('a')
+    elink.download = filename
+    elink.style.display = 'none'
+    elink.href = URL.createObjectURL(blob)
+    document.body.appendChild(elink)
+    elink.click()
+    URL.revokeObjectURL(elink.href)
+    document.body.removeChild(elink)
   }).catch((r) => {
     console.error(r)
   })

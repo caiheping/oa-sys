@@ -20,7 +20,7 @@
             v-on="item.fn ? item.fn : {}"
           />
           <a-textarea
-            v-if="item.type === 'textarea'"
+            v-else-if="item.type === 'textarea'"
             :rows="3"
             v-model:value="formState[item.name]"
             :placeholder="item.placeholder"
