@@ -20,7 +20,7 @@
             v-on="item.fn ? item.fn : {}"
           />
           <a-textarea
-            v-if="item.type === 'textarea'"
+            v-else-if="item.type === 'textarea'"
             :rows="3"
             v-model:value="formState[item.name]"
             :placeholder="item.placeholder"
@@ -132,14 +132,19 @@
       </a-col>
     </a-row>
     <slot>
-      <a-button type="primary" @click.prevent="handleSubmit">确定</a-button>
-      <a-button class="ml-3" @click="handleCancel">取消</a-button>
+      <a-button type="primary" @click.prevent="handleSubmit">{{
+        t('common.okText')
+      }}</a-button>
+      <a-button class="ml-3" @click="handleCancel">{{
+        t('common.cancelText')
+      }}</a-button>
     </slot>
   </a-form>
 </template>
 
 <script lang="ts">
 import { defineComponent, computed } from 'vue'
+import { useI18n } from '@/hooks/useI18n'
 import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
 import { Form } from 'ant-design-vue'
 
@@ -169,6 +174,7 @@ export default defineComponent({
   },
   emits: ['close', 'submit'],
   setup(props, { emit }) {
+    const { t } = useI18n()
     const formDataList = computed(
       (): FormDataItem[] => props.formData as FormDataItem[]
     )
@@ -198,6 +204,7 @@ export default defineComponent({
     }
 
     return {
+      t,
       formDataList,
       formState,
       labelCol: { span: 6 },

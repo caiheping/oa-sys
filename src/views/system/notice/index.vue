@@ -9,17 +9,21 @@
     </div>
     <a-row :gutter="10" class="mb-2">
       <a-col v-has-permi="['system:notice:add']">
-        <a-button color="success" @click="handleAdd">新增</a-button>
+        <a-button color="success" @click="handleAdd">{{
+          t('common.add')
+        }}</a-button>
       </a-col>
       <a-col v-has-permi="['system:notice:delete']">
         <a-popconfirm
-          title="确定要删除选中数据吗？"
-          ok-text="确定"
-          cancel-text="取消"
+          :title="t('common.confirmDelete')"
+          :ok-text="t('common.okText')"
+          :cancel-text="t('common.cancelText')"
           @confirm="confirm"
           @cancel="cancel"
         >
-          <a-button :disabled="!hasSelected" color="error"> 删除 </a-button>
+          <a-button :disabled="!hasSelected" color="error">
+            {{ t('common.update') }}
+          </a-button>
         </a-popconfirm>
       </a-col>
     </a-row>
@@ -51,12 +55,12 @@
             @click="handleUpdate(record)"
             v-has-permi="['system:notice:update']"
           >
-            修改
+            {{ t('common.update') }}
           </a-button>
           <a-popconfirm
-            title="确定要删除该数据吗？"
-            ok-text="确定"
-            cancel-text="取消"
+            :title="t('common.confirmDelete')"
+            :ok-text="t('common.okText')"
+            :cancel-text="t('common.cancelText')"
             @confirm="confirm(record)"
             @cancel="cancel"
           >
@@ -65,7 +69,7 @@
               color="error"
               v-has-permi="['system:notice:delete']"
             >
-              删除
+              {{ t('common.delete') }}
             </a-button>
           </a-popconfirm>
         </span>
@@ -91,18 +95,24 @@
       >
         <a-row>
           <a-col :span="24">
-            <a-form-item label="标题" name="noticeTitle">
+            <a-form-item
+              :label="t('routes.notice.noticeTitle')"
+              name="noticeTitle"
+            >
               <a-input
                 v-model:value="formState.noticeTitle"
-                placeholder="请输入标题"
+                :placeholder="t('routes.notice.noticeTitle')"
               />
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item label="类型" name="noticeType">
+            <a-form-item
+              :label="t('routes.notice.noticeType')"
+              name="noticeType"
+            >
               <a-select
                 v-model:value="formState.noticeType"
-                placeholder="请输入类型"
+                :placeholder="t('routes.notice.noticeTypePlaceholder')"
               >
                 <a-select-option
                   v-for="item in typeOptions"
@@ -115,7 +125,7 @@
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item label="状态" name="status">
+            <a-form-item :label="t('routes.notice.status')" name="status">
               <a-radio-group
                 v-model:value="formState.status"
                 :options="disableOptions"
@@ -123,20 +133,25 @@
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item label="内容" name="noticeContent">
+            <a-form-item
+              :label="t('routes.notice.noticeContent')"
+              name="noticeContent"
+            >
               <a-textarea
                 :rows="3"
                 v-model:value="formState.noticeContent"
-                placeholder="请输入内容"
+                :placeholder="t('routes.notice.noticeContentPlaceholder')"
               />
             </a-form-item>
           </a-col>
           <a-col :span="24">
             <a-form-item>
               <a-button type="primary" class="mr-3" @click="handleSubmit">
-                确认
+                {{ t('common.okText') }}
               </a-button>
-              <a-button @click="handleClose">取消</a-button>
+              <a-button @click="handleClose">{{
+                t('common.cancelText')
+              }}</a-button>
             </a-form-item>
           </a-col>
         </a-row>
@@ -171,6 +186,9 @@ import { TableState } from 'ant-design-vue/es/table/interface'
 import FormSearch from '@/components/FormSearch/index.vue'
 import { INotice } from '@/api/admin/system/notice/type'
 import { IData } from '@/api/admin/system/dict/data/type'
+import { useI18n } from '@/hooks/useI18n'
+
+const { t } = useI18n()
 
 interface FormState {
   id: undefined | number
@@ -183,45 +201,45 @@ type Pagination = TableState['pagination']
 
 const columns = [
   {
-    title: '标题',
+    title: t('routes.notice.noticeTitle'),
     dataIndex: 'noticeTitle',
     key: 'noticeTitle',
     align: 'center',
   },
   {
-    title: '类型',
+    title: t('routes.notice.noticeType'),
     dataIndex: 'noticeType',
     key: 'noticeType',
     align: 'center',
     slots: { customRender: 'noticeType' },
   },
   {
-    title: '内容',
+    title: t('routes.notice.noticeContent'),
     dataIndex: 'noticeContent',
     key: 'noticeContent',
     align: 'center',
   },
   {
-    title: '状态',
+    title: t('routes.notice.status'),
     dataIndex: 'status',
     key: 'status',
     align: 'center',
     slots: { customRender: 'status' },
   },
   {
-    title: '创建者',
+    title: t('routes.notice.createdBy'),
     dataIndex: 'createdBy',
     key: 'createdBy',
     align: 'center',
   },
   {
-    title: '创建时间',
+    title: t('routes.notice.createdAt'),
     dataIndex: 'createdAt',
     key: 'createdAt',
     align: 'center',
   },
   {
-    title: '操作',
+    title: t('routes.notice.action'),
     key: 'action',
     align: 'center',
     slots: { customRender: 'action' },
@@ -239,27 +257,41 @@ export default defineComponent({
     const typeOptions = ref<IData[]>([])
     const rules = {
       noticeTitle: [
-        { required: true, message: '标题不能为空', trigger: 'blur' },
+        {
+          required: true,
+          message: t('routes.notice.noticeTitleCannotBeEmpty'),
+          trigger: 'blur',
+        },
       ],
       noticeType: [
-        { required: true, message: '类型不能为空', trigger: 'blur' },
+        {
+          required: true,
+          message: t('routes.notice.noticeTypeCannotBeEmpty'),
+          trigger: 'blur',
+        },
       ],
-      status: [{ required: true, message: '状态不能为空', trigger: 'change' }],
+      status: [
+        {
+          required: true,
+          message: t('routes.notice.statusCannotBeEmpty'),
+          trigger: 'change',
+        },
+      ],
     }
     const formFields = reactive([
       {
         type: 'input',
-        label: '标题',
+        label: t('routes.notice.noticeTitle'),
         name: 'noticeTitle',
         value: '',
-        placeholder: '请输入标题',
+        placeholder: t('routes.notice.noticeTitlePlaceholder'),
       },
       {
         type: 'select',
-        label: '类型',
+        label: t('routes.notice.noticeType'),
         name: 'noticeType',
         value: undefined,
-        placeholder: '请选择类型',
+        placeholder: t('routes.notice.noticeTypePlaceholder'),
         normalizer: {
           value: 'dictValue',
           label: 'dictLabel',
@@ -268,10 +300,10 @@ export default defineComponent({
       },
       {
         type: 'select',
-        label: '状态',
+        label: t('routes.notice.status'),
         name: 'status',
         value: undefined,
-        placeholder: '请选择角色状态',
+        placeholder: t('routes.notice.statusPlaceholder'),
         normalizer: {
           value: 'dictValue',
           label: 'dictLabel',
@@ -384,28 +416,40 @@ export default defineComponent({
     }
     // 确认删除
     const confirm = (row) => {
-      const dictId = row.id || state.selectedRowKeys
-      delNotice(dictId).then(() => {
+      const ids = row.id || state.selectedRowKeys
+      delNotice(ids).then(() => {
+        if (
+          (ids.length && ids.length === noticeList.value.length) ||
+          noticeList.value.length === 1
+        ) {
+          if (
+            Math.ceil(pagination.value.total / queryParams.pageSize) ===
+              queryParams.pageNum &&
+            queryParams.pageNum > 1
+          ) {
+            queryParams.pageNum--
+          }
+        }
         getList(queryParams)
-        Message.success('删除成功')
+        Message.success(t('common.deleteSuccess'))
       })
     }
     // 取消删除
     const cancel = (e: MouseEvent) => {
       console.log(e)
-      Message.success('取消删除')
+      Message.success(t('common.cancelDelete'))
     }
 
     // 新增按钮操作
     const handleAdd = () => {
       open.value = true
-      drawerTitle.value = '添加消息'
+      drawerTitle.value = t('common.add')
     }
     // 更新按钮操作
     const handleUpdate = (row) => {
       getNoticeById(row.id).then((res) => {
         open.value = true
-        drawerTitle.value = '修改消息'
+        drawerTitle.value = t('common.update')
         nextTick(() => {
           Object.keys(formState).forEach((key) => {
             formState[key] = res.data[key]
@@ -426,6 +470,7 @@ export default defineComponent({
     })
 
     return {
+      t,
       loading,
       queryParams,
       formFields,

@@ -1,8 +1,9 @@
 import HttpRequest from "@/utils/request"
+import { IData } from "./type"
 
 // 登录
 export function login(params = {}) {
-  return HttpRequest('/login', 'POST', params)
+  return HttpRequest<IData>('/login', 'POST', params)
 }
 
 // 登出

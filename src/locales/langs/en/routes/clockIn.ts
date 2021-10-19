@@ -1,0 +1,17 @@
+export default {
+  nickName: "nickName",
+  clockInType: "Punch in type",
+  clockInWiFi: "Clock in WiFi",
+  clockInAddr: "Clock in address",
+  clockInTime: "Clock in time",
+  clockOutWiFi: "Clock out WiFi",
+  clockOutAddr: "Clock out address",
+  clockOutTime: "Clock out time",
+  action: "action",
+  nickNamePlaceholder: "Please enter your name",
+  clockInTypePlaceholder: "Please select a type",
+  clockInWiFiPlaceholder: "Please enter the clock in WiFi",
+  clockInAddrPlaceholder: "Please enter the clock in address",
+  clockOutWiFiPlaceholder: "Please enter the clock out WiFi",
+  clockOutAddrPlaceholder: "Please enter the clock out address",
+}

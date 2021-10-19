@@ -9,17 +9,21 @@
     </div>
     <a-row :gutter="10" class="mb-2">
       <a-col v-has-permi="['system:role:add']">
-        <a-button color="success" @click="handleAdd"> 新增 </a-button>
+        <a-button color="success" @click="handleAdd">
+          {{ t('common.add') }}
+        </a-button>
       </a-col>
       <a-col v-has-permi="['system:role:delete']">
         <a-popconfirm
-          title="确定要删除选中数据吗？"
-          ok-text="确定"
-          cancel-text="取消"
+          :title="t('common.confirmDelete')"
+          :ok-text="t('common.okText')"
+          :cancel-text="t('common.cancelText')"
           @confirm="confirm"
           @cancel="cancel"
         >
-          <a-button :disabled="!hasSelected" color="error"> 删除 </a-button>
+          <a-button :disabled="!hasSelected" color="error">
+            {{ t('common.delete') }}
+          </a-button>
         </a-popconfirm>
       </a-col>
     </a-row>
@@ -53,7 +57,7 @@
             @click="handleUpdate(record)"
             v-has-permi="['system:role:update']"
           >
-            修改
+            {{ t('common.update') }}
           </a-button>
           <a-button
             type="link"
@@ -62,12 +66,12 @@
             @click="handleScopeOpen(record)"
             v-has-permi="['system:role:update']"
           >
-            数据权限
+            {{ t('routes.role.dataAuth') }}
           </a-button>
           <a-popconfirm
-            title="确定要删除该数据吗？"
-            ok-text="确定"
-            cancel-text="取消"
+            :title="t('common.confirmDelete')"
+            :ok-text="t('common.okText')"
+            :cancel-text="t('common.cancelText')"
             @confirm="confirm(record)"
             @cancel="cancel"
           >
@@ -76,7 +80,7 @@
               color="error"
               v-has-permi="['system:role:delete']"
             >
-              删除
+              {{ t('common.delete') }}
             </a-button>
           </a-popconfirm>
         </span>
@@ -102,32 +106,32 @@
       >
         <a-row>
           <a-col :span="24">
-            <a-form-item label="角色名称" name="roleName">
+            <a-form-item :label="t('routes.role.roleName')" name="roleName">
               <a-input
                 v-model:value="formState.roleName"
-                placeholder="请输入角色名称"
+                :placeholder="t('routes.role.roleNamePlaceholder')"
               />
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item label="权限字符" name="roleKey">
+            <a-form-item :label="t('routes.role.roleKey')" name="roleKey">
               <a-input
                 v-model:value="formState.roleKey"
-                placeholder="请输入权限字符"
+                :placeholder="t('routes.role.roleKeyPlaceholder')"
               />
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item label="显示排序" name="roleSort">
+            <a-form-item :label="t('routes.role.roleSort')" name="roleSort">
               <a-input-number
                 class="!w-[100%]"
                 v-model:value="formState.roleSort"
-                placeholder="请输入显示排序"
+                :placeholder="t('routes.role.roleSortPlaceholder')"
               />
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item label="状态" name="status">
+            <a-form-item :label="t('routes.role.status')" name="status">
               <a-radio-group
                 v-model:value="formState.status"
                 :options="disableOptions"
@@ -135,10 +139,11 @@
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item label="菜单权限" name="menuIds">
+            <a-form-item :label="t('routes.role.menuIds')" name="menuIds">
               <a-tree
                 :blockNode="true"
                 checkable
+                checkStrictly
                 :replace-fields="replaceFields"
                 :tree-data="menuOptions"
                 v-model:checkedKeys="checkedKeys"
@@ -146,20 +151,22 @@
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item label="备注" name="remark">
+            <a-form-item :label="t('routes.role.remark')" name="remark">
               <a-textarea
                 :rows="3"
                 v-model:value="formState.remark"
-                placeholder="请输入备注"
+                :placeholder="t('routes.role.remarkPlaceholder')"
               />
             </a-form-item>
           </a-col>
           <a-col :span="24">
             <a-form-item>
               <a-button type="primary" class="mr-3" @click="handleSubmit">
-                确认
+                {{ t('common.okText') }}
               </a-button>
-              <a-button @click="handleClose">取消</a-button>
+              <a-button @click="handleClose">{{
+                t('common.cancelText')
+              }}</a-button>
             </a-form-item>
           </a-col>
         </a-row>
@@ -169,7 +176,7 @@
     <!-- 数据权限推窗 -->
     <a-drawer
       width="540px"
-      title="分配数据权限"
+      :title="t('routes.role.assignDataPermissions')"
       placement="right"
       v-model:visible="dataScopeOpen"
       :maskClosable="false"
@@ -185,28 +192,28 @@
       >
         <a-row>
           <a-col :span="24">
-            <a-form-item label="角色名称" name="roleName">
+            <a-form-item :label="t('routes.role.roleName')" name="roleName">
               <a-input
                 :disabled="true"
                 v-model:value="formScopeState.roleName"
-                placeholder="请输入角色名称"
+                :placeholder="t('routes.role.roleNamePlaceholder')"
               />
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item label="权限字符" name="roleKey">
+            <a-form-item :label="t('routes.role.roleKey')" name="roleKey">
               <a-input
                 :disabled="true"
                 v-model:value="formScopeState.roleKey"
-                placeholder="请输入权限字符"
+                :placeholder="t('routes.role.roleKeyPlaceholder')"
               />
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item label="权限范围" name="dataScope">
+            <a-form-item :label="t('routes.role.dataScope')" name="dataScope">
               <a-select
                 v-model:value="formScopeState.dataScope"
-                placeholder="请选择权限范围"
+                :placeholder="t('routes.role.dataScopePlaceholder')"
               >
                 <a-select-option
                   v-for="item in dataScopeOptions"
@@ -220,9 +227,11 @@
           <a-col :span="24">
             <a-form-item>
               <a-button type="primary" class="mr-3" @click="handleScopeSubmit">
-                确认
+                {{ t('common.okText') }}
               </a-button>
-              <a-button @click="handleScopeClose">取消</a-button>
+              <a-button @click="handleScopeClose">{{
+                t('common.cancelText')
+              }}</a-button>
             </a-form-item>
           </a-col>
         </a-row>
@@ -261,6 +270,9 @@ import FormSearch from '@/components/FormSearch/index.vue'
 import { IRole } from '@/api/admin/system/role/type'
 import { IData } from '@/api/admin/system/dict/data/type'
 import { IMenu } from '@/api/admin/system/menu/type'
+import { useI18n } from '@/hooks/useI18n'
+
+const { t } = useI18n()
 
 interface FormState {
   id: undefined | number
@@ -287,44 +299,44 @@ type Pagination = TableState['pagination']
 
 const columns = [
   {
-    title: '角色名称',
+    title: t('routes.role.roleName'),
     dataIndex: 'roleName',
     key: 'roleName',
     align: 'center',
   },
   {
-    title: '权限字符',
+    title: t('routes.role.roleKey'),
     dataIndex: 'roleKey',
     key: 'roleKey',
     align: 'center',
   },
   {
-    title: '显示顺序',
+    title: t('routes.role.roleSort'),
     dataIndex: 'roleSort',
     key: 'roleSort',
     align: 'center',
   },
   {
-    title: '状态',
+    title: t('routes.role.status'),
     dataIndex: 'status',
     key: 'status',
     align: 'center',
     slots: { customRender: 'status' },
   },
   {
-    title: '创建人',
+    title: t('routes.role.createdBy'),
     dataIndex: 'createdBy',
     key: 'createdBy',
     align: 'center',
   },
   {
-    title: '创建时间',
+    title: t('routes.role.createdAt'),
     dataIndex: 'createdAt',
     key: 'createdAt',
     align: 'center',
   },
   {
-    title: '操作',
+    title: t('routes.role.action'),
     key: 'action',
     align: 'center',
     slots: { customRender: 'action' },
@@ -340,20 +352,34 @@ export default defineComponent({
     const statusOptions = ref<IData[]>([])
     const disableOptions = ref<IData[]>([])
     const checkMenus = () => {
-      if (checkedKeys.value.length) {
+      if ([...checkedKeys.value.checked].length) {
         return Promise.resolve()
       } else {
-        return Promise.reject('菜单权限为空')
+        return Promise.reject(t('routes.role.menuPermissionIsEmpty'))
       }
     }
     const rules = {
       roleName: [
-        { required: true, message: '角色名称不能为空', trigger: 'blur' },
+        {
+          required: true,
+          message: t('routes.role.roleNameIsEmpty'),
+          trigger: 'blur',
+        },
       ],
       roleKey: [
-        { required: true, message: '权限字符不能为空', trigger: 'blur' },
+        {
+          required: true,
+          message: t('routes.role.roleKeyIsEmpty'),
+          trigger: 'blur',
+        },
       ],
-      status: [{ required: true, message: '状态不能为空', trigger: 'change' }],
+      status: [
+        {
+          required: true,
+          message: t('routes.role.statusIsEmpty'),
+          trigger: 'change',
+        },
+      ],
       menuIds: [
         {
           required: true,
@@ -373,17 +399,17 @@ export default defineComponent({
     const formFields = reactive([
       {
         type: 'input',
-        label: '角色名称',
+        label: t('routes.role.roleName'),
         name: 'roleName',
         value: '',
-        placeholder: '请输入角色名称',
+        placeholder: t('routes.role.roleNamePlaceholder'),
       },
       {
         type: 'select',
-        label: '状态',
+        label: t('routes.role.status'),
         name: 'status',
         value: undefined,
-        placeholder: '请选择角色状态',
+        placeholder: t('routes.role.statusPlaceholder'),
         normalizer: {
           value: 'dictValue',
           label: 'dictLabel',
@@ -457,19 +483,18 @@ export default defineComponent({
     })
     const { open, drawerTitle } = useDrawer()
     const handleClose = () => {
+      checkedKeys.value.checked = []
       formState.id = undefined
-      checkedKeys.value = []
       formRef.value.resetFields()
       console.log(formRef)
       open.value = false
     }
     // 表单提交
     const handleSubmit = () => {
-      console.log(formState, checkedKeys)
       formRef.value
         .validate()
         .then(() => {
-          formState.menuIds = checkedKeys.value
+          formState.menuIds = [...checkedKeys.value.checked]
           if (formState.id) {
             updateRole(formState).then((res) => {
               Message.success(res.message)
@@ -494,40 +519,58 @@ export default defineComponent({
     }
     // 确认删除
     const confirm = (row) => {
-      const dictId = row.id || state.selectedRowKeys
-      delRole(dictId).then(() => {
+      const ids = row.id || state.selectedRowKeys
+      delRole(ids).then(() => {
+        if (
+          (ids.length && ids.length === roleList.value.length) ||
+          roleList.value.length === 1
+        ) {
+          if (
+            Math.ceil(pagination.value.total / queryParams.pageSize) ===
+              queryParams.pageNum &&
+            queryParams.pageNum > 1
+          ) {
+            queryParams.pageNum--
+          }
+        }
         getList(queryParams)
-        Message.success('删除成功')
+        Message.success(t('common.deleteSuccess'))
       })
     }
     // 取消删除
     const cancel = (e: MouseEvent) => {
       console.log(e)
-      Message.success('取消删除')
+      Message.success(t('common.cancelDelete'))
     }
 
     // 新增按钮操作
     const handleAdd = () => {
       open.value = true
-      drawerTitle.value = '添加角色'
+      drawerTitle.value = t('common.add')
     }
     // 更新按钮操作
     const handleUpdate = (row) => {
       getRoleById(row.id).then((res) => {
         open.value = true
-        drawerTitle.value = '修改角色'
+        drawerTitle.value = t('common.update')
         nextTick(() => {
           Object.keys(formState).forEach((key) => {
             formState[key] = res.data[key]
           })
-          checkedKeys.value = res.data.menus.map((list) => list.id)
+          const obj = {
+            checked: res.data.menus.map((list) => list.id),
+            halfChecked: [],
+          }
+          checkedKeys.value = toRefs(obj)
         })
       })
     }
 
     /** 查询菜单树结构 */
     const menuOptions = ref<IMenu[]>([])
-    const checkedKeys = ref([])
+    const checkedKeys = ref<any>({
+      checked: [],
+    })
     // 树形控件操作
     const replaceFields = {
       children: 'children',
@@ -544,22 +587,26 @@ export default defineComponent({
     const dataScopeOptions = reactive([
       {
         value: '1',
-        label: '本部门及以下数据权限',
+        label: t('routes.role.CurrentAndBelow'),
       },
       {
         value: '2',
-        label: '本部门数据权限',
+        label: t('routes.role.current'),
       },
       {
         value: '3',
-        label: '仅本人数据权限',
+        label: t('routes.role.myself'),
       },
     ])
     const formScopeRef = ref()
     const dataScopeOpen = ref(false)
     const scopeRules = {
       dataScope: [
-        { required: true, message: '权限范围不能为空', trigger: 'blur' },
+        {
+          required: true,
+          message: t('routes.role.menuIdsIsEmpty'),
+          trigger: 'blur',
+        },
       ],
     }
     const formScopeState: FormScopeState = reactive({
@@ -615,6 +662,7 @@ export default defineComponent({
     })
 
     return {
+      t,
       loading,
       queryParams,
       formFields,

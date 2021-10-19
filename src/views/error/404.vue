@@ -20,16 +20,32 @@
         />
       </div>
       <div class="bullshit">
-        <div class="bullshit__oops">404错误!</div>
-        <div class="bullshit__headline">网页找不到</div>
+        <div class="bullshit__oops">404{{ t('error.404.error') }}</div>
+        <div class="bullshit__headline">{{ t('error.404.notFound') }}</div>
         <div class="bullshit__info">
-          对不起，您正在寻找的页面不存在。尝试检查URL的错误，然后按浏览器上的刷新按钮或尝试在我们的应用程序中找到其他内容。
+          {{ t('error.404.errorMsg') }}
         </div>
-        <router-link to="/" class="bullshit__return-home">返回首页</router-link>
+        <router-link to="/" class="bullshit__return-home">{{
+          t('error.404.goHome')
+        }}</router-link>
       </div>
     </div>
   </div>
 </template>
+
+<script>
+import { defineComponent } from 'vue'
+import { useI18n } from '@/hooks/useI18n'
+
+export default defineComponent({
+  setup() {
+    const { t } = useI18n()
+    return {
+      t,
+    }
+  },
+})
+</script>
 
 <style lang="less" scoped>
 .wscn-http404-container {

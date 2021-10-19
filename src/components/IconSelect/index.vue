@@ -3,14 +3,16 @@
     <a-select
       v-model:value="selected"
       style="width: 100%"
-      placeholder="请选择图标"
+      :placeholder="iconPlaceholder || t('common.resetText')"
       option-label-prop="label"
       @change="handleChange"
     >
       <template #suffixIcon>
         <svg-icon :name="selected" size="12" />
       </template>
-      <a-select-option value="" label="无">无</a-select-option>
+      <a-select-option value="" :label="t('common.nothing')">{{
+        t('common.nothing')
+      }}</a-select-option>
       <a-select-option
         :value="icon"
         :label="icon"
@@ -27,7 +29,8 @@
 </template>
 
 <script lang="ts">
-import { ref, defineComponent, watchEffect } from 'vue'
+import { ref, defineComponent, watchEffect, computed } from 'vue'
+import { useI18n } from '@/hooks/useI18n'
 import icons from './requireIcon'
 export default defineComponent({
   props: {
@@ -35,10 +38,15 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    placeholder: {
+      type: String,
+    }
   },
   emits: ['change'],
   setup(props, { emit }) {
+    const { t } = useI18n()
     const selected = ref(props.value)
+    const iconPlaceholder = ref(props.placeholder)
     const handleChange = (val) => {
       emit('change', val)
     }
@@ -49,7 +57,9 @@ export default defineComponent({
       selected.value = ''
     }
     return {
+      t,
       icons,
+      iconPlaceholder,
       selected,
       handleChange,
       reset,

@@ -31,8 +31,8 @@ export function createPermissionGuard(router: Router) {
               console.log(route)
               router.addRoute(route)
             })
-
-            if (to.path === "/login") {
+            console.log(to)
+            if (to.path === "/login" || to.path === "/layout") {
               next({
                 name: accessRoutes[0].children[0].name,
                 query: to.query,

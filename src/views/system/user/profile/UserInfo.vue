@@ -1,7 +1,7 @@
 <template>
   <a-row :gutter="24">
     <a-col :span="8">
-      <a-card title="基本信息">
+      <a-card :title="t('routes.user.baseInfo')">
         <div class="flex justify-center">
           <img
             @click="isShowDialog = true"
@@ -16,61 +16,76 @@
           <li
             class="flex justify-between border-b border-b-[#e7eaec] pt-2 pb-2"
           >
-            <span>用户名</span>
+            <span>{{ t('routes.user.userName') }}</span>
             <span>{{ userInfo.userName }}</span>
           </li>
           <li
             class="flex justify-between border-b border-b-[#e7eaec] pt-2 pb-2"
           >
-            <span>手机号</span>
+            <span>{{ t('routes.user.mobile') }}</span>
             <span>{{ userInfo.mobile }}</span>
           </li>
           <li
             class="flex justify-between border-b border-b-[#e7eaec] pt-2 pb-2"
           >
-            <span>用户邮箱</span>
+            <span>{{ t('routes.user.email') }}</span>
             <span>{{ userInfo.email }}</span>
           </li>
           <li
             class="flex justify-between border-b border-b-[#e7eaec] pt-2 pb-2"
           >
-            <span>所属部门</span>
+            <span>{{ t('routes.user.deptId') }}</span>
             <span>{{ userInfo.department.deptName }}</span>
           </li>
           <li
             class="flex justify-between border-b border-b-[#e7eaec] pt-2 pb-2"
           >
-            <span>角色</span>
+            <span>{{ t('routes.user.roleIds') }}</span>
             <span>{{ getRoleName(userInfo.roles) }}</span>
           </li>
           <li
             class="flex justify-between border-b border-b-[#e7eaec] pt-2 pb-2"
           >
-            <span>创建日期</span>
+            <span>{{ t('routes.user.createdAt') }}</span>
             <span>{{ userInfo.createdAt }}</span>
           </li>
         </ul>
       </a-card>
     </a-col>
     <a-col :span="16">
-      <a-card title="信息修改">
+      <a-card :title="t('routes.user.updateInfo')">
         <a-form name="custom-validation" ref="formRef" :model="formState">
-          <a-form-item has-feedback label="用户昵称" name="nickName">
+          <a-form-item
+            has-feedback
+            :label="t('routes.user.nickName')"
+            name="nickName"
+          >
             <a-input
               v-model:value="formState.nickName"
-              placeholder="请输入用户昵称"
+              :placeholder="t('routes.user.userNamePlaceholder')"
             />
           </a-form-item>
-          <a-form-item has-feedback label="手机号码" name="mobile">
+          <a-form-item
+            has-feedback
+            :label="t('routes.user.mobile')"
+            name="mobile"
+          >
             <a-input
               v-model:value="formState.mobile"
-              placeholder="请输入手机号码"
+              :placeholder="t('routes.user.mobilePlaceholder')"
             />
           </a-form-item>
-          <a-form-item has-feedback label="用户邮箱" name="email">
-            <a-input v-model:value="formState.email" placeholder="请输入邮箱" />
+          <a-form-item
+            has-feedback
+            :label="t('routes.user.email')"
+            name="email"
+          >
+            <a-input
+              v-model:value="formState.email"
+              :placeholder="t('routes.user.emailPlaceholder')"
+            />
           </a-form-item>
-          <a-form-item has-feedback label="性别" name="sex">
+          <a-form-item has-feedback :label="t('routes.user.sex')" name="sex">
             <a-radio-group
               v-model:value="formState.sex"
               :options="sexOptions"
@@ -84,9 +99,9 @@
               @click="handleSubmit"
               v-has-permi="['system:user:update']"
             >
-              保存修改
+              {{ t('routes.user.saveUpdate') }}
             </a-button>
-            <a-button @click="resetForm">重置</a-button>
+            <a-button @click="resetForm">{{ t('routes.user.reset') }}</a-button>
           </a-form-item>
         </a-form>
       </a-card>
@@ -96,14 +111,14 @@
   <!-- 用于裁切的弹窗 -->
   <a-modal
     v-model:visible="isShowDialog"
-    title="上传图片"
+    :title="t('routes.user.uploadImage')"
     :maskClosable="false"
     width="750px"
     @cancel="handleCancle"
   >
     <template #footer>
       <a-button class="select-picture">
-        <span>选择图片</span>
+        <span>{{ t('routes.user.selectImage') }}</span>
         <input
           class="absolute top-0 left-0 w-[100%] h-[100%] opacity-0"
           ref="uploadInput"
@@ -117,12 +132,12 @@
         @click="getResult"
         v-has-permi="['system:user:update']"
       >
-        上传
+        {{ t('routes.user.upload') }}
       </a-button>
     </template>
     <div class="flex justify-between">
       <p v-show="!pic" class="text-center w-[100%] text-color-[#999]">
-        请选择图片
+        {{ t('routes.user.selectImagePlaceholder') }}
       </p>
       <!-- 图片裁切插件 -->
       <vue-picture-cropper
@@ -151,13 +166,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, UnwrapRef, reactive, ref, onMounted } from 'vue'
+import {
+  defineComponent,
+  UnwrapRef,
+  reactive,
+  ref,
+  onMounted,
+  computed,
+} from 'vue'
 import { message as Message } from 'ant-design-vue'
 import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
 import { useUserStore } from '@/store/modules/user'
 import VuePictureCropper, { cropper } from 'vue-picture-cropper/dist/esm'
 import { getDict } from '@/utils/dictFormat'
-
 import {
   updateUser,
   uploadAvatar,
@@ -166,6 +187,9 @@ import {
 import defaultAvatar from '@/assets/images/profile.jpg'
 import { imageUrl } from '@/config'
 import { IData } from '@/api/admin/system/dict/data/type'
+import { useI18n } from '@/hooks/useI18n'
+
+const { t } = useI18n()
 
 interface FormState {
   nickName: undefined | string
@@ -180,9 +204,10 @@ export default defineComponent({
   },
   setup() {
     const userStore = useUserStore()
-    const { userInfo } = userStore
+    const userInfo = computed(() => userStore.userInfo)
     const sexOptions = ref<IData[]>([])
     const baseImgUrl = imageUrl
+    console.log(userStore)
     const getRoleName = (roles) => {
       return roles.map((item) => item.roleName).join()
     }
@@ -310,6 +335,7 @@ export default defineComponent({
       })
     })
     return {
+      t,
       userInfo,
       baseImgUrl,
       defaultAvatar,
@@ -318,6 +344,7 @@ export default defineComponent({
       formState,
       sexOptions,
       formRef,
+      result,
       resetForm,
       handleSubmit,
       selectFile,

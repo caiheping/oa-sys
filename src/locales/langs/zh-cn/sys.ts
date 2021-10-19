@@ -1,5 +1,6 @@
 export default {
   api: {
+    operationSuccess: "操作成功",
     operationFailed: "操作失败",
     errorTip: "错误提示",
     errorMessage: "操作失败,系统异常!",
@@ -19,6 +20,10 @@ export default {
     errMsg503: "服务不可用，服务器暂时过载或维护!",
     errMsg504: "网络超时!",
     errMsg505: "http版本不支持该请求!",
+    errMsg400: "参数错误",
+    errTokenExpire: "登录状态已过期，您可以继续留在该页面，或者重新登录"
+
+
   },
   app: {
     logoutTip: "温馨提醒",
@@ -76,7 +81,7 @@ export default {
 
     loginButton: "登录",
     registerButton: "注册",
-    rememberMe: "记住我",
+    rememberMe: "记住我？",
     forgetPassword: "忘记密码?",
     otherSignIn: "其他登录方式",
 

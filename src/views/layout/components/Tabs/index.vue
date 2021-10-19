@@ -137,7 +137,7 @@ export default defineComponent({
       }
     }
 
-    const go = (item: RouteRecordRaw) => {
+    const go = (item: RouteRecordRaw | any) => {
       // console.log(item)
       router.push({
         path: item.path,

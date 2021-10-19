@@ -46,13 +46,12 @@ export default defineComponent({
     SidebarItem,
   },
   setup() {
-    const permissionStore = usePermissionStore()
-    const sidebarRouters = computed(() => permissionStore.sidebarRouters)
     const appStore = useAppStore()
     const isMobile = computed(() => appStore.isMobile)
-    const sideBarConfig = computed(() => appStore.sideBarConfig)
     const sidebarStatus = computed(() => appStore.sidebarStatus)
+    const sideBarConfig = computed(() => appStore.sideBarConfig)
     const collapsed = computed(() => appStore.collapsed)
+    const sidebarRouters = computed(() => usePermissionStore().sidebarRouters)
     const route = useRoute()
     const selectedKeys = ref([''])
     const openKeys = ref([''])
@@ -105,8 +104,8 @@ export default defineComponent({
     }
     return {
       isMobile,
-      sideBarConfig,
       sidebarStatus,
+      sideBarConfig,
       collapsed,
       sidebarRouters,
       changeMode,

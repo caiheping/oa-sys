@@ -1,0 +1,18 @@
+export default {
+  approve: "审批",
+  nickName: "姓名",
+  dateToBeSupplemented: "待补卡日期",
+  makeUpCardType: "补卡类型",
+  makeUpCardReason: "补卡原因",
+  createdAt: "创建时间",
+  status: "审批状态",
+  remark: "审批备注",
+  action: "操作",
+  nickNamePlaceholder: "请输入姓名",
+  statusPlaceholder: "请选择审批状态",
+  cardRenewalDate: "补卡日期",
+  createdAtPlaceholder: "请选择创建时间",
+  makeUpCardTypePlaceholder: "请选择补卡类型",
+  cardRenewalDatePlaceholder: "请选择补卡日期",
+  makeUpCardReasonPlaceholder: "请输入补卡原因",
+}

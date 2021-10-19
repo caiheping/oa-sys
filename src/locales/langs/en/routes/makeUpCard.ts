@@ -1,0 +1,18 @@
+export default {
+  approve: "approve",
+  nickName: "nickName",
+  dateToBeSupplemented: "Date to be supplemented",
+  makeUpCardType: "type",
+  makeUpCardReason: "reason",
+  createdAt: "createdAt",
+  status: "status",
+  remark: "remark",
+  action: "action",
+  nickNamePlaceholder: "Please enter your name",
+  statusPlaceholder: "Please select approval status",
+  cardRenewalDate: "Card renewal date",
+  createdAtPlaceholder: "Please select the creation time",
+  makeUpCardTypePlaceholder: "Please select the card replacement type",
+  cardRenewalDatePlaceholder: "Please select the card replacement date",
+  makeUpCardReasonPlaceholder: "Please enter the reason for card replacement",
+}

@@ -38,7 +38,7 @@
         "
       >
         <a-tooltip>
-          <template #title>搜索</template>
+          <template #title>{{ t('common.searchText') }}</template>
           <svg-icon name="search" size="20px" />
         </a-tooltip>
       </div>
@@ -56,11 +56,11 @@
         "
       >
         <a-tooltip v-if="!isFullscreen">
-          <template #title>全屏</template>
+          <template #title>{{ t('layout.header.tooltipEntryFull') }}</template>
           <svg-icon name="fullScreen" size="20px" />
         </a-tooltip>
         <a-tooltip v-else>
-          <template #title>退出全屏</template>
+          <template #title>{{ t('layout.header.tooltipExitFull') }}</template>
           <svg-icon name="exitFullScreen" size="20px" />
         </a-tooltip>
       </div>
@@ -116,10 +116,12 @@
         <template #overlay>
           <a-menu @click="handleMenuClick">
             <a-menu-item key="1">
-              <span>个人中心</span>
+              <span>{{ t('layout.header.personalCenter') }}</span>
             </a-menu-item>
             <a-menu-divider />
-            <a-menu-item key="3">退出登录</a-menu-item>
+            <a-menu-item key="3">{{
+              t('layout.header.dropdownItemLoginOut')
+            }}</a-menu-item>
           </a-menu>
         </template>
       </a-dropdown>
@@ -136,40 +138,41 @@
         "
       >
         <a-tooltip>
-          <template #title>设置</template>
+          <template #title>{{ t('layout.header.setting') }}</template>
           <svg-icon name="setting" size="20px" />
         </a-tooltip>
       </div>
 
       <!-- setting -->
       <a-drawer
-        title="系统配置"
+        width="360px"
+        :title="t('layout.setting.systemConfiguration')"
         :placement="placement"
         :maskClosable="false"
         :visible="openSetting"
         @close="onClose"
       >
-        <a-divider>侧边栏</a-divider>
+        <a-divider>{{ t('layout.setting.sidebar') }}</a-divider>
         <div class="flex justify-between items-center mb-3">
-          <span>是否显示logo</span>
+          <span>{{ t('layout.setting.showLogo') }}</span>
           <a-switch v-model:checked="sideBarConfig.showLogo" />
         </div>
         <div class="flex justify-between items-center mb-3">
-          <span>菜单类型</span>
+          <span>{{ t('layout.setting.sidebarType') }}</span>
           <a-select v-model:value="sideBarConfig.mode" style="width: 120px">
             <a-select-option value="inline">inline</a-select-option>
             <a-select-option value="vertical">vertical</a-select-option>
           </a-select>
         </div>
         <div class="flex justify-between items-center mb-3">
-          <span>菜单主题</span>
+          <span>{{ t('layout.setting.sidebarTheme') }}</span>
           <a-select v-model:value="sideBarConfig.theme" style="width: 120px">
             <a-select-option value="dark">dark</a-select-option>
             <a-select-option value="light">light</a-select-option>
           </a-select>
         </div>
         <div class="flex justify-between items-center mb-3">
-          <span>菜单宽度</span>
+          <span>{{ t('layout.setting.expandedMenuWidth') }}</span>
           <a-input-number
             v-model:value="sideBarConfig.width"
             :min="200"
@@ -177,33 +180,35 @@
           />
         </div>
 
-        <a-divider>头部</a-divider>
+        <a-divider>{{ t('layout.setting.header') }}</a-divider>
         <div class="flex justify-between items-center mb-3">
-          <span>是否显示标题</span>
+          <span>{{ t('layout.setting.showTitle') }}</span>
           <a-switch v-model:checked="headerConfig.showTitle" />
         </div>
         <div class="flex justify-between items-center mb-3">
-          <span>是否显示搜索</span>
+          <span>{{ t('layout.setting.showSearch') }}</span>
           <a-switch v-model:checked="headerConfig.showSearch" />
         </div>
         <div class="flex justify-between items-center mb-3">
-          <span>是否显示全屏</span>
+          <span>{{ t('layout.setting.showFull') }}</span>
           <a-switch v-model:checked="headerConfig.showFullScreen" />
         </div>
         <div class="flex justify-between items-center mb-3">
-          <span>是否显示语言</span>
+          <span>{{ t('layout.setting.showLanguage') }}</span>
           <a-switch v-model:checked="headerConfig.showLocale" />
         </div>
         <div class="flex justify-between items-center mb-3">
-          <span>是否显示tabs</span>
+          <span>{{ t('layout.setting.showTabs') }}</span>
           <a-switch v-model:checked="headerConfig.showTabs" />
         </div>
         <a-divider />
         <div class="flex justify-center items-center mb-3">
           <a-button @click="handleSaveSetting" type="primary" class="mr-3">
-            保存设置
+            {{ t('common.saveText') }}
           </a-button>
-          <a-button @click="handleResetSetting">重置</a-button>
+          <a-button @click="handleResetSetting">{{
+            t('common.resetText')
+          }}</a-button>
         </div>
       </a-drawer>
     </div>
@@ -218,6 +223,7 @@ import { message as Message } from 'ant-design-vue'
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons-vue'
 import avatar from '@/assets/images/profile.jpg'
 import settings from '@/settings'
+import { useI18n } from '@/hooks/useI18n'
 import router from '@/router'
 import { useFullscreen } from '@vueuse/core'
 import { imageUrl } from '@/config'
@@ -234,6 +240,7 @@ export default defineComponent({
     MenuUnfoldOutlined,
   },
   setup() {
+    const { t } = useI18n()
     const placement = ref<string>('right')
     const openSetting = ref<boolean>(false)
     const baseImgUrl = imageUrl
@@ -242,7 +249,8 @@ export default defineComponent({
     const headerConfig = computed(() => appStore.headerConfig)
     const sideBarConfig = computed(() => appStore.sideBarConfig)
     const userStore = useUserStore()
-    const { userInfo } = userStore
+    const userInfo = computed(() => userStore.userInfo)
+
     const { toggle, isFullscreen } = useFullscreen()
     // 改变菜单栏状态
     const toggleCollapsed = () => {
@@ -262,6 +270,7 @@ export default defineComponent({
         const res = await userStore.Logout()
         if (res.code === 0) {
           router.replace(`/redirect/login`)
+          window.location.reload()
         }
       }
     }
@@ -286,7 +295,7 @@ export default defineComponent({
         headerConfig: appStore.headerConfig,
       }
       localStorage.setItem('sysSettings', JSON.stringify(settings))
-      Message.success('保存成功')
+      Message.success(t('sys.api.operationSuccess'))
       openSetting.value = false
     }
 
@@ -296,11 +305,12 @@ export default defineComponent({
     }
 
     return {
-      toggleCollapsed,
-      userInfo,
+      t,
       collapsed,
       headerConfig,
       sideBarConfig,
+      userInfo,
+      toggleCollapsed,
       avatar,
       baseImgUrl,
       settings,

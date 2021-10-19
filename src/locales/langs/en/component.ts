@@ -24,8 +24,12 @@ export default {
     maxTip: "The number of characters should be less than {0}",
     apiSelectNotFound: "Wait for data loading to complete...",
   },
+  deptSearch: {
+    placeholder: "Please enter department name"
+  },
   icon: {
     placeholder: "Click the select icon",
+    nothing: "nothing",
     search: "Search icon",
     copy: "Copy icon successfully!",
   },

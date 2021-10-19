@@ -3,6 +3,7 @@ export default {
   header: {
     // user dropdown
     dropdownItemDoc: "文档",
+    personalCenter: "个人中心",
     dropdownItemLoginOut: "退出系统",
 
     // tooltip
@@ -19,6 +20,7 @@ export default {
     lockScreenBtn: "锁定",
 
     home: "首页",
+    setting: "设置",
   },
   multipleTab: {
     reload: "重新加载",
@@ -29,6 +31,8 @@ export default {
     closeAll: "关闭全部标签页",
   },
   setting: {
+    systemConfiguration: "系统配置",
+    showLogo: "显示Logo",
     // content mode
     contentModeFull: "流式",
     contentModeFixed: "定宽",
@@ -59,6 +63,11 @@ export default {
     clearBtn: "清空缓存并返回登录页",
 
     drawerTitle: "项目配置",
+    showTitle: "是否显示标题",
+    showSearch: "是否显示搜索",
+    showFull: "是否显示全屏",
+    showLanguage: "是否显示语言",
+    showTabs: "是否显示tabs",
 
     darkMode: "主题",
     navMode: "导航栏模式",
@@ -89,6 +98,7 @@ export default {
     tabsRedoBtn: "标签页刷新按钮",
     tabsFoldBtn: "标签页折叠按钮",
     sidebar: "左侧菜单",
+    sidebarType: "菜单类型",
     header: "顶栏",
     footer: "页脚",
     fullContent: "全屏内容",

@@ -1,0 +1,17 @@
+export default {
+  approve: "审批",
+  nickName: "姓名",
+  workOverTimeDuration: "加班时长",
+  workOverTimeReason: "加班原因",
+  startTime: "开始时间",
+  endTime: "结束时间",
+  createdAt: "创建时间",
+  status: "审批状态",
+  remark: "审批备注",
+  action: "操作",
+  nickNamePlaceholder: "请输入姓名",
+  statusPlaceholder: "请选择审批状态",
+  startTimePlaceholder: "请选择加班时间",
+  selectTime: "选择时间",
+  workOverTimeReasonPlaceholder: "请输入加班原因",
+}

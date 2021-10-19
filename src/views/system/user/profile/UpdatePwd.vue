@@ -8,24 +8,36 @@
     :wrapperCol="layout.wrapperCol"
     class="w-100"
   >
-    <a-form-item has-feedback label="原始密码" name="oldPassword">
+    <a-form-item
+      has-feedback
+      :label="t('routes.user.oldPassword')"
+      name="oldPassword"
+    >
       <a-input-password
         v-model:value="formState.oldPassword"
-        placeholder="请输入原始密码"
+        :placeholder="t('routes.user.oldPasswordPlaceholder')"
         type="password"
       />
     </a-form-item>
-    <a-form-item has-feedback label="新密码" name="newPassword">
+    <a-form-item
+      has-feedback
+      :label="t('routes.user.newPassword')"
+      name="newPassword"
+    >
       <a-input-password
         v-model:value="formState.newPassword"
-        placeholder="请输入新密码"
+        :placeholder="t('routes.user.newPasswordPlaceholder')"
         type="password"
       />
     </a-form-item>
-    <a-form-item has-feedback label="确认密码" name="confirmPassword">
+    <a-form-item
+      has-feedback
+      :label="t('routes.user.confirmPassword')"
+      name="confirmPassword"
+    >
       <a-input-password
         v-model:value="formState.confirmPassword"
-        placeholder="请输入确认新密码"
+        :placeholder="t('routes.user.confirmPasswordPlaceholder')"
         type="password"
       />
     </a-form-item>
@@ -37,9 +49,9 @@
         @click="handleSubmit"
         v-has-permi="['system:user:update']"
       >
-        保存修改
+        {{ t('routes.user.saveUpdate') }}
       </a-button>
-      <a-button @click="resetForm">重置</a-button>
+      <a-button @click="resetForm">{{ t('routes.user.reset') }}</a-button>
     </a-form-item>
   </a-form>
 </template>
@@ -49,6 +61,9 @@ import { updateUserPwd } from '@/api/admin/system/user'
 import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface'
 import { message as Message } from 'ant-design-vue'
 import { useUserStore } from '@/store/modules/user'
+import { useI18n } from '@/hooks/useI18n'
+
+const { t } = useI18n()
 
 interface FormState {
   oldPassword: undefined | string
@@ -67,7 +82,7 @@ export default defineComponent({
 
     const equalToPassword = (rule, value) => {
       if (formState.newPassword !== value) {
-        return Promise.reject('两次密码不一致')
+        return Promise.reject(t('routes.user.InconsistentPasswords'))
       } else {
         return Promise.resolve()
       }
@@ -75,11 +90,24 @@ export default defineComponent({
 
     const rules = {
       oldPassword: [
-        { required: true, message: '旧密码不能为空', trigger: 'blur' },
+        {
+          required: true,
+          message: t('routes.user.oldPasswordCannotBeEmpty'),
+          trigger: 'blur',
+        },
       ],
       newPassword: [
-        { required: true, message: '新密码不能为空', trigger: 'blur' },
-        { min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur' },
+        {
+          required: true,
+          message: t('routes.user.newPasswordCannotBeEmpty'),
+          trigger: 'blur',
+        },
+        {
+          min: 6,
+          max: 20,
+          message: t('routes.user.checkStringLength'),
+          trigger: 'blur',
+        },
       ],
       confirmPassword: [
         {
@@ -116,6 +144,7 @@ export default defineComponent({
     }
 
     return {
+      t,
       formState,
       formRef,
       rules,

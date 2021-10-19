@@ -7,7 +7,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, provide } from 'vue'
+import { defineComponent, provide, computed } from 'vue'
 import AppProvider from '@/components/AppProvider/index.vue'
 import enUS from 'ant-design-vue/es/locale/en_US'
 import zhCN from 'ant-design-vue/es/locale/zh_CN'

@@ -43,15 +43,9 @@ const settings: Settings = {
    */
   sidebarLogo: false,
 
-  /**
-   * @type {string | array} 'production' | ['production', 'development']
-   * @description Need show err logs component.
-   * The default is only used in the production env
-   * If you want to also use it in dev, you can pass ['production', 'development']
-   */
-  version: "1.0.1",
-  companyName: "版权所有 ©2021 广州云积软件技术有限公司",
-  title: "xxx系统",
+  version: "1.0.0",
+  companyName: "版权所有 ©2021 xxx公司",
+  title: "xxx - 员工管理系统",
 }
 
 export default settings

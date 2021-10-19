@@ -17,8 +17,8 @@
       marginLeft: isMobile
         ? '0px'
         : collapsed
-        ? '80px'
-        : sideBarConfig.width + 'px',
+          ? '80px'
+          : sideBarConfig.width + 'px',
     }"
   >
     <div class="header" :style="headerStyle">
@@ -60,8 +60,8 @@ export default defineComponent({
     const appStore = useAppStore()
     const isMobile = computed(() => appStore.isMobile)
     const sidebarStatus = computed(() => appStore.sidebarStatus)
-    const collapsed = computed(() => appStore.collapsed)
     const sideBarConfig = computed(() => appStore.sideBarConfig)
+    const collapsed = computed(() => appStore.collapsed)
     const headerConfig = computed(() => appStore.headerConfig)
     // 改变遮罩层状态
     const toggleDrawer = () => {

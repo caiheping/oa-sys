@@ -1,6 +1,8 @@
 <template>
   <div class="mr-25 bg-white p-6 w-100">
-    <h3 class="text-xl text-center mb-5 font-bold">登 录</h3>
+    <h3 class="text-xl text-center mb-5 font-bold">
+      {{ t('sys.login.signInFormTitle') }}
+    </h3>
     <a-form
       name="custom-validation"
       ref="formRef"
@@ -14,7 +16,7 @@
         <a-input
           size="large"
           v-model:value="formState.userName"
-          placeholder="请输入用户名"
+          :placeholder="t('sys.login.accountPlaceholder')"
         >
           <template #prefix>
             <UserOutlined style="color: rgba(0, 0, 0, 0.25)" />
@@ -26,7 +28,7 @@
           size="large"
           v-model:value="formState.password"
           type="password"
-          placeholder="请输入密码"
+          :placeholder="t('sys.login.passwordPlaceholder')"
         >
           <template #prefix>
             <LockOutlined style="color: rgba(0, 0, 0, 0.25)" />
@@ -38,7 +40,7 @@
           <a-input
             size="large"
             v-model:value="formState.captcha"
-            placeholder="请输入验证码"
+            :placeholder="t('sys.login.smsPlaceholder')"
           >
             <template #prefix>
               <SafetyOutlined style="color: rgba(0, 0, 0, 0.25)" />
@@ -47,7 +49,9 @@
           <div class="login-captcha" v-html="codeHtml" @click="getCode"></div>
         </div>
       </a-form-item>
-      <a-checkbox v-model:checked="checked">记住我？</a-checkbox>
+      <a-checkbox v-model:checked="checked">
+        {{ t('sys.login.rememberMe') }}
+      </a-checkbox>
       <a-form-item :wrapper-col="{ span: 24, offset: 0 }">
         <a-button
           class="mt-5"
@@ -55,8 +59,9 @@
           html-type="submit"
           size="large"
           style="width: 100%"
-        >{{ t('sys.login.loginButton') }}</a-button
         >
+          {{ t('sys.login.loginButton') }}
+        </a-button>
       </a-form-item>
     </a-form>
   </div>
@@ -111,21 +116,21 @@ export default defineComponent({
       userName: [
         {
           required: true,
-          message: '请输入用户名',
+          message: t('sys.login.accountPlaceholder'),
           trigger: 'blur',
         },
       ],
       password: [
         {
           required: true,
-          message: '请输入密码',
+          message: t('sys.login.passwordPlaceholder'),
           trigger: 'blur',
         },
       ],
       captcha: [
         {
           required: true,
-          message: '请输入验证码',
+          message: t('sys.login.smsPlaceholder'),
           trigger: 'blur',
         },
       ],
@@ -134,6 +139,7 @@ export default defineComponent({
     // 获取验证码
     const codeHtml: any = ref()
     const getCode = () => {
+      console.log(t('sys.lock.unlock'))
       return getCodeImg().then((res) => {
         codeHtml.value = res
       })
@@ -142,9 +148,8 @@ export default defineComponent({
     const handleFinish = async () => {
       const params = unref(formState)
       const res = await userStore.Login(params, checked.value)
-      console.log(res.code)
       if (res && res.code === 0) {
-        router.replace('/layout/home')
+        router.replace('/layout')
       }
     }
     // 校验失败
@@ -164,6 +169,7 @@ export default defineComponent({
     })
 
     return {
+      t,
       formState,
       formRef,
       layout,
@@ -172,7 +178,6 @@ export default defineComponent({
       handleFinish,
       codeHtml,
       getCode,
-      t,
       checked,
     }
   },

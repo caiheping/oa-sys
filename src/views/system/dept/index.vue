@@ -2,7 +2,9 @@
   <div class="p-4">
     <a-row :gutter="10" class="mb-2">
       <a-col v-has-permi="['system:department:add']">
-        <a-button color="success" @click="handleAdd">新增</a-button>
+        <a-button color="success" @click="handleAdd">{{
+          t('common.add')
+        }}</a-button>
       </a-col>
     </a-row>
     <a-table
@@ -20,7 +22,9 @@
       </template>
       <template #status="{ record }">
         <div class="flex justify-center">
-          <span>{{ record.status === '1' ? '正常' : '停用' }}</span>
+          <span>{{
+            record.status === '1' ? t('common.normal') : t('common.deactivate')
+          }}</span>
         </div>
       </template>
       <template #action="{ record }">
@@ -32,7 +36,7 @@
             @click="handleAdd(record)"
             v-has-permi="['system:department:add']"
           >
-            新增
+            {{ t('common.add') }}
           </a-button>
           <a-button
             type="link"
@@ -41,12 +45,12 @@
             @click="handleUpdate(record)"
             v-has-permi="['system:department:update']"
           >
-            修改
+            {{ t('common.update') }}
           </a-button>
           <a-popconfirm
-            title="确定要删除该数据吗？"
-            ok-text="确定"
-            cancel-text="取消"
+            :title="t('common.confirmDelete')"
+            :ok-text="t('common.okText')"
+            :cancel-text="t('common.cancelText')"
             @confirm="confirm(record)"
             @cancel="cancel"
           >
@@ -55,7 +59,7 @@
               color="error"
               v-has-permi="['system:department:delete']"
             >
-              删除
+              {{ t('common.delete') }}
             </a-button>
           </a-popconfirm>
         </span>
@@ -81,37 +85,40 @@
       >
         <a-row>
           <a-col :span="12" v-show="formState.parentId !== 0">
-            <a-form-item label="上级部门" name="parentId">
+            <a-form-item
+              :label="t('routes.dept.superiorDepartment')"
+              name="parentId"
+            >
               <treeselect
                 ref="treeRef"
                 class="!mt-[3px]"
                 v-model:value="formState.parentId"
                 :normalizer="normalizer"
-                placeholder="请选择上级部门"
+                :placeholder="t('routes.dept.superiorDepartmentPlaceholder')"
                 :options="deptOptions"
                 @select="handleTreeSelect"
               />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="部门名称" name="deptName">
+            <a-form-item :label="t('routes.dept.deptName')" name="deptName">
               <a-input
                 v-model:value="formState.deptName"
-                placeholder="请输入部门名称"
+                :placeholder="t('routes.dept.deptNamePlaceholder')"
               />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="显示排序" name="orderNum">
+            <a-form-item :label="t('routes.dept.orderNum')" name="orderNum">
               <a-input-number
                 class="!w-[100%]"
                 v-model:value="formState.orderNum"
-                placeholder="请输入显示排序"
+                :placeholder="t('routes.dept.orderNumPlaceholder')"
               />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="部门状态" name="status">
+            <a-form-item :label="t('routes.dept.status')" name="status">
               <a-radio-group
                 v-model:value="formState.status"
                 :options="disableOptions"
@@ -121,9 +128,11 @@
           <a-col :span="24">
             <a-form-item>
               <a-button type="primary" class="mr-3" @click="handleSubmit">
-                确认
+                {{ t('common.okText') }}
               </a-button>
-              <a-button @click="handleClose">取消</a-button>
+              <a-button @click="handleClose">{{
+                t('common.cancelText')
+              }}</a-button>
             </a-form-item>
           </a-col>
         </a-row>
@@ -160,6 +169,9 @@ import 'vue3-treeselect/dist/vue3-treeselect.css'
 import { IDept } from '@/api/admin/system/dept/type'
 import { IData } from '@/api/admin/system/dict/data/type'
 import { getDict } from '@/utils/dictFormat'
+import { useI18n } from '@/hooks/useI18n'
+
+const { t } = useI18n()
 
 interface FormState {
   deptId: undefined | number
@@ -172,31 +184,31 @@ interface FormState {
 // 表头配置
 const columns = [
   {
-    title: '部门名称',
+    title: t('routes.dept.deptName'),
     dataIndex: 'deptName',
     key: 'deptName',
   },
   {
-    title: '排序',
+    title: t('routes.dept.orderNum'),
     dataIndex: 'orderNum',
     key: 'orderNum',
     align: 'center',
   },
   {
-    title: '状态',
+    title: t('routes.dept.status'),
     dataIndex: 'status',
     key: 'status',
     align: 'center',
     slots: { customRender: 'status' },
   },
   {
-    title: '创建时间',
+    title: t('routes.dept.createdAt'),
     dataIndex: 'createdAt',
     key: 'createdAt',
     align: 'center',
   },
   {
-    title: '操作',
+    title: t('routes.dept.action'),
     key: 'action',
     align: 'center',
     slots: { customRender: 'action' },
@@ -207,27 +219,31 @@ export default defineComponent({
     Treeselect,
   },
   setup() {
+    const loading = computed(() => useAppStore().loading)
     const disableOptions = ref<IData[]>([])
     const userStore = useUserStore()
-    const loading = computed(() => useAppStore().loading)
     const treeRef = ref()
     const rules = {
       parentId: [
         {
           required: true,
           validator: formRules.number,
-          message: '上级部门不能为空',
+          message: t('routes.dept.superiorDepartmentCannotBeBlank'),
           trigger: 'change',
         },
       ],
       deptName: [
-        { required: true, message: '部门名称不能为空', trigger: 'blur' },
+        {
+          required: true,
+          message: t('routes.dept.deptNameCannotBeBlank'),
+          trigger: 'blur',
+        },
       ],
       orderNum: [
         {
           required: true,
           validator: formRules.number,
-          message: '显示排序不能为空',
+          message: t('routes.dept.orderNumCannotBeBlank'),
           trigger: 'blur',
         },
       ],
@@ -313,13 +329,13 @@ export default defineComponent({
     const confirm = (row) => {
       delDept(row.deptId).then(() => {
         getList()
-        Message.success('删除成功')
+        Message.success(t('common.deleteSuccess'))
       })
     }
     // 取消删除
     const cancel = (e: MouseEvent) => {
       console.log(e)
-      Message.success('取消删除')
+      Message.success(t('common.cancelDelete'))
     }
 
     // 新增按钮操作
@@ -343,7 +359,7 @@ export default defineComponent({
         deptOptions.value = parent
 
         open.value = true
-        drawerTitle.value = '添加部门'
+        drawerTitle.value = t('common.add')
         if (row != null && row.deptId) {
           nextTick(() => {
             formState.parentId = row.deptId
@@ -380,7 +396,7 @@ export default defineComponent({
 
         getDeptById(row.deptId).then((res) => {
           open.value = true
-          drawerTitle.value = '修改部门'
+          drawerTitle.value = t('common.update')
           nextTick(() => {
             Object.keys(formState).forEach((key) => {
               formState[key] = res.data[key]
@@ -410,6 +426,7 @@ export default defineComponent({
     })
 
     return {
+      t,
       loading,
       deptList,
       confirm,

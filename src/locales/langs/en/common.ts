@@ -2,6 +2,8 @@ export default {
   okText: "OK",
   closeText: "Close",
   cancelText: "Cancel",
+  confirmDelete: "Are you sure you want to delete this data?",
+  confirmDeleteSelect: "Are you sure you want to delete the selected data?",
   loadingText: "Loading...",
   saveText: "Save",
   delText: "Delete",
@@ -17,4 +19,19 @@ export default {
 
   light: "Light",
   dark: "Dark",
+
+  deleteSuccess: "delete success",
+  cancelDelete: "cancel delete",
+  search: "search",
+  add: "add",
+  update: "update",
+  delete: "delete",
+  detail: 'detail',
+  export: "export",
+  import: "import",
+  normal: 'normal',
+  deactivate: 'deactivate',
+  show: 'show',
+  hidden: 'hidden',
+  clearAll: 'clearAll',
 }
