@@ -29,7 +29,7 @@
 </template>
 
 <script lang="ts">
-import { ref, defineComponent, watchEffect, computed } from 'vue'
+import { ref, defineComponent, watchEffect } from 'vue'
 import { useI18n } from '@/hooks/useI18n'
 import icons from './requireIcon'
 export default defineComponent({
@@ -40,7 +40,7 @@ export default defineComponent({
     },
     placeholder: {
       type: String,
-    }
+    },
   },
   emits: ['change'],
   setup(props, { emit }) {
