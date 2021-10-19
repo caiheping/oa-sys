@@ -7,6 +7,11 @@
     "serve": "vite preview",
     "lint": "eslint --ext .js,ts,.vue src --fix"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint"
+    }
+  },
   "dependencies": {
     "@vueuse/core": "^5.0.2",
     "all": "^0.0.0",
@@ -35,6 +40,7 @@
     "eslint-define-config": "^1.0.8",
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-vue": "^7.9.0",
+    "husky": "^4.3.8",
     "less": "^4.1.1",
     "less-loader": "^8.1.1",
     "prettier": "^2.2.1",
