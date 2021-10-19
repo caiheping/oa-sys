@@ -149,7 +149,7 @@ export default defineComponent({
       const params = unref(formState)
       const res = await userStore.Login(params, checked.value)
       if (res && res.code === 0) {
-        router.replace('/layout/home')
+        router.replace('/layout')
       }
     }
     // 校验失败

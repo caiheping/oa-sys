@@ -3,7 +3,7 @@
     <a-select
       v-model:value="selected"
       style="width: 100%"
-      :placeholder="t('common.resetText')"
+      :placeholder="iconPlaceholder || t('common.resetText')"
       option-label-prop="label"
       @change="handleChange"
     >
@@ -38,11 +38,15 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    placeholder: {
+      type: String,
+    },
   },
   emits: ['change'],
   setup(props, { emit }) {
     const { t } = useI18n()
     const selected = ref(props.value)
+    const iconPlaceholder = ref(props.placeholder)
     const handleChange = (val) => {
       emit('change', val)
     }
@@ -55,6 +59,7 @@ export default defineComponent({
     return {
       t,
       icons,
+      iconPlaceholder,
       selected,
       handleChange,
       reset,
