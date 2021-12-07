@@ -97,10 +97,15 @@ export default defineComponent({
       return style
     })
     const handleClick = ({ key }: { key: string }) => {
-      // console.log(key)
-      router.push({
-        name: key,
-      })
+      const reg =
+        /^(https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]$/i
+      if (reg.test(key)) {
+        window.location.href = key
+      } else {
+        router.push({
+          name: key,
+        })
+      }
     }
     return {
       isMobile,
