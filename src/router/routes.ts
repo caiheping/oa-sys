@@ -1,4 +1,4 @@
-import type { RouteRecordRaw } from 'vue-router'
+import type { RouteRecordRaw } from "vue-router"
 
 // @ts-ignore
 interface AppRouteRecordRaw extends RouteRecordRaw {
@@ -8,14 +8,14 @@ interface AppRouteRecordRaw extends RouteRecordRaw {
   hidden?: boolean;
   redirect?: string;
   children?: AppRouteRecordRaw[];
-  meta?: RouteMeta
+  meta?: RouteMeta;
 }
 
 interface RouteMeta {
-  title: string,
-  menuType?: string,
-  noCache?: boolean, // 不缓存
-  icon?: string
+  title: string;
+  menuType?: string;
+  noCache?: boolean; // 不缓存
+  icon?: string;
 }
 
 const constantRoutes: AppRouteRecordRaw[] = [
@@ -36,7 +36,7 @@ const constantRoutes: AppRouteRecordRaw[] = [
       {
         path: "/redirect/:path(.*)",
         name: "Redirect",
-        component: import("@/views/redirect/index.vue"),
+        component: () => import("@/views/redirect/index.vue"),
       },
     ],
   },
